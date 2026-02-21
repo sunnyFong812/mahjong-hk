@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="zh-HK">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>港式麻雀 Online - 4人聯機</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+
+<div id="connection-status" class="connection-status status-disconnected" style="
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    padding: 5px 10px;
+    border-radius: 5px;
+    font-size: 12px;
+    z-index: 9999;
+    background: #dc3545;
+    color: white;" >未連接</div>
+
+<style>
+.connection-status.status-connected { background: #28a745; }
+.connection-status.status-error { background: #dc3545; }
+.connection-status.status-connecting { background: #ffc107; color: black; }
+</style>
+<body>
+    <div class="container">
+        <!-- 登入畫面 -->
+        <div id="login-screen" class="screen">
+            <div class="login-box">
+                <h1>港式麻雀</h1>
+                <div class="input-group">
+                    <label>玩家名字</label>
+                    <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" value="玩家">
+                </div>
+                <div class="input-group">
+                    <label>房間號碼</label>
+                    <input type="text" id="room-id" placeholder="例如: 1234" value="test123">
+                </div>
+                <button onclick="joinRoom()" class="btn-primary">加入房間</button>
+                <button onclick="createRoom()" class="btn-secondary">創建房間</button>
+            </div>
+        </div>
+        
+        <!-- 大廳畫面 -->
+        <div id="lobby-screen" class="screen" style="display: none;">
+            <div class="lobby-box">
+                <h2>房間: <span id="display-room-id"></span></h2>
+                
+                <div class="players-container">
+                    <div class="player-slot" id="player0">
+                        <div class="position">東</div>
+                        <div class="player-info">等待中...</div>
+                        <div class="ready-status"></div>
+                    </div>
+                    <div class="player-slot" id="player1">
+                        <div class="position">南</div>
+                        <div class="player-info">等待中...</div>
+                        <div class="ready-status"></div>
+                    </div>
+                    <div class="player-slot" id="player2">
+                        <div class="position">西</div>
+                        <div class="player-info">等待中...</div>
+                        <div class="ready-status"></div>
+                    </div>
+                    <div class="player-slot" id="player3">
+                        <div class="position">北</div>
+                        <div class="player-info">等待中...</div>
+                        <div class="ready-status"></div>
+                    </div>
+                </div>
+                
+                <div class="lobby-controls">
+                    <button id="ready-button" onclick="toggleReady()" class="btn-primary">準備</button>
+                    <button onclick="leaveRoom()" class="btn-danger">離開房間</button>
+                </div>
+                
+                <div id="countdown" class="countdown" style="display: none;">
+                    遊戲即將開始: <span id="countdown-seconds">3</span>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 遊戲畫面 -->
+        <div id="game-screen" class="screen" style="display: none;">
+            <canvas id="game-canvas" width="1200" height="700"></canvas>
+            
+            <div id="action-buttons" class="action-buttons">
+                <button id="btn-chow" class="btn-action" disabled>吃</button>
+                <button id="btn-pong" class="btn-action" disabled>碰</button>
+                <button id="btn-kong" class="btn-action" disabled>槓</button>
+                <button id="btn-mahjong" class="btn-action mahjong" disabled>食糊</button>
+                <button id="btn-pass" class="btn-action" disabled>過</button>
+            </div>
+            
+            <div id="game-info" class="game-info">
+                <div id="wind-display"></div>
+                <div id="scores-display"></div>
+                <div id="wall-size"></div>
+            </div>
+            
+            <div id="win-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h2>食糊！</h2>
+                    <div id="win-details"></div>
+                    <div id="win-total" class="win-total"></div>
+                    <button onclick="closeWinModal()" class="btn-primary">確定</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="js/socket.js"></script>
+    <script src="js/renderer.js"></script>
+    <script src="js/input.js"></script>
+    <script src="js/game.js"></script>
+</body>
+</html>
