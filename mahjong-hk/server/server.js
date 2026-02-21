@@ -7,12 +7,12 @@ const cors = require('cors');
 const app = express();
 const server = http.createServer(app);
 
-// 設定 CORS
+// 設定 CORS - 移除無效嘅網址
 app.use(cors({
   origin: [
     'http://localhost:3000',
-    'https://mahjong-hk.onrender.com',  // 你嘅 Render 網址
-    'https://你的-netlify-網址.netlify.app' // 之後加 Netlify 網址
+    'https://mahjong-hk.onrender.com'
+    // 暫時唔加 Netlify 網址，等之後再加
   ],
   credentials: true
 }));
@@ -32,7 +32,7 @@ app.get('/api/test', (req, res) => {
 
 const io = new Server(server, {
   cors: {
-    origin: "*",
+    origin: "*",  // 開發階段用 *，之後再收緊
     methods: ["GET", "POST"],
     credentials: true
   },
