@@ -1,0 +1,355 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Microsoft YaHei', Arial, sans-serif;
+    background: linear-gradient(135deg, #1a4d2a 0%, #2d6a4f 100%);
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #333;
+}
+
+.container {
+    width: 1200px;
+    height: 700px;
+    background-color: #2a6f2a;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    position: relative;
+    overflow: hidden;
+    border: 8px solid #8b5a2b;
+}
+
+.screen {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+/* 登入畫面 */
+.login-box {
+    width: 400px;
+    margin: 150px auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+    text-align: center;
+}
+
+.login-box h1 {
+    color: #d4a373;
+    margin-bottom: 30px;
+    font-size: 36px;
+    text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.input-group {
+    margin-bottom: 20px;
+    text-align: left;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 5px;
+    color: #555;
+    font-weight: bold;
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: border-color 0.3s;
+}
+
+.input-group input:focus {
+    outline: none;
+    border-color: #d4a373;
+}
+
+/* 按鈕樣式 */
+.btn-primary {
+    background: #d4a373;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin: 5px;
+    font-weight: bold;
+}
+
+.btn-primary:hover {
+    background: #b5835a;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin: 5px;
+    font-weight: bold;
+}
+
+.btn-secondary:hover {
+    background: #5a6268;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: white;
+    border: none;
+    padding: 12px 30px;
+    border-radius: 8px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: background 0.3s;
+    margin: 5px;
+    font-weight: bold;
+}
+
+.btn-danger:hover {
+    background: #c82333;
+}
+
+.btn-action {
+    background: #ffd966;
+    color: #333;
+    border: 2px solid #b5835a;
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: all 0.3s;
+    font-weight: bold;
+    min-width: 80px;
+}
+
+.btn-action:hover:not(:disabled) {
+    background: #ffe68f;
+    transform: scale(1.05);
+}
+
+.btn-action.mahjong {
+    background: #ff6b6b;
+    color: white;
+    border-color: #c92a2a;
+}
+
+.btn-action:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 大廳畫面 */
+.lobby-box {
+    width: 600px;
+    margin: 100px auto;
+    background: rgba(255, 255, 255, 0.95);
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+}
+
+.lobby-box h2 {
+    color: #d4a373;
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.players-container {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.player-slot {
+    background: #f8f9fa;
+    border: 3px solid #dee2e6;
+    border-radius: 10px;
+    padding: 15px;
+    position: relative;
+    transition: all 0.3s;
+}
+
+.player-slot.ready {
+    border-color: #28a745;
+    background: #d4edda;
+}
+
+.player-slot .position {
+    position: absolute;
+    top: -12px;
+    left: 10px;
+    background: #d4a373;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 15px;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+.player-slot .player-info {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 5px;
+}
+
+.player-slot .ready-status {
+    font-size: 14px;
+    color: #6c757d;
+}
+
+.player-slot.ready .ready-status::after {
+    content: "✓ 已準備";
+    color: #28a745;
+    font-weight: bold;
+}
+
+.lobby-controls {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+}
+
+.countdown {
+    text-align: center;
+    margin-top: 20px;
+    font-size: 24px;
+    color: #d4a373;
+    font-weight: bold;
+}
+
+/* 遊戲畫面 */
+#game-canvas {
+    width: 100%;
+    height: 100%;
+    display: block;
+}
+
+.action-buttons {
+    position: absolute;
+    bottom: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 15px;
+    z-index: 10;
+    background: rgba(0, 0, 0, 0.6);
+    padding: 15px 25px;
+    border-radius: 50px;
+    backdrop-filter: blur(5px);
+}
+
+.game-info {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    padding: 15px 25px;
+    border-radius: 10px;
+    backdrop-filter: blur(5px);
+    z-index: 10;
+}
+
+.game-info div {
+    margin: 5px 0;
+}
+
+/* 彈窗 */
+.modal {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+}
+
+.modal-content {
+    background: white;
+    padding: 40px;
+    border-radius: 15px;
+    max-width: 500px;
+    width: 90%;
+    text-align: center;
+}
+
+.modal-content h2 {
+    color: #d4a373;
+    margin-bottom: 20px;
+    font-size: 32px;
+}
+
+#win-details {
+    margin: 20px 0;
+    max-height: 300px;
+    overflow-y: auto;
+}
+
+.win-detail-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 10px;
+    border-bottom: 1px solid #eee;
+    font-size: 18px;
+}
+
+.win-total {
+    font-size: 28px;
+    font-weight: bold;
+    color: #d4a373;
+    margin: 20px 0;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+}
+
+/* 響應式設計 */
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        height: 100vh;
+        border-radius: 0;
+    }
+    
+    .login-box,
+    .lobby-box {
+        width: 90%;
+        margin: 50px auto;
+    }
+    
+    .action-buttons {
+        bottom: 20px;
+        padding: 10px;
+    }
+    
+    .btn-action {
+        padding: 8px 15px;
+        font-size: 14px;
+        min-width: 60px;
+    }
+}
