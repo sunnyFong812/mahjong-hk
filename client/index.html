@@ -5,25 +5,28 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>港式麻雀 Online - 4人聯機</title>
     <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* 將 style 搬返嚟 head 入面 */
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 9999;
+            color: white;
+        }
+        .connection-status.status-connected { background: #28a745; }
+        .connection-status.status-error { background: #dc3545; }
+        .connection-status.status-connecting { background: #ffc107; color: black; }
+        .status-disconnected { background: #dc3545; }
+    </style>
 </head>
-
-<div id="connection-status" class="connection-status status-disconnected" style="
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    z-index: 9999;
-    background: #dc3545;
-    color: white;" >未連接</div>
-
-<style>
-.connection-status.status-connected { background: #28a745; }
-.connection-status.status-error { background: #dc3545; }
-.connection-status.status-connecting { background: #ffc107; color: black; }
-</style>
 <body>
+    <!-- 連接狀態指示器 - 放喺 body 入面最頂 -->
+    <div id="connection-status" class="connection-status status-disconnected">未連接</div>
+
     <div class="container">
         <!-- 登入畫面 -->
         <div id="login-screen" class="screen">
@@ -111,9 +114,41 @@
     </div>
     
     <script src="/socket.io/socket.io.js"></script>
+    <!-- 呢度先 load 你嘅 socket.js -->
     <script src="js/socket.js"></script>
     <script src="js/renderer.js"></script>
     <script src="js/input.js"></script>
     <script src="js/game.js"></script>
+    
+    <!-- 測試用 script - 可以暫時留低，但之後要移除 -->
+    <script>
+    (function() {
+      console.log('🚀 頁面載入完成');
+      
+      // 如果 socket 未定義，先定義
+      if (typeof socket === 'undefined') {
+        window.socket = io(window.location.origin, {
+          transports: ['polling', 'websocket'],
+          reconnectionAttempts: 5
+        });
+      }
+      
+      socket.on('connect', () => {
+        console.log('✅ Socket 連接成功');
+        document.getElementById('connection-status').textContent = '已連接';
+        document.getElementById('connection-status').className = 'connection-status status-connected';
+      });
+      
+      socket.on('connect_error', (err) => {
+        console.error('❌ Socket 連接失敗:', err);
+        document.getElementById('connection-status').textContent = '連接失敗';
+        document.getElementById('connection-status').className = 'connection-status status-error';
+      });
+      
+      socket.on('roomUpdate', (data) => {
+        console.log('📦 收到更新:', data);
+      });
+    })();
+    </script>
 </body>
 </html>
