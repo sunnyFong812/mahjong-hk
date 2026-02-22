@@ -742,13 +742,20 @@ socket.on('gameUpdate', (data) => {
         };
 
         window.toggleReady = function() {
-            if (socket && socket.connected && window.currentRoom) {
-                socket.emit('playerReady', { roomId: window.currentRoom });
-            } else {
-                alert('❌ 未連接到伺服器或未加入房間');
-            }
-        };
+    if (!socket || !socket.connected) {
+        alert('❌ 未連接到伺服器');
+        return;
+    }
 
+    if (!window.currentRoom) {
+        alert('❌ 未加入房間 (currentRoom 係空)');
+        console.log('❌ currentRoom:', window.currentRoom);
+        return;
+    }
+
+    console.log('📤 發送 playerReady:', window.currentRoom);
+    socket.emit('playerReady', { roomId: window.currentRoom });
+};
         window.leaveRoom = function() {
             document.getElementById('lobby-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'block';
