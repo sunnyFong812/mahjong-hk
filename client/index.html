@@ -166,14 +166,45 @@ window.toggleReady = function() {
 
 // 監聽房間更新
 window.socket.on('roomUpdate', (data) => {
+    console.log('📦 房間更新:', data);
+    
     for (let i = 0; i < 4; i++) {
         const slot = document.getElementById(`player${i}`);
-        if (!slot || !data.players[i]) continue;
+        if (!slot) continue;
         
-        slot.querySelector('.player-info').textContent = data.players[i].name;
-        if (data.players[i].ready) {
-            slot.classList.add('ready');
+        const info = slot.querySelector('.player-info');
+        
+        if (data.players && data.players[i]) {
+            const player = data.players[i];
+            
+            // 清空原有內容
+            info.innerHTML = '';
+            
+            // 加玩家名
+            const nameSpan = document.createElement('span');
+            nameSpan.textContent = player.name;
+            info.appendChild(nameSpan);
+            
+            // 如果係 AI，加 AI 標籤
+            if (player.isAI) {
+                const badge = document.createElement('span');
+                badge.textContent = 'AI';
+                badge.style.cssText = 'background: #6c5ce7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 5px; display: inline-block;';
+                info.appendChild(badge);
+                
+                // AI 自動 ready
+                slot.classList.add('ready');
+            } else {
+                // 真人玩家根據 ready 狀態
+                if (player.ready) {
+                    slot.classList.add('ready');
+                } else {
+                    slot.classList.remove('ready');
+                }
+            }
         } else {
+            // 冇玩家
+            info.innerHTML = '等待中...';
             slot.classList.remove('ready');
         }
     }
