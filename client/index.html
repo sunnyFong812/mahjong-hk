@@ -126,47 +126,19 @@
     </div>
 <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 <script>
-// 簡單版 - 冇 alert，直接玩得
-window.socket = io(window.location.origin, {
-    transports: ['polling', 'websocket']
-});
+// ===== Socket 初始化 =====
+const socket = io(window.location.origin);
 
-window.socket.on('connect', () => {
+// ===== 連接狀態 =====
+socket.on('connect', () => {
     console.log('✅ 連接成功');
     document.getElementById('connection-status').textContent = '已連接';
     document.getElementById('connection-status').style.background = '#28a745';
 });
 
-// 定義按鈕函數
-window.joinRoom = function() {
-    const name = document.getElementById('player-name').value;
-    const room = document.getElementById('room-id').value;
-    
-    if (window.socket && window.socket.connected) {
-        window.socket.emit('joinRoom', { roomId: room, playerName: name });
-        
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('lobby-screen').style.display = 'block';
-        document.getElementById('display-room-id').textContent = room;
-        window.currentRoom = room;
-    }
-};
-
-window.createRoom = function() {
-    const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-    document.getElementById('room-id').value = roomId;
-    window.joinRoom();
-};
-
-window.toggleReady = function() {
-    if (window.socket && window.socket.connected && window.currentRoom) {
-        window.socket.emit('playerReady', { roomId: window.currentRoom });
-    }
-};
-
-// 監聽房間更新
-window.socket.on('roomUpdate', (data) => {
-    console.log('📦 房間更新:', data);
+// ===== 房間更新 =====
+socket.on('roomUpdate', (data) => {
+    console.log('📦 房間更新', data);
     
     for (let i = 0; i < 4; i++) {
         const slot = document.getElementById(`player${i}`);
@@ -177,25 +149,11 @@ window.socket.on('roomUpdate', (data) => {
         if (data.players && data.players[i]) {
             const player = data.players[i];
             
-            // 清空原有內容
-            info.innerHTML = '';
-            
-            // 加玩家名
-            const nameSpan = document.createElement('span');
-            nameSpan.textContent = player.name;
-            info.appendChild(nameSpan);
-            
-            // 如果係 AI，加 AI 標籤
             if (player.isAI) {
-                const badge = document.createElement('span');
-                badge.textContent = 'AI';
-                badge.style.cssText = 'background: #6c5ce7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 5px; display: inline-block;';
-                info.appendChild(badge);
-                
-                // AI 自動 ready
+                info.innerHTML = player.name + ' <span class="ai-badge" style="background:#6c5ce7; color:white; padding:2px 8px; border-radius:10px; font-size:12px; margin-left:5px;">AI</span>';
                 slot.classList.add('ready');
             } else {
-                // 真人玩家根據 ready 狀態
+                info.textContent = player.name;
                 if (player.ready) {
                     slot.classList.add('ready');
                 } else {
@@ -203,13 +161,19 @@ window.socket.on('roomUpdate', (data) => {
                 }
             }
         } else {
-            // 冇玩家
-            info.innerHTML = '等待中...';
+            info.textContent = '等待中...';
             slot.classList.remove('ready');
         }
     }
+    
+    // 顯示大廳
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('lobby-screen').style.display = 'block';
+    document.getElementById('display-room-id').textContent = data.roomId;
+    window.currentRoom = data.roomId;
 });
-// ===== 遊戲開始事件 =====
+
+// ===== 🎮 遊戲開始 =====
 socket.on('gameStart', (data) => {
     console.log('🎮 遊戲開始', data);
     
@@ -217,31 +181,158 @@ socket.on('gameStart', (data) => {
     document.getElementById('lobby-screen').style.display = 'none';
     document.getElementById('game-screen').style.display = 'block';
     
-    // 儲存玩家位置同手牌
+    // 儲存玩家資料
     window.myPosition = data.position;
     window.myHand = data.hand;
     window.currentPlayer = data.currentPlayer;
     
     // 更新遊戲資訊
     document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
+    document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
     
-    // 如果有 renderer，初始化
-    if (window.gameRenderer) {
-        window.gameRenderer.renderGame(data, data.position);
+    // 初始化渲染器
+    if (!window.gameRenderer) {
+        window.gameRenderer = new MahjongRenderer('game-canvas');
     }
     
-    alert(`遊戲開始！你是 ${data.wind}家`);
+    // 渲染手牌
+    window.gameRenderer.renderHand(data.hand, 200, 500);
 });
 
-// ===== 公共遊戲狀態更新 =====
+// ===== 公共遊戲狀態 =====
 socket.on('publicGameState', (data) => {
     console.log('📊 公共狀態', data);
     document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
 });
-window.socket.on('gameCountdown', (data) => {
-    document.getElementById('countdown').style.display = 'block';
-    document.getElementById('countdown-seconds').textContent = data.seconds;
+
+// ===== 遊戲更新（出牌、碰、槓等）=====
+socket.on('gameUpdate', (data) => {
+    console.log('🔄 遊戲更新', data);
+    // 更新渲染
+    if (window.gameRenderer) {
+        window.gameRenderer.renderGame(data, window.myPosition);
+    }
 });
+
+// ===== 簡易渲染器 =====
+class MahjongRenderer {
+    constructor(canvasId) {
+        this.canvas = document.getElementById(canvasId);
+        this.ctx = this.canvas.getContext('2d');
+        this.tileWidth = 40;
+        this.tileHeight = 50;
+    }
+    
+    renderHand(hand, startX, startY) {
+        if (!hand || hand.length === 0) {
+            console.log('⚠️ 冇手牌可渲染');
+            return;
+        }
+        
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // 畫背景
+        this.ctx.fillStyle = '#2a6f2a';
+        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+        
+        // 畫手牌
+        hand.sort().forEach((tile, i) => {
+            const x = startX + i * (this.tileWidth + 5);
+            const y = startY;
+            
+            // 牌面
+            this.ctx.fillStyle = '#f8f9fa';
+            this.ctx.fillRect(x, y, this.tileWidth, this.tileHeight);
+            this.ctx.strokeStyle = '#333';
+            this.ctx.strokeRect(x, y, this.tileWidth, this.tileHeight);
+            
+            // 牌面文字
+            this.ctx.fillStyle = this.getTileColor(tile);
+            this.ctx.font = '20px Arial';
+            this.ctx.fillText(this.getTileDisplay(tile), x + 5, y + 30);
+        });
+    }
+    
+    renderGame(gameState, myPosition) {
+        // 簡單版渲染
+        this.renderHand(gameState.hands[myPosition], 200, 500);
+    }
+    
+    getTileColor(tile) {
+        if (tile.includes('m')) return '#d32f2f';
+        if (tile.includes('p')) return '#2e7d32';
+        if (tile.includes('s')) return '#1976d2';
+        return '#7b1fa2';
+    }
+    
+    getTileDisplay(tile) {
+        if (tile.includes('m')) return tile.replace('m', '萬');
+        if (tile.includes('p')) return tile.replace('p', '筒');
+        if (tile.includes('s')) return tile.replace('s', '條');
+        return tile;
+    }
+}
+
+// ===== 按鈕函數 =====
+window.joinRoom = function() {
+    const name = document.getElementById('player-name').value;
+    const room = document.getElementById('room-id').value;
+    
+    if (socket && socket.connected) {
+        socket.emit('joinRoom', { roomId: room, playerName: name });
+        window.currentRoom = room;
+    } else {
+        alert('未連接到伺服器');
+    }
+};
+
+window.createRoom = function() {
+    const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+    document.getElementById('room-id').value = roomId;
+    window.joinRoom();
+};
+
+window.toggleReady = function() {
+    if (socket && socket.connected && window.currentRoom) {
+        socket.emit('playerReady', { roomId: window.currentRoom });
+    }
+};
+
+window.leaveRoom = function() {
+    document.getElementById('lobby-screen').style.display = 'none';
+    document.getElementById('login-screen').style.display = 'block';
+};
+
+window.closeWinModal = function() {
+    document.getElementById('win-modal').style.display = 'none';
+};
+
+// ===== 橫屏支援 =====
+function handleOrientationChange() {
+    const canvas = document.getElementById('game-canvas');
+    if (window.innerWidth > window.innerHeight) {
+        // 橫屏
+        canvas.width = 1200;
+        canvas.height = 700;
+        console.log('🔄 橫屏模式');
+    } else {
+        // 直屏
+        canvas.width = 700;
+        canvas.height = 1200;
+        console.log('🔄 直屏模式');
+    }
+    
+    // 重新渲染
+    if (window.gameRenderer && window.myHand) {
+        window.gameRenderer.renderHand(window.myHand, 100, 500);
+    }
+}
+
+// 監聽屏幕旋轉
+window.addEventListener('resize', handleOrientationChange);
+handleOrientationChange(); // 初始化
+
+console.log('✅ 前端初始化完成');
 </script>
 </body>
 </html>
