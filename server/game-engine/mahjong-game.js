@@ -11,7 +11,7 @@ class MahjongGame {
     this.discards = {};
     this.flowers = {};
     this.currentPlayer = 0; // 0:東, 1:南, 2:西, 3:北
-    self.drawCount = 0;
+    this.drawCount = 0;
     this.lastDiscard = null;
     this.lastDiscardPlayer = null;
     this.gameOver = false;
