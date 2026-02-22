@@ -405,40 +405,42 @@
 
         // ===== 房間更新 =====
         socket.on('roomUpdate', (data) => {
-            console.log('📦 房間更新', data);
-            
-            for (let i = 0; i < 4; i++) {
-                const slot = document.getElementById(`player${i}`);
-                if (!slot) continue;
-                
-                const info = slot.querySelector('.player-info');
-                
-                if (data.players && data.players[i]) {
-                    const player = data.players[i];
-                    
-                    if (player.isAI) {
-                        info.innerHTML = player.name + ' <span class="ai-badge">AI</span>';
-                        slot.classList.add('ready');
-                    } else {
-                        info.textContent = player.name;
-                        if (player.ready) {
-                            slot.classList.add('ready');
-                        } else {
-                            slot.classList.remove('ready');
-                        }
-                    }
+    console.log('📦 房間更新', data);
+
+    // ✅ 強制記錄 currentRoom
+    window.currentRoom = data.roomId;
+    console.log('✅ currentRoom 已設為:', window.currentRoom);
+
+    for (let i = 0; i < 4; i++) {
+        const slot = document.getElementById(`player${i}`);
+        if (!slot) continue;
+
+        const info = slot.querySelector('.player-info');
+
+        if (data.players && data.players[i]) {
+            const player = data.players[i];
+
+            if (player.isAI) {
+                info.innerHTML = player.name + ' <span class="ai-badge">AI</span>';
+                slot.classList.add('ready');
+            } else {
+                info.textContent = player.name;
+                if (player.ready) {
+                    slot.classList.add('ready');
                 } else {
-                    info.textContent = '等待中...';
                     slot.classList.remove('ready');
                 }
             }
-            
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('lobby-screen').style.display = 'block';
-            document.getElementById('display-room-id').textContent = data.roomId;
-            window.currentRoom = data.roomId;
-        });
+        } else {
+            info.textContent = '等待中...';
+            slot.classList.remove('ready');
+        }
+    }
 
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('lobby-screen').style.display = 'block';
+    document.getElementById('display-room-id').textContent = data.roomId;
+});
         // ===== 遊戲開始 =====
         socket.on('gameStart', (data) => {
             console.log('🎮 遊戲開始', data);
