@@ -485,69 +485,53 @@
 // ===== 遊戲更新 =====
 // ===== 遊戲更新 =====
 socket.on('gameUpdate', (data) => {
-    console.log('🔄 遊戲更新', data);
-    //更新當前玩家
-    if (data.currentPlayer !== undefined) {
-  window.currentPlayer = data.currentPlayer;
-  console.log('🔄 當前玩家更新為:', window.currentPlayer);
-}
-    // 處理自己打牌
-    if (data.type === 'DISCARD') {
-        if (data.player === window.myPosition) {
-            // 自己打牌：更新手牌
-            if (data.hand) {
-                window.myHand = sortTiles(data.hand);
-                console.log('🎯 自己打牌後手牌:', window.myHand);
-            }
-        }
-        
-        // 更新棄牌區
-        if (data.discards) {
-            window.discards = data.discards;
-        }
-        
-        // 更新當前玩家
-        if (data.currentPlayer !== undefined) {
-            window.currentPlayer = data.currentPlayer;
-        }
-        
-        // 取消選中狀態
-        if (window.gameRenderer) {
-            window.gameRenderer.selectedIndex = -1;
-        }
-        document.getElementById('selected-tile-hint').style.display = 'none';
-    }
-    
-    // 處理自己摸牌
-    if (data.type === 'DRAW' && data.player === window.myPosition) {
-        if (data.hand) {
-            window.myHand = sortTiles(data.hand);
-            console.log('🀄️ 摸牌後手牌:', window.myHand);
-        }
-        
-        document.getElementById('selected-tile-hint').textContent = '🀄️ 摸到新牌，請選擇要打出的牌';
-        document.getElementById('selected-tile-hint').style.display = 'block';
-        setTimeout(() => {
-            document.getElementById('selected-tile-hint').textContent = '👆 點擊手牌選擇，再點擊同一張打出';
-        }, 3000);
-    }
-    
-    // 更新當前玩家（如果上面未更新）
-    if (data.currentPlayer !== undefined && window.currentPlayer !== data.currentPlayer) {
-        window.currentPlayer = data.currentPlayer;
-    }
-    
-    // 重新渲染
-    if (window.gameRenderer) {
-        window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-    }
-    
-    // 更新當前玩家提示
-    if (window.currentPlayer === window.myPosition) {
-        document.getElementById('selected-tile-hint').style.display = 'block';
+  console.log('🔄 gameUpdate', data);
+
+  if (data.currentPlayer !== undefined) {
+    window.currentPlayer = data.currentPlayer;
+  }
+
+  if (data.hand && data.player === window.myPosition) {
+    window.myHand = sortTiles(data.hand);
+  }
+
+  if (data.discards) {
+    window.discards = data.discards;
+  }
+
+  // ✅ 處理 reactions（碰、槓、糊按鈕）
+  if (data.reactions) {
+    const myReaction = data.reactions.find(r => r.player === window.myPosition);
+    if (myReaction) {
+      document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
+      document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
+      document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
+      document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
+      window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
     } else {
-        document.getElementById('selected-tile-hint').style.display = 'none';
+      document.getElementById('btn-pong').disabled = true;
+      document.getElementById('btn-chow').disabled = true;
+      document.getElementById('btn-kong').disabled = true;
+      document.getElementById('btn-mahjong').disabled = true;
+      window.canPongTile = null;
     }
+  } else {
+    document.getElementById('btn-pong').disabled = true;
+    document.getElementById('btn-chow').disabled = true;
+    document.getElementById('btn-kong').disabled = true;
+    document.getElementById('btn-mahjong').disabled = true;
+    window.canPongTile = null;
+  }
+
+  if (window.gameRenderer) {
+    window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+  }
+
+  if (window.currentPlayer === window.myPosition) {
+    document.getElementById('selected-tile-hint').style.display = 'block';
+  } else {
+    document.getElementById('selected-tile-hint').style.display = 'none';
+  }
 });
 
         // ===== 渲染器 =====
