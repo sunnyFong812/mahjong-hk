@@ -2,11 +2,220 @@
 <html lang="zh-HK">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>港式麻雀 Online - 4人聯機</title>
-    <link rel="stylesheet" href="css/style.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>港式麻雀 - 16隻牌</title>
     <style>
-        /* 將 style 搬返嚟 head 入面 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
+
+        body {
+            font-family: 'PingFang HK', Arial, sans-serif;
+            background: #1a4d2a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 100vh;
+            background-color: #2a6f2a;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #8b5a2b;
+        }
+
+        .screen {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(42, 111, 42, 0.95);
+        }
+
+        /* 登入畫面 */
+        .login-box {
+            width: 90%;
+            max-width: 400px;
+            margin: 20% auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .login-box h1 {
+            color: #d4a373;
+            margin-bottom: 30px;
+            font-size: 36px;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            border-radius: 10px;
+            font-size: 18px;
+            margin: 5px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary {
+            background: #d4a373;
+            color: white;
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
+
+        .btn-action {
+            background: #ffd966;
+            color: #333;
+            border: 2px solid #b5835a;
+            padding: 10px 15px;
+            border-radius: 8px;
+            font-size: 16px;
+            min-width: 60px;
+        }
+
+        .btn-action.mahjong {
+            background: #ff6b6b;
+            color: white;
+        }
+
+        .btn-action:disabled {
+            opacity: 0.4;
+        }
+
+        /* 大廳 */
+        .lobby-box {
+            width: 90%;
+            max-width: 600px;
+            margin: 15% auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+        }
+
+        .players-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .player-slot {
+            background: #f8f9fa;
+            border: 3px solid #dee2e6;
+            border-radius: 15px;
+            padding: 15px;
+            position: relative;
+            min-height: 100px;
+        }
+
+        .player-slot.ready {
+            border-color: #28a745;
+            background: #d4edda;
+        }
+
+        .player-slot .position {
+            position: absolute;
+            top: -12px;
+            left: 15px;
+            background: #d4a373;
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+        }
+
+        .player-slot .player-info {
+            font-size: 18px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .ai-badge {
+            background: #6c5ce7;
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
+            display: inline-block;
+        }
+
+        /* 遊戲畫面 */
+        #game-canvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            touch-action: none;
+        }
+
+        .action-buttons {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 100;
+            background: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .game-info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            z-index: 10;
+        }
+
         .connection-status {
             position: fixed;
             top: 10px;
@@ -17,31 +226,59 @@
             z-index: 9999;
             color: white;
         }
-        .connection-status.status-connected { background: #28a745; }
-        .connection-status.status-error { background: #dc3545; }
-        .connection-status.status-connecting { background: #ffc107; color: black; }
+        .status-connected { background: #28a745; }
         .status-disconnected { background: #dc3545; }
+
+        /* 彈窗 */
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
+
+        .countdown {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 24px;
+            color: #d4a373;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
-    <!-- 連接狀態指示器 - 放喺 body 入面最頂 -->
     <div id="connection-status" class="connection-status status-disconnected">未連接</div>
 
     <div class="container">
         <!-- 登入畫面 -->
         <div id="login-screen" class="screen">
             <div class="login-box">
-                <h1>港式麻雀</h1>
+                <h1>🀄️ 港式麻雀</h1>
                 <div class="input-group">
                     <label>玩家名字</label>
-                    <input type="text" id="player-name" placeholder="輸入名字" maxlength="10" value="玩家">
+                    <input type="text" id="player-name" value="玩家" maxlength="10">
                 </div>
                 <div class="input-group">
                     <label>房間號碼</label>
-                    <input type="text" id="room-id" placeholder="例如: 1234" value="test123">
+                    <input type="text" id="room-id" value="test123">
                 </div>
-                <button onclick="joinRoom()" class="btn-primary">加入房間</button>
-                <button onclick="createRoom()" class="btn-secondary">創建房間</button>
+                <button onclick="window.joinRoom()" class="btn btn-primary">加入房間</button>
+                <button onclick="window.createRoom()" class="btn btn-secondary">創建房間</button>
             </div>
         </div>
         
@@ -53,45 +290,29 @@
                 <div class="players-container">
                     <div class="player-slot" id="player0">
                         <div class="position">東</div>
-                        <div class="player-info">等待中...
-                            <!-- 喺每個 player-slot 入面加個 AI 標籤 -->
-<div class="ai-badge" style="display: none; background: #6c5ce7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 5px;">AI</div>
-                        </div>
-                        <div class="ready-status"></div>
+                        <div class="player-info">等待中...</div>
                     </div>
                     <div class="player-slot" id="player1">
                         <div class="position">南</div>
-                        <div class="player-info">等待中...
-                            <!-- 喺每個 player-slot 入面加個 AI 標籤 -->
-<div class="ai-badge" style="display: none; background: #6c5ce7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 5px;">AI</div>
-                        </div>
-                        <div class="ready-status"></div>
+                        <div class="player-info">等待中...</div>
                     </div>
                     <div class="player-slot" id="player2">
                         <div class="position">西</div>
-                        <div class="player-info">等待中...
-                            <!-- 喺每個 player-slot 入面加個 AI 標籤 -->
-<div class="ai-badge" style="display: none; background: #6c5ce7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 5px;">AI</div>
-                        </div>
-                        <div class="ready-status"></div>
+                        <div class="player-info">等待中...</div>
                     </div>
                     <div class="player-slot" id="player3">
                         <div class="position">北</div>
-                        <div class="player-info">等待中...
-                            <!-- 喺每個 player-slot 入面加個 AI 標籤 -->
-<div class="ai-badge" style="display: none; background: #6c5ce7; color: white; padding: 2px 8px; border-radius: 10px; font-size: 12px; margin-left: 5px;">AI</div>
-                        </div>
-                        <div class="ready-status"></div>
+                        <div class="player-info">等待中...</div>
                     </div>
                 </div>
                 
-                <div class="lobby-controls">
-                    <button id="ready-button" onclick="toggleReady()" class="btn-primary">準備</button>
-                    <button onclick="leaveRoom()" class="btn-danger">離開房間</button>
+                <div style="display: flex; justify-content: center; gap: 10px;">
+                    <button id="ready-button" onclick="window.toggleReady()" class="btn btn-primary">準備</button>
+                    <button onclick="window.leaveRoom()" class="btn btn-danger">離開</button>
                 </div>
                 
-                <div id="countdown" class="countdown" style="display: none;">
-                    遊戲即將開始: <span id="countdown-seconds">3</span>
+                <div id="countdown" style="display: none; text-align: center; margin-top: 20px; font-size: 24px;">
+                    遊戲開始倒數: <span id="countdown-seconds">3</span>
                 </div>
             </div>
         </div>
@@ -100,7 +321,7 @@
         <div id="game-screen" class="screen" style="display: none;">
             <canvas id="game-canvas" width="1200" height="700"></canvas>
             
-            <div id="action-buttons" class="action-buttons">
+            <div class="action-buttons">
                 <button id="btn-chow" class="btn-action" disabled>吃</button>
                 <button id="btn-pong" class="btn-action" disabled>碰</button>
                 <button id="btn-kong" class="btn-action" disabled>槓</button>
@@ -108,231 +329,282 @@
                 <button id="btn-pass" class="btn-action" disabled>過</button>
             </div>
             
-            <div id="game-info" class="game-info">
-                <div id="wind-display"></div>
-                <div id="scores-display"></div>
-                <div id="wall-size"></div>
+            <div class="game-info">
+                <div id="wind-display">門風: 東</div>
+                <div id="scores-display">分數: 0</div>
+                <div id="wall-size">剩牌: 68</div>
             </div>
             
-            <div id="win-modal" class="modal" style="display: none;">
-                <div class="modal-content">
-                    <h2>食糊！</h2>
-                    <div id="win-details"></div>
-                    <div id="win-total" class="win-total"></div>
-                    <button onclick="closeWinModal()" class="btn-primary">確定</button>
-                </div>
+            <div id="selected-tile-hint" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: gold; padding: 8px 15px; border-radius: 20px; display: none;">
+                點擊手牌選擇，再點擊打出
             </div>
         </div>
     </div>
-<script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
-<script>
-// ===== Socket 初始化 =====
-const socket = io(window.location.origin);
 
-// ===== 連接狀態 =====
-socket.on('connect', () => {
-    console.log('✅ 連接成功');
-    document.getElementById('connection-status').textContent = '已連接';
-    document.getElementById('connection-status').style.background = '#28a745';
-});
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        // ===== Socket 初始化 =====
+        const socket = io(window.location.origin);
+        
+        // ===== 全域變數 =====
+        window.currentRoom = '';
+        window.myPosition = -1;
+        window.myHand = [];
+        window.selectedTileIndex = -1;
+        window.gameRenderer = null;
 
-// ===== 房間更新 =====
-socket.on('roomUpdate', (data) => {
-    console.log('📦 房間更新', data);
-    
-    for (let i = 0; i < 4; i++) {
-        const slot = document.getElementById(`player${i}`);
-        if (!slot) continue;
-        
-        const info = slot.querySelector('.player-info');
-        
-        if (data.players && data.players[i]) {
-            const player = data.players[i];
+        // ===== 連接狀態 =====
+        socket.on('connect', () => {
+            console.log('✅ 連接成功');
+            document.getElementById('connection-status').textContent = '已連接';
+            document.getElementById('connection-status').className = 'connection-status status-connected';
+        });
+
+        socket.on('connect_error', (err) => {
+            console.error('❌ 連接錯誤:', err);
+            document.getElementById('connection-status').textContent = '連接失敗';
+            document.getElementById('connection-status').className = 'connection-status status-disconnected';
+        });
+
+        // ===== 房間更新 =====
+        socket.on('roomUpdate', (data) => {
+            console.log('📦 房間更新', data);
             
-            if (player.isAI) {
-                info.innerHTML = player.name + ' <span class="ai-badge" style="background:#6c5ce7; color:white; padding:2px 8px; border-radius:10px; font-size:12px; margin-left:5px;">AI</span>';
-                slot.classList.add('ready');
-            } else {
-                info.textContent = player.name;
-                if (player.ready) {
-                    slot.classList.add('ready');
+            for (let i = 0; i < 4; i++) {
+                const slot = document.getElementById(`player${i}`);
+                if (!slot) continue;
+                
+                const info = slot.querySelector('.player-info');
+                
+                if (data.players && data.players[i]) {
+                    const player = data.players[i];
+                    
+                    if (player.isAI) {
+                        info.innerHTML = player.name + ' <span class="ai-badge">AI</span>';
+                        slot.classList.add('ready');
+                    } else {
+                        info.textContent = player.name;
+                        if (player.ready) {
+                            slot.classList.add('ready');
+                        } else {
+                            slot.classList.remove('ready');
+                        }
+                    }
                 } else {
+                    info.textContent = '等待中...';
                     slot.classList.remove('ready');
                 }
             }
-        } else {
-            info.textContent = '等待中...';
-            slot.classList.remove('ready');
-        }
-    }
-    
-    // 顯示大廳
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('lobby-screen').style.display = 'block';
-    document.getElementById('display-room-id').textContent = data.roomId;
-    window.currentRoom = data.roomId;
-});
-
-// ===== 🎮 遊戲開始 =====
-socket.on('gameStart', (data) => {
-    console.log('🎮 遊戲開始', data);
-    
-    // 隱藏大廳，顯示遊戲畫面
-    document.getElementById('lobby-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'block';
-    
-    // 儲存玩家資料
-    window.myPosition = data.position;
-    window.myHand = data.hand;
-    window.currentPlayer = data.currentPlayer;
-    
-    // 更新遊戲資訊
-    document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
-    document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
-    
-    // 初始化渲染器
-    if (!window.gameRenderer) {
-        window.gameRenderer = new MahjongRenderer('game-canvas');
-    }
-    
-    // 渲染手牌
-    window.gameRenderer.renderHand(data.hand, 200, 500);
-});
-
-// ===== 公共遊戲狀態 =====
-socket.on('publicGameState', (data) => {
-    console.log('📊 公共狀態', data);
-    document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
-});
-
-// ===== 遊戲更新（出牌、碰、槓等）=====
-socket.on('gameUpdate', (data) => {
-    console.log('🔄 遊戲更新', data);
-    // 更新渲染
-    if (window.gameRenderer) {
-        window.gameRenderer.renderGame(data, window.myPosition);
-    }
-});
-
-// ===== 簡易渲染器 =====
-class MahjongRenderer {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.tileWidth = 40;
-        this.tileHeight = 50;
-    }
-    
-    renderHand(hand, startX, startY) {
-        if (!hand || hand.length === 0) {
-            console.log('⚠️ 冇手牌可渲染');
-            return;
-        }
-        
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // 畫背景
-        this.ctx.fillStyle = '#2a6f2a';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // 畫手牌
-        hand.sort().forEach((tile, i) => {
-            const x = startX + i * (this.tileWidth + 5);
-            const y = startY;
             
-            // 牌面
-            this.ctx.fillStyle = '#f8f9fa';
-            this.ctx.fillRect(x, y, this.tileWidth, this.tileHeight);
-            this.ctx.strokeStyle = '#333';
-            this.ctx.strokeRect(x, y, this.tileWidth, this.tileHeight);
-            
-            // 牌面文字
-            this.ctx.fillStyle = this.getTileColor(tile);
-            this.ctx.font = '20px Arial';
-            this.ctx.fillText(this.getTileDisplay(tile), x + 5, y + 30);
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('lobby-screen').style.display = 'block';
+            document.getElementById('display-room-id').textContent = data.roomId;
+            window.currentRoom = data.roomId;
         });
-    }
-    
-    renderGame(gameState, myPosition) {
-        // 簡單版渲染
-        this.renderHand(gameState.hands[myPosition], 200, 500);
-    }
-    
-    getTileColor(tile) {
-        if (tile.includes('m')) return '#d32f2f';
-        if (tile.includes('p')) return '#2e7d32';
-        if (tile.includes('s')) return '#1976d2';
-        return '#7b1fa2';
-    }
-    
-    getTileDisplay(tile) {
-        if (tile.includes('m')) return tile.replace('m', '萬');
-        if (tile.includes('p')) return tile.replace('p', '筒');
-        if (tile.includes('s')) return tile.replace('s', '條');
-        return tile;
-    }
-}
 
-// ===== 按鈕函數 =====
-window.joinRoom = function() {
-    const name = document.getElementById('player-name').value;
-    const room = document.getElementById('room-id').value;
-    
-    if (socket && socket.connected) {
-        socket.emit('joinRoom', { roomId: room, playerName: name });
-        window.currentRoom = room;
-    } else {
-        alert('未連接到伺服器');
-    }
-};
+        // ===== 遊戲開始 =====
+        socket.on('gameStart', (data) => {
+            console.log('🎮 遊戲開始', data);
+            
+            document.getElementById('lobby-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            
+            window.myPosition = data.position;
+            window.myHand = data.hand || [];
+            window.currentPlayer = data.currentPlayer;
+            
+            document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
+            document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
+            
+            // 初始化渲染器
+            if (!window.gameRenderer) {
+                window.gameRenderer = new MahjongRenderer('game-canvas');
+            }
+            
+            // 渲染手牌
+            window.gameRenderer.render(window.myHand, window.myPosition);
+            
+            // 如果係自己回合，顯示提示
+            if (data.currentPlayer === window.myPosition) {
+                document.getElementById('selected-tile-hint').style.display = 'block';
+            }
+        });
 
-window.createRoom = function() {
-    const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
-    document.getElementById('room-id').value = roomId;
-    window.joinRoom();
-};
+        // ===== 遊戲更新 =====
+        socket.on('gameUpdate', (data) => {
+            console.log('🔄 遊戲更新', data);
+            
+            if (data.hand && data.player === window.myPosition) {
+                window.myHand = data.hand;
+            }
+            
+            if (window.gameRenderer) {
+                window.gameRenderer.render(window.myHand, window.myPosition);
+            }
+            
+            // 更新當前玩家提示
+            if (data.currentPlayer !== undefined) {
+                window.currentPlayer = data.currentPlayer;
+                if (data.currentPlayer === window.myPosition) {
+                    document.getElementById('selected-tile-hint').style.display = 'block';
+                } else {
+                    document.getElementById('selected-tile-hint').style.display = 'none';
+                }
+            }
+        });
 
-window.toggleReady = function() {
-    if (socket && socket.connected && window.currentRoom) {
-        socket.emit('playerReady', { roomId: window.currentRoom });
-    }
-};
+        // ===== 渲染器 =====
+        class MahjongRenderer {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.tileWidth = 45;
+                this.tileHeight = 60;
+                this.selectedIndex = -1;
+                
+                // 加入點擊事件
+                this.canvas.addEventListener('click', (e) => this.handleClick(e));
+            }
+            
+            handleClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                
+                // 檢查手牌區域
+                const startX = 100;
+                const startY = 500;
+                
+                for (let i = 0; i < window.myHand.length; i++) {
+                    const tileX = startX + i * (this.tileWidth + 5);
+                    
+                    if (x >= tileX && x <= tileX + this.tileWidth &&
+                        y >= startY && y <= startY + this.tileHeight) {
+                        
+                        if (this.selectedIndex === i) {
+                            // 同一張牌㩒兩次 = 打出
+                            if (window.currentPlayer === window.myPosition) {
+                                console.log('🎯 打出:', window.myHand[i]);
+                                socket.emit('playerAction', {
+                                    roomId: window.currentRoom,
+                                    action: 'DISCARD',
+                                    tile: window.myHand[i]
+                                });
+                                this.selectedIndex = -1;
+                                document.getElementById('selected-tile-hint').style.display = 'none';
+                            }
+                        } else {
+                            // 選擇新牌
+                            this.selectedIndex = i;
+                            document.getElementById('selected-tile-hint').style.display = 'block';
+                        }
+                        this.render(window.myHand, window.myPosition);
+                        break;
+                    }
+                }
+            }
+            
+            render(hand, myPosition) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 背景
+                this.ctx.fillStyle = '#2a6f2a';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                // 手牌 (16隻)
+                const startX = 100;
+                const startY = 500;
+                
+                hand.sort().forEach((tile, i) => {
+                    const x = startX + i * (this.tileWidth + 5);
+                    
+                    // 牌面
+                    this.ctx.fillStyle = '#f8f9fa';
+                    this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
+                    
+                    // 邊框 - 選中時金色
+                    this.ctx.strokeStyle = (i === this.selectedIndex) ? 'gold' : '#333';
+                    this.ctx.lineWidth = (i === this.selectedIndex) ? 4 : 1;
+                    this.ctx.strokeRect(x, startY, this.tileWidth, this.tileHeight);
+                    
+                    // 牌面文字
+                    this.ctx.fillStyle = this.getTileColor(tile);
+                    this.ctx.font = 'bold 24px "PingFang HK"';
+                    this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
+                });
+                
+                // 其他玩家 (簡單表示)
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '18px Arial';
+                this.ctx.fillText('其他玩家', 500, 200);
+            }
+            
+            getTileColor(tile) {
+                if (tile.includes('m')) return '#d32f2f';
+                if (tile.includes('p')) return '#2e7d32';
+                if (tile.includes('s')) return '#1976d2';
+                return '#7b1fa2';
+            }
+            
+            getTileDisplay(tile) {
+                if (tile.includes('m')) return tile.replace('m', '萬');
+                if (tile.includes('p')) return tile.replace('p', '筒');
+                if (tile.includes('s')) return tile.replace('s', '條');
+                return tile;
+            }
+        }
 
-window.leaveRoom = function() {
-    document.getElementById('lobby-screen').style.display = 'none';
-    document.getElementById('login-screen').style.display = 'block';
-};
+        // ===== 按鈕函數 =====
+        window.joinRoom = function() {
+            const name = document.getElementById('player-name').value;
+            const room = document.getElementById('room-id').value;
+            
+            if (socket && socket.connected) {
+                socket.emit('joinRoom', { roomId: room, playerName: name });
+            } else {
+                alert('未連接到伺服器');
+            }
+        };
 
-window.closeWinModal = function() {
-    document.getElementById('win-modal').style.display = 'none';
-};
+        window.createRoom = function() {
+            const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
+            document.getElementById('room-id').value = roomId;
+            window.joinRoom();
+        };
 
-// ===== 橫屏支援 =====
-function handleOrientationChange() {
-    const canvas = document.getElementById('game-canvas');
-    if (window.innerWidth > window.innerHeight) {
-        // 橫屏
-        canvas.width = 1200;
-        canvas.height = 700;
-        console.log('🔄 橫屏模式');
-    } else {
-        // 直屏
-        canvas.width = 700;
-        canvas.height = 1200;
-        console.log('🔄 直屏模式');
-    }
-    
-    // 重新渲染
-    if (window.gameRenderer && window.myHand) {
-        window.gameRenderer.renderHand(window.myHand, 100, 500);
-    }
-}
+        window.toggleReady = function() {
+            if (socket && socket.connected && window.currentRoom) {
+                socket.emit('playerReady', { roomId: window.currentRoom });
+            }
+        };
 
-// 監聽屏幕旋轉
-window.addEventListener('resize', handleOrientationChange);
-handleOrientationChange(); // 初始化
+        window.leaveRoom = function() {
+            document.getElementById('lobby-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'block';
+        };
 
-console.log('✅ 前端初始化完成');
-</script>
+        // ===== 橫屏處理 =====
+        function handleOrientation() {
+            const canvas = document.getElementById('game-canvas');
+            if (window.innerWidth > window.innerHeight) {
+                canvas.width = 1200;
+                canvas.height = 700;
+            } else {
+                canvas.width = 700;
+                canvas.height = 1200;
+            }
+            if (window.gameRenderer && window.myHand) {
+                window.gameRenderer.render(window.myHand, window.myPosition);
+            }
+        }
+        
+        window.addEventListener('resize', handleOrientation);
+        handleOrientation();
+
+        console.log('✅ 前端初始化完成');
+    </script>
 </body>
 </html>
