@@ -146,43 +146,47 @@ class MahjongGame {
   }
 
   // 處理碰
-  handlePong(playerPosition, tile, targetPosition) {
-    // 檢查手牌中是否有兩張相同的牌
-    const hand = this.hands[playerPosition];
-    const matchingTiles = hand.filter(t => t === tile);
-    if (matchingTiles.length < 2) {
-      return { error: '不能碰，手牌中少於兩張相同的牌' };
-    }
-
-    // 移除這兩張牌
-    let removedCount = 0;
-    const newHand = [];
-    for (const t of hand) {
-      if (t === tile && removedCount < 2) {
-        removedCount++;
-      } else {
-        newHand.push(t);
-      }
-    }
-    this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
-
-    console.log(`⚙️ 玩家 ${playerPosition} 碰了 ${targetPosition} 的 ${tile}`);
-
-    // 碰完後，輪到這個玩家打牌
-    this.currentPlayer = playerPosition;
-    // 清除最後打出的牌，因為被碰走了
-    this.lastDiscard = null;
-
-    return {
-      type: 'PONG',
-      player: playerPosition,
-      tile: tile,
-      from: targetPosition,
-      hand: this.hands[playerPosition], // 更新手牌
-      currentPlayer: this.currentPlayer
-    };
+ handlePong(playerPosition, tile, targetPosition) {
+  const hand = this.hands[playerPosition];
+  const matchingTiles = hand.filter(t => t === tile);
+  if (matchingTiles.length < 2) {
+    return { error: '不能碰，手牌中少於兩張相同的牌' };
   }
 
+  // 移除兩張牌
+  let removedCount = 0;
+  const newHand = [];
+  for (const t of hand) {
+    if (t === tile && removedCount < 2) {
+      removedCount++;
+    } else {
+      newHand.push(t);
+    }
+  }
+  this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+
+  // ✅ 記錄副露
+  this.melds[playerPosition].push({
+    type: 'PONG',
+    tile: tile,
+    from: targetPosition
+  });
+
+  console.log(`⚙️ 玩家 ${playerPosition} 碰了 ${targetPosition} 的 ${tile}`);
+
+  this.currentPlayer = playerPosition;
+  this.lastDiscard = null;
+
+  return {
+    type: 'PONG',
+    player: playerPosition,
+    tile: tile,
+    from: targetPosition,
+    hand: this.hands[playerPosition],
+    melds: this.melds[playerPosition], // ✅ 俾前端用
+    currentPlayer: this.currentPlayer
+  };
+}
   // 檢查其他玩家對打出的牌的反應
   checkReactions(discardPlayer, tile) {
     const reactions = [];
