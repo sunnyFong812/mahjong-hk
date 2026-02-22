@@ -209,7 +209,35 @@ window.socket.on('roomUpdate', (data) => {
         }
     }
 });
+// ===== 遊戲開始事件 =====
+socket.on('gameStart', (data) => {
+    console.log('🎮 遊戲開始', data);
+    
+    // 隱藏大廳，顯示遊戲畫面
+    document.getElementById('lobby-screen').style.display = 'none';
+    document.getElementById('game-screen').style.display = 'block';
+    
+    // 儲存玩家位置同手牌
+    window.myPosition = data.position;
+    window.myHand = data.hand;
+    window.currentPlayer = data.currentPlayer;
+    
+    // 更新遊戲資訊
+    document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
+    
+    // 如果有 renderer，初始化
+    if (window.gameRenderer) {
+        window.gameRenderer.renderGame(data, data.position);
+    }
+    
+    alert(`遊戲開始！你是 ${data.wind}家`);
+});
 
+// ===== 公共遊戲狀態更新 =====
+socket.on('publicGameState', (data) => {
+    console.log('📊 公共狀態', data);
+    document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
+});
 window.socket.on('gameCountdown', (data) => {
     document.getElementById('countdown').style.display = 'block';
     document.getElementById('countdown-seconds').textContent = data.seconds;
