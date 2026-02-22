@@ -165,7 +165,13 @@ function startGame(room) {
     currentPlayer: 0,
     wallSize: wall.length
   });
+  //如果第一個玩家係 AI，觸發 AI 決策
+  const firstPlayer = room.players.find(p => p.position === 0);
+  if (firstPlayer && firstPlayer.isAI) {
+    setTimeout(() => aiMakeDecision(room, firstPlayer), 1000);
+  }
 }
+
 
 // 檢查並補充 AI
 function checkAndAddAIPlayers(room) {
