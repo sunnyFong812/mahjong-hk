@@ -75,11 +75,10 @@ function aiMakeDecision(room, aiPlayer) {
   const game = room.gameState;
   if (!game) return;
   
-  // 取得 AI 手牌
   const hand = game.hands[aiPlayer.position];
   
   if (hand && hand.length > 0) {
-    // 簡單 AI：隨機打出一張牌（唔係字牌優先，但為咗簡單，隨機）
+    // AI 隨機打出一張牌
     const randomIndex = Math.floor(Math.random() * hand.length);
     const tileToDiscard = hand[randomIndex];
     
@@ -96,22 +95,41 @@ function aiMakeDecision(room, aiPlayer) {
       // 輪到下家
       game.currentPlayer = (aiPlayer.position + 1) % 4;
       
-      // 通知所有玩家
+      // 下家摸牌
+      const nextPlayer = room.players.find(p => p.position === game.currentPlayer);
+      if (nextPlayer) {
+        if (game.wall.length > 0) {
+          const drawnTile = game.wall.pop();
+          
+          if (!nextPlayer.isAI) {
+            // 真人下家
+            game.hands[nextPlayer.position].push(drawnTile);
+            game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+            
+            io.to(nextPlayer.id).emit('gameUpdate', {
+              type: 'DRAW',
+              player: nextPlayer.position,
+              hand: game.hands[nextPlayer.position],
+              drawnTile: drawnTile
+            });
+          } else {
+            // AI 下家
+            game.hands[nextPlayer.position].push(drawnTile);
+            game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+            
+            setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
+          }
+        }
+      }
+      
+      // 廣播更新
       io.to(room.id).emit('gameUpdate', {
         type: 'DISCARD',
         player: aiPlayer.position,
         tile: tileToDiscard,
-        hand: hand,
         discards: game.discards,
         currentPlayer: game.currentPlayer
       });
-      
-      // 如果下家係 AI，繼續觸發
-      const nextPlayer = room.players.find(p => p.position === game.currentPlayer);
-      if (nextPlayer && nextPlayer.isAI) {
-        // 少少延遲，似真人思考
-        setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
-      }
     }
   }
 }
