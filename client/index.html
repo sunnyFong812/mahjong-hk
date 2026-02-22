@@ -486,7 +486,11 @@
 // ===== 遊戲更新 =====
 socket.on('gameUpdate', (data) => {
     console.log('🔄 遊戲更新', data);
-    
+    //更新當前玩家
+    if (data.currentPlayer !== undefined) {
+  window.currentPlayer = data.currentPlayer;
+  console.log('🔄 當前玩家更新為:', window.currentPlayer);
+}
     // 處理自己打牌
     if (data.type === 'DISCARD') {
         if (data.player === window.myPosition) {
