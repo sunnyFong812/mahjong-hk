@@ -2,247 +2,89 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const path = require('path');
-const cors = require('cors');
+const MahjongGame = require('./game-engine/mahjong-game');
 
 const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
-  cors: {
-    origin: "*",
-    methods: ["GET", "POST"]
-  },
+  cors: { origin: "*", methods: ["GET", "POST"] },
   transports: ['polling', 'websocket']
 });
 
-// 提供靜態檔案
 app.use(express.static(path.join(__dirname, '../client')));
+app.get('/health', (req, res) => res.send('OK'));
 
-// 健康檢查
-app.get('/health', (req, res) => {
-  res.status(200).send('OK');
-});
-
-// 房間管理
 const rooms = {};
-
-// AI 玩家名稱
 const AI_NAMES = ['🤖 阿強', '🤖 阿倫', '🤖 阿東', '🤖 阿北'];
 
-// 建立 AI 玩家
-function createAIPlayer(roomId, position) {
+function createAIPlayer(roomId, pos) {
   return {
-    id: `ai_${roomId}_${position}_${Date.now()}`,
-    name: AI_NAMES[position % AI_NAMES.length],
-    position: position,
+    id: `ai_${roomId}_${pos}_${Date.now()}`,
+    name: AI_NAMES[pos % AI_NAMES.length],
+    position: pos,
     isAI: true,
     ready: true
   };
 }
 
-// 建立牌牆
-function createWall() {
-  const wall = [];
-  const suits = ['m', 'p', 's'];
-  const honors = ['東', '南', '西', '北', '中', '發', '白'];
-  
-  // 萬筒條 1-9 x4
-  for (const suit of suits) {
-    for (let num = 1; num <= 9; num++) {
-      for (let i = 0; i < 4; i++) {
-        wall.push(`${num}${suit}`);
-      }
+function aiMove(room, aiPlayer) {
+  const game = room.game;
+  if (!game || game.gameOver) return;
+  if (game.currentPlayer !== aiPlayer.position) return;
+
+  const hand = game.hands[aiPlayer.position];
+  if (!hand || hand.length === 0) return;
+
+  const tile = hand[Math.floor(Math.random() * hand.length)];
+  console.log(`🤖 AI ${aiPlayer.name} 打出 ${tile}`);
+
+  const result = game.processAction(aiPlayer.position, 'DISCARD', tile);
+  if (result) {
+    io.to(room.id).emit('gameUpdate', result);
+
+    if (!game.gameOver && game.currentPlayer !== undefined) {
+      const next = room.players.find(p => p.position === game.currentPlayer);
+      if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
     }
   }
-  
-  // 字牌 x4
-  for (const honor of honors) {
-    for (let i = 0; i < 4; i++) {
-      wall.push(honor);
-    }
-  }
-  
-  // 洗牌
-  for (let i = wall.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [wall[i], wall[j]] = [wall[j], wall[i]];
-  }
-  
-  return wall;
 }
 
-// ===== AI 決策 =====
-function aiMakeDecision(room, aiPlayer) {
-  const game = room.gameState;
-  if (!game) return;
-  
-  const hand = game.hands[aiPlayer.position];
-  
-  if (hand && hand.length > 0) {
-    // AI 隨機打出一張牌
-    const randomIndex = Math.floor(Math.random() * hand.length);
-    const tileToDiscard = hand[randomIndex];
-    
-    console.log(`🤖 AI ${aiPlayer.name} 打出: ${tileToDiscard}`);
-    
-    // 從手牌移除
-    const index = hand.indexOf(tileToDiscard);
-    if (index !== -1) {
-      hand.splice(index, 1);
-      
-      // 加入棄牌區
-      game.discards[aiPlayer.position].push(tileToDiscard);
-      
-      // 輪到下家
-      game.currentPlayer = (aiPlayer.position + 1) % 4;
-      
-      // 下家摸牌
-      const nextPlayer = room.players.find(p => p.position === game.currentPlayer);
-      if (nextPlayer) {
-        if (game.wall.length > 0) {
-          const drawnTile = game.wall.pop();
-          
-          if (!nextPlayer.isAI) {
-            // 真人下家
-            game.hands[nextPlayer.position].push(drawnTile);
-            game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
-            
-            io.to(nextPlayer.id).emit('gameUpdate', {
-              type: 'DRAW',
-              player: nextPlayer.position,
-              hand: game.hands[nextPlayer.position],
-              drawnTile: drawnTile
-            });
-          } else {
-            // AI 下家
-            game.hands[nextPlayer.position].push(drawnTile);
-            game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
-            
-            setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
-          }
-        }
-      }
-      
-      // 廣播更新
-      io.to(room.id).emit('gameUpdate', {
-        type: 'DISCARD',
-        player: aiPlayer.position,
-        tile: tileToDiscard,
-        discards: game.discards,
-        currentPlayer: game.currentPlayer
-      });
-    }
-  }
-}
-// 開始遊戲
 function startGame(room) {
   console.log(`🎮 房間 ${room.id} 遊戲開始`);
-  
-  const wall = createWall();
-  const hands = {};
-  const discards = { 0: [], 1: [], 2: [], 3: [] };
-  
-  // 發牌：莊家(0) 17張，閒家16張
-  for (let i = 0; i < 4; i++) {
-    hands[i] = [];
-    const tileCount = i === 0 ? 17 : 16;
-    for (let j = 0; j < tileCount; j++) {
-      hands[i].push(wall.pop());
-    }
-    // 排序手牌
-    hands[i].sort((a, b) => a.localeCompare(b));
-  }
-  
-  room.gameState = {
-    hands: hands,
-    discards: discards,
-    wall: wall,
-    currentPlayer: 0, // 莊家先
-    winds: ['東', '南', '西', '北']
-  };
-  
-  // 通知所有真人玩家
-  room.players.forEach(player => {
-    if (!player.isAI) {
-      console.log(`📤 發送 gameStart 給 ${player.name}`);
-      io.to(player.id).emit('gameStart', {
-        position: player.position,
-        hand: hands[player.position],
-        wind: room.gameState.winds[player.position],
-        currentPlayer: 0,
-        discards: discards,
-        wallSize: wall.length
-      });
-    } else {
-      console.log(`🤖 AI ${player.name} 開始遊戲`);
-    }
-  });
-  
-  // 廣播公共狀態
-  io.to(room.id).emit('publicGameState', {
-    discards: discards,
-    currentPlayer: 0,
-    wallSize: wall.length
-  });
-  //如果第一個玩家係 AI，觸發 AI 決策
-  const firstPlayer = room.players.find(p => p.position === 0);
-  if (firstPlayer && firstPlayer.isAI) {
-    setTimeout(() => aiMakeDecision(room, firstPlayer), 1000);
-  }
-}
+  room.game = new MahjongGame(room.players);
+  const init = room.game.start();
 
-
-// 檢查並補充 AI
-function checkAndAddAIPlayers(room) {
-  const humanPlayers = room.players.filter(p => !p.isAI);
-  const readyHumans = humanPlayers.filter(p => p.ready);
-  
-  if (humanPlayers.length > 0 && readyHumans.length === humanPlayers.length) {
-    // 補 AI 到 4 人
-    for (let i = room.players.length; i < 4; i++) {
-      const aiPlayer = createAIPlayer(room.id, i);
-      room.players.push(aiPlayer);
-      console.log(`🤖 AI 加入房間 ${room.id}，位置 ${i}`);
-    }
-    
-    // 通知更新
-    io.to(room.id).emit('roomUpdate', {
-      players: room.players.map(p => ({
-        name: p.name,
-        ready: p.ready,
+  room.players.forEach(p => {
+    if (!p.isAI) {
+      io.to(p.id).emit('gameStart', {
         position: p.position,
-        isAI: p.isAI || false
-      })),
-      gameState: 'playing',
-      roomId: room.id
-    });
-    
-    // 開始遊戲
-    setTimeout(() => startGame(room), 1000);
-  }
+        hand: init.hands[p.position],
+        wind: ['東', '南', '西', '北'][p.position],
+        currentPlayer: init.currentPlayer,
+        discards: init.discards,
+        wallSize: init.wallSize
+      });
+    }
+  });
+
+  io.to(room.id).emit('publicGameState', {
+    discards: init.discards,
+    currentPlayer: init.currentPlayer,
+    wallSize: init.wallSize
+  });
+
+  const first = room.players.find(p => p.position === 0);
+  if (first?.isAI) setTimeout(() => aiMove(room, first), 800);
 }
 
-// ===== Socket 連接 =====
 io.on('connection', (socket) => {
-  console.log('✅ 新連線:', socket.id);
-  
-  socket.on('joinRoom', (data) => {
-    const { roomId, playerName } = data;
-    
-    if (!rooms[roomId]) {
-      rooms[roomId] = {
-        id: roomId,
-        players: [],
-        gameState: 'waiting'
-      };
-    }
-    
+  console.log('✅ 連線:', socket.id);
+
+  socket.on('joinRoom', ({ roomId, playerName }) => {
+    if (!rooms[roomId]) rooms[roomId] = { id: roomId, players: [], game: null };
     const room = rooms[roomId];
-    
-    if (room.players.length >= 4) {
-      socket.emit('roomError', '房間已滿');
-      return;
-    }
-    
+    if (room.players.length >= 4) return socket.emit('roomError', '已滿');
+
     const player = {
       id: socket.id,
       name: playerName,
@@ -250,147 +92,69 @@ io.on('connection', (socket) => {
       ready: false,
       isAI: false
     };
-    
     room.players.push(player);
     socket.join(roomId);
-    
+
     io.to(roomId).emit('roomUpdate', {
       players: room.players.map(p => ({
-        name: p.name,
-        ready: p.ready,
-        position: p.position,
-        isAI: p.isAI || false
-      })),
-      gameState: room.gameState,
-      roomId: roomId
+        name: p.name, ready: p.ready, position: p.position, isAI: p.isAI
+      }))
     });
-    
-    console.log(`👤 ${playerName} 加入房間 ${roomId}，位置 ${player.position}`);
+    console.log(`👤 ${playerName} 加入 ${roomId}`);
   });
-  
-  socket.on('playerReady', (data) => {
-    const { roomId } = data;
+
+  socket.on('playerReady', ({ roomId }) => {
     const room = rooms[roomId];
     if (!room) return;
-    
-    const player = room.players.find(p => p.id === socket.id);
-    if (player && !player.isAI) {
-      player.ready = !player.ready;
-      
-      io.to(roomId).emit('roomUpdate', {
-        players: room.players.map(p => ({
-          name: p.name,
-          ready: p.ready,
-          position: p.position,
-          isAI: p.isAI || false
-        })),
-        gameState: room.gameState
-      });
-      
-      checkAndAddAIPlayers(room);
+    const p = room.players.find(p => p.id === socket.id);
+    if (!p || p.isAI) return;
+
+    p.ready = !p.ready;
+    io.to(roomId).emit('roomUpdate', {
+      players: room.players.map(p => ({
+        name: p.name, ready: p.ready, position: p.position, isAI: p.isAI
+      }))
+    });
+
+    const humans = room.players.filter(p => !p.isAI);
+    if (humans.length && humans.every(h => h.ready)) {
+      while (room.players.length < 4) {
+        room.players.push(createAIPlayer(roomId, room.players.length));
+      }
+      startGame(room);
     }
   });
-  
-socket.on('playerAction', (data) => {
-  const { roomId, action, tile } = data;
-  const room = rooms[roomId];
-  if (!room || !room.gameState) return;
-  
-  const player = room.players.find(p => p.id === socket.id);
-  if (!player) return;
-  
-  if (action === 'DISCARD') {
-    // 從手牌移除
-    const hand = room.gameState.hands[player.position];
-    const index = hand.indexOf(tile);
-    if (index !== -1) {
-      hand.splice(index, 1);
-      
-      // 加入棄牌區
-      room.gameState.discards[player.position].push(tile);
-      
-      // 輪到下家
-      room.gameState.currentPlayer = (player.position + 1) % 4;
-      
-      // ✅ 下家摸牌 (從牌牆抽一張)
-      const nextPlayer = room.players.find(p => p.position === room.gameState.currentPlayer);
-      if (nextPlayer) {
-        // 檢查牌牆仲有冇牌
-        if (room.gameState.wall.length > 0) {
-          const drawnTile = room.gameState.wall.pop();
-          
-          if (!nextPlayer.isAI) {
-            // 真人下家：將摸到嘅牌加入手牌
-            room.gameState.hands[nextPlayer.position].push(drawnTile);
-            room.gameState.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
-            
-            console.log(`🀄️ ${nextPlayer.name} 摸到 ${drawnTile}`);
-            
-            // 通知下家摸到牌
-            io.to(nextPlayer.id).emit('gameUpdate', {
-              type: 'DRAW',
-              player: nextPlayer.position,
-              hand: room.gameState.hands[nextPlayer.position],
-              drawnTile: drawnTile
-            });
-          } else {
-            // AI 下家：將摸到嘅牌加入手牌，然後觸發 AI 決策
-            room.gameState.hands[nextPlayer.position].push(drawnTile);
-            room.gameState.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
-            
-            console.log(`🤖 AI ${nextPlayer.name} 摸到 ${drawnTile}`);
-            
-            // 延遲少少等 AI 思考
-            setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
-          }
-        } else {
-          console.log('⚠️ 牌牆冇牌，遊戲結束');
-          // 流局處理
-        }
+
+  socket.on('playerAction', ({ roomId, action, tile }) => {
+    const room = rooms[roomId];
+    if (!room?.game) return;
+
+    const player = room.players.find(p => p.id === socket.id);
+    if (!player) return;
+
+    const result = room.game.processAction(player.position, action, tile);
+    if (result) {
+      io.to(roomId).emit('gameUpdate', result);
+
+      if (!room.game.gameOver && room.game.currentPlayer !== undefined) {
+        const next = room.players.find(p => p.position === room.game.currentPlayer);
+        if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
       }
-      
-      // 廣播更新 (俾所有玩家知道有人打牌)
-      io.to(roomId).emit('gameUpdate', {
-        type: 'DISCARD',
-        player: player.position,
-        tile: tile,
-        discards: room.gameState.discards,
-        currentPlayer: room.gameState.currentPlayer
-      });
-      
-      // 同時更新所有玩家嘅手牌（只發送俾對應玩家）
-      room.players.forEach(p => {
-        if (!p.isAI && p.id !== player.id) {
-          // 其他真人玩家只需要知道有人打牌，唔需要知道手牌內容
-          // 但可以更新佢哋嘅公共狀態
-        }
-      });
     }
-  }
-});
-  
+  });
+
   socket.on('disconnect', () => {
-    console.log('❌ 斷線:', socket.id);
-    
-    for (const roomId in rooms) {
-      const room = rooms[roomId];
-      const index = room.players.findIndex(p => p.id === socket.id);
-      
-      if (index !== -1) {
-        const player = room.players[index];
-        room.players.splice(index, 1);
-        
-        io.to(roomId).emit('roomUpdate', {
+    for (const rid in rooms) {
+      const room = rooms[rid];
+      const idx = room.players.findIndex(p => p.id === socket.id);
+      if (idx !== -1) {
+        room.players.splice(idx, 1);
+        io.to(rid).emit('roomUpdate', {
           players: room.players.map(p => ({
-            name: p.name,
-            ready: p.ready,
-            position: p.position,
-            isAI: p.isAI || false
-          })),
-          gameState: room.gameState
+            name: p.name, ready: p.ready, position: p.position, isAI: p.isAI
+          }))
         });
-        
-        console.log(`👋 ${player.name} 離開`);
+        if (room.players.length === 0) delete rooms[rid];
         break;
       }
     }
@@ -399,8 +163,7 @@ socket.on('playerAction', (data) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log('\n=== 🀄️ 港式麻雀伺服器 ===');
-  console.log(`📱 本地: http://localhost:${PORT}`);
-  console.log('🎮 莊家 17 張，閒家 16 張');
-  console.log('========================\n');
+  console.log('\n=== 🀄️ 港式麻雀（5c89b31 改良版）===');
+  console.log(`🌐 http://localhost:${PORT}`);
+  console.log('🎮 碰、槓、糊已加入，人機正常');
 });
