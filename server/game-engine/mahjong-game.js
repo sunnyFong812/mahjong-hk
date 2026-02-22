@@ -116,29 +116,53 @@ class MahjongGame {
   }
 
   handlePong(playerPosition, tile, targetPosition) {
-    const hand = this.hands[playerPosition];
-    const matching = hand.filter(t => t === tile);
-    if (matching.length < 2) return { error: 'cannot pong' };
-    let removed = 0;
-    const newHand = [];
-    for (const t of hand) {
-      if (t === tile && removed < 2) { removed++; } else { newHand.push(t); }
+  const hand = this.hands[playerPosition];
+  
+  // 檢查有冇足夠嘅相同牌
+  const indices = [];
+  for (let i = 0; i < hand.length; i++) {
+    if (hand[i] === tile) {
+      indices.push(i);
+      if (indices.length === 2) break;
     }
-    this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
-    this.melds[playerPosition].push({ type: 'PONG', tile, from: targetPosition });
-    this.currentPlayer = playerPosition;
-    this.lastDiscard = null;
-    return {
-      type: 'PONG',
-      player: playerPosition,
-      tile,
-      from: targetPosition,
-      hand: this.hands[playerPosition],
-      melds: this.melds[playerPosition],
-      currentPlayer: this.currentPlayer
-    };
   }
 
+  if (indices.length < 2) {
+    return { error: '不能碰，手牌中少於兩張相同的牌' };
+  }
+
+  // ✅ 安全移除：由後往前刪，唔會影響 index
+  const newHand = [...hand];
+  for (let i = indices.length - 1; i >= 0; i--) {
+    newHand.splice(indices[i], 1);
+  }
+
+  this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+
+  // ✅ 記錄副露
+  if (!this.melds) this.melds = { 0: [], 1: [], 2: [], 3: [] };
+  this.melds[playerPosition].push({
+    type: 'PONG',
+    tile: tile,
+    from: targetPosition
+  });
+
+  console.log(`⚙️ 玩家 ${playerPosition} 碰了 ${targetPosition} 的 ${tile}`);
+  console.log(`📊 碰後手牌 (${this.hands[playerPosition].length} 張):`, this.hands[playerPosition]);
+
+  this.currentPlayer = playerPosition;
+  this.lastDiscard = null;
+
+  return {
+    type: 'PONG',
+    player: playerPosition,
+    tile: tile,
+    from: targetPosition,
+    hand: this.hands[playerPosition],
+    melds: this.melds[playerPosition],
+    currentPlayer: this.currentPlayer
+  };
+}
   processAction(playerPosition, action, tile, targetPosition) {
     switch (action) {
       case 'DISCARD': return this.handleDiscard(playerPosition, tile);
