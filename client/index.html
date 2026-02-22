@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>港式麻雀 - 16隻牌</title>
+    <title>港式麻雀 - 16張牌</title>
     <style>
         * {
             margin: 0;
@@ -349,6 +349,7 @@
         window.selectedTileIndex = -1;
         window.gameRenderer = null;
         window.currentPlayer = -1;
+        window.discards = {};  // 棄牌區
 
         // ===== 牌型排序函數 =====
         function sortTiles(tiles) {
@@ -357,7 +358,6 @@
             const suitOrder = { 'm': 0, 'p': 1, 's': 2, '東': 3, '南': 4, '西': 5, '北': 6, '中': 7, '發': 8, '白': 9 };
             
             return [...tiles].sort((a, b) => {
-                // 先分花色
                 let suitA = 'z', suitB = 'z';
                 let numA = 0, numB = 0;
                 
@@ -375,7 +375,6 @@
                     suitB = b;
                 }
                 
-                // 先比較花色
                 const orderA = suitOrder[suitA] || 99;
                 const orderB = suitOrder[suitB] || 99;
                 
@@ -383,7 +382,6 @@
                     return orderA - orderB;
                 }
                 
-                // 相同花色，比較數字
                 if (suitA === suitB) {
                     return numA - numB;
                 }
@@ -449,8 +447,17 @@
             document.getElementById('game-screen').style.display = 'block';
             
             window.myPosition = data.position;
-            window.myHand = sortTiles(data.hand || []);
+            
+            // 莊家（東位）有17張，其他16張
+            if (data.position === 0) {
+                window.myHand = sortTiles(data.hand || []);
+                console.log('🎲 你是莊家，有 17 張牌');
+            } else {
+                window.myHand = sortTiles(data.hand || []);
+            }
+            
             window.currentPlayer = data.currentPlayer;
+            window.discards = data.discards || { 0: [], 1: [], 2: [], 3: [] };
             
             document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
             document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
@@ -460,8 +467,8 @@
                 window.gameRenderer = new MahjongRenderer('game-canvas');
             }
             
-            // 渲染手牌
-            window.gameRenderer.render(window.myHand, window.myPosition);
+            // 渲染
+            window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
             
             // 如果係自己回合，顯示提示
             if (data.currentPlayer === window.myPosition) {
@@ -476,16 +483,34 @@
         socket.on('gameUpdate', (data) => {
             console.log('🔄 遊戲更新', data);
             
+            // 更新手牌
             if (data.hand && data.player === window.myPosition) {
                 window.myHand = sortTiles(data.hand);
             }
             
+            // 更新棄牌區
+            if (data.discards) {
+                window.discards = data.discards;
+            }
+            
+            // 如果係自己摸牌，顯示提示
+            if (data.type === 'DRAW' && data.player === window.myPosition) {
+                console.log('🀄️ 你摸到新牌');
+                document.getElementById('selected-tile-hint').textContent = '🀄️ 摸到新牌，請選擇要打出的牌';
+                document.getElementById('selected-tile-hint').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('selected-tile-hint').textContent = '👆 點擊手牌選擇，再點擊同一張打出';
+                }, 3000);
+            }
+            
+            // 更新當前玩家
             if (data.currentPlayer !== undefined) {
                 window.currentPlayer = data.currentPlayer;
             }
             
+            // 重新渲染
             if (window.gameRenderer) {
-                window.gameRenderer.render(window.myHand, window.myPosition);
+                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
             }
             
             // 更新當前玩家提示
@@ -494,6 +519,8 @@
                 setTimeout(() => {
                     document.getElementById('selected-tile-hint').style.display = 'none';
                 }, 5000);
+            } else {
+                document.getElementById('selected-tile-hint').style.display = 'none';
             }
         });
 
@@ -520,12 +547,12 @@
                 
                 console.log(`🖱️ 點擊位置: (${x}, ${y})`);
                 
-                // 檢查手牌區域 (16隻牌)
-                const startX = 100;
-                const startY = 500;
+                // 檢查手牌區域 (最多17張)
+                const startX = 50;
+                const startY = 550;
                 
                 for (let i = 0; i < window.myHand.length; i++) {
-                    const tileX = startX + i * (this.tileWidth + 5);
+                    const tileX = startX + i * (this.tileWidth + 3);
                     
                     if (x >= tileX && x <= tileX + this.tileWidth &&
                         y >= startY && y <= startY + this.tileHeight) {
@@ -546,10 +573,6 @@
                                 
                                 this.selectedIndex = -1;
                                 document.getElementById('selected-tile-hint').style.display = 'none';
-                                document.getElementById('selected-tile-hint').textContent = '✅ 已打出';
-                                setTimeout(() => {
-                                    document.getElementById('selected-tile-hint').textContent = '👆 點擊手牌選擇，再點擊同一張打出';
-                                }, 2000);
                             } else {
                                 alert('⚠️ 唔係你嘅回合');
                                 this.selectedIndex = -1;
@@ -561,30 +584,33 @@
                             document.getElementById('selected-tile-hint').textContent = `✅ 已選中 ${this.getTileDisplay(window.myHand[i])}，再點擊打出`;
                         }
                         
-                        this.render(window.myHand, window.myPosition);
+                        this.render(window.myHand, window.myPosition, window.discards);
                         break;
                     }
                 }
             }
             
-            render(hand, myPosition) {
+            render(hand, myPosition, discards) {
                 this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
                 
                 // 背景
                 this.ctx.fillStyle = '#2a6f2a';
                 this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
                 
+                // 畫棄牌區 (台中間)
+                this.renderDiscardArea(discards);
+                
                 // 顯示手牌數量
                 this.ctx.fillStyle = 'white';
                 this.ctx.font = '20px Arial';
-                this.ctx.fillText(`手牌: ${hand.length} 隻`, 20, 50);
+                this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
                 
-                // 手牌 (最多16隻)
-                const startX = 100;
-                const startY = 500;
+                // 手牌 (最多17張)
+                const startX = 50;
+                const startY = 550;
                 
                 hand.forEach((tile, i) => {
-                    const x = startX + i * (this.tileWidth + 5);
+                    const x = startX + i * (this.tileWidth + 3);
                     
                     // 牌面
                     this.ctx.fillStyle = '#f8f9fa';
@@ -608,7 +634,49 @@
                 
                 // 顯示當前玩家
                 this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
-                this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '你' : '其他'}`, 500, 250);
+                this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 250);
+                
+                // 顯示誰是莊家
+                this.ctx.fillStyle = '#ffd700';
+                this.ctx.fillText('莊家: 東位', 500, 300);
+            }
+            
+            renderDiscardArea(discards) {
+                if (!discards) return;
+                
+                const centerX = 500;
+                const centerY = 350;
+                
+                this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                this.ctx.fillRect(centerX - 200, centerY - 100, 400, 200);
+                
+                this.ctx.strokeStyle = '#d4a373';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(centerX - 200, centerY - 100, 400, 200);
+                
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '16px Arial';
+                this.ctx.fillText('棄牌區', centerX - 30, centerY - 80);
+                
+                // 顯示最近打出的牌
+                let x = centerX - 180;
+                let y = centerY - 50;
+                
+                for (let i = 0; i < 4; i++) {
+                    const playerDiscards = discards[i] || [];
+                    const lastTiles = playerDiscards.slice(-6);
+                    
+                    lastTiles.forEach((tile, index) => {
+                        this.ctx.fillStyle = '#f8f9fa';
+                        this.ctx.fillRect(x + index * 30, y + i * 40, 25, 35);
+                        this.ctx.strokeStyle = '#333';
+                        this.ctx.strokeRect(x + index * 30, y + i * 40, 25, 35);
+                        
+                        this.ctx.fillStyle = this.getTileColor(tile);
+                        this.ctx.font = '14px Arial';
+                        this.ctx.fillText(this.getTileDisplay(tile), x + index * 30 + 3, y + i * 40 + 22);
+                    });
+                }
             }
             
             getTileColor(tile) {
@@ -672,7 +740,7 @@
                 canvas.height = 1200;
             }
             if (window.gameRenderer && window.myHand) {
-                window.gameRenderer.render(window.myHand, window.myPosition);
+                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
             }
         }
         
