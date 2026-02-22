@@ -480,49 +480,49 @@
         });
 
         // ===== 遊戲更新 =====
-        socket.on('gameUpdate', (data) => {
-            console.log('🔄 遊戲更新', data);
-            
-            // 更新手牌
-            if (data.hand && data.player === window.myPosition) {
-                window.myHand = sortTiles(data.hand);
-            }
-            
-            // 更新棄牌區
-            if (data.discards) {
-                window.discards = data.discards;
-            }
-            
-            // 如果係自己摸牌，顯示提示
-            if (data.type === 'DRAW' && data.player === window.myPosition) {
-                console.log('🀄️ 你摸到新牌');
-                document.getElementById('selected-tile-hint').textContent = '🀄️ 摸到新牌，請選擇要打出的牌';
-                document.getElementById('selected-tile-hint').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('selected-tile-hint').textContent = '👆 點擊手牌選擇，再點擊同一張打出';
-                }, 3000);
-            }
-            
-            // 更新當前玩家
-            if (data.currentPlayer !== undefined) {
-                window.currentPlayer = data.currentPlayer;
-            }
-            
-            // 重新渲染
-            if (window.gameRenderer) {
-                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-            }
-            
-            // 更新當前玩家提示
-            if (data.currentPlayer === window.myPosition) {
-                document.getElementById('selected-tile-hint').style.display = 'block';
-                setTimeout(() => {
-                    document.getElementById('selected-tile-hint').style.display = 'none';
-                }, 5000);
-            } else {
-                document.getElementById('selected-tile-hint').style.display = 'none';
-            }
-        });
+// ===== 遊戲更新 =====
+socket.on('gameUpdate', (data) => {
+    console.log('🔄 遊戲更新', data);
+    
+    if (data.type === 'DRAW' && data.player === window.myPosition) {
+        // 自己摸牌
+        window.myHand = sortTiles(data.hand);
+        document.getElementById('selected-tile-hint').textContent = '🀄️ 摸到新牌，請選擇要打出的牌';
+        document.getElementById('selected-tile-hint').style.display = 'block';
+        setTimeout(() => {
+            document.getElementById('selected-tile-hint').textContent = '👆 點擊手牌選擇，再點擊同一張打出';
+        }, 3000);
+    }
+    
+    if (data.type === 'DISCARD') {
+        if (data.player === window.myPosition) {
+            // 自己打牌，更新手牌
+            window.myHand = sortTiles(data.hand);
+        }
+        
+        // 更新棄牌區
+        if (data.discards) {
+            window.discards = data.discards;
+        }
+    }
+    
+    // 更新當前玩家
+    if (data.currentPlayer !== undefined) {
+        window.currentPlayer = data.currentPlayer;
+    }
+    
+    // 重新渲染
+    if (window.gameRenderer) {
+        window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+    }
+    
+    // 更新當前玩家提示
+    if (data.currentPlayer === window.myPosition) {
+        document.getElementById('selected-tile-hint').style.display = 'block';
+    } else {
+        document.getElementById('selected-tile-hint').style.display = 'none';
+    }
+});
 
         // ===== 渲染器 =====
         class MahjongRenderer {
