@@ -70,6 +70,51 @@ function createWall() {
   return wall;
 }
 
+// ===== AI 決策 =====
+function aiMakeDecision(room, aiPlayer) {
+  const game = room.gameState;
+  if (!game) return;
+  
+  // 取得 AI 手牌
+  const hand = game.hands[aiPlayer.position];
+  
+  if (hand && hand.length > 0) {
+    // 簡單 AI：隨機打出一張牌（唔係字牌優先，但為咗簡單，隨機）
+    const randomIndex = Math.floor(Math.random() * hand.length);
+    const tileToDiscard = hand[randomIndex];
+    
+    console.log(`🤖 AI ${aiPlayer.name} 打出: ${tileToDiscard}`);
+    
+    // 從手牌移除
+    const index = hand.indexOf(tileToDiscard);
+    if (index !== -1) {
+      hand.splice(index, 1);
+      
+      // 加入棄牌區
+      game.discards[aiPlayer.position].push(tileToDiscard);
+      
+      // 輪到下家
+      game.currentPlayer = (aiPlayer.position + 1) % 4;
+      
+      // 通知所有玩家
+      io.to(room.id).emit('gameUpdate', {
+        type: 'DISCARD',
+        player: aiPlayer.position,
+        tile: tileToDiscard,
+        hand: hand,
+        discards: game.discards,
+        currentPlayer: game.currentPlayer
+      });
+      
+      // 如果下家係 AI，繼續觸發
+      const nextPlayer = room.players.find(p => p.position === game.currentPlayer);
+      if (nextPlayer && nextPlayer.isAI) {
+        // 少少延遲，似真人思考
+        setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
+      }
+    }
+  }
+}
 // 開始遊戲
 function startGame(room) {
   console.log(`🎮 房間 ${room.id} 遊戲開始`);
