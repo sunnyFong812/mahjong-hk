@@ -120,8 +120,12 @@ io.on('connection', (socket) => {
 
     const humans = room.players.filter(p => !p.isAI);
     if (humans.length && humans.every(h => h.ready)) {
+      console.log('準備補ai，目前玩家人數:', room.players.length);
+      
       while (room.players.length < 4) {
-        room.players.push(createAIPlayer(roomId, room.players.length));
+        const ai = createAIPlayer(roomId, room.players.length);
+        console.log('嘗試加入AI'， ai);
+        room.players.push(ai);
       }
       startGame(room);
     }
