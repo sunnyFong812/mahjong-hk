@@ -273,7 +273,7 @@ io.on('connection', (socket) => {
     }
   });
   
-  socket.on('playerAction', (data) => {
+socket.on('playerAction', (data) => {
   const { roomId, action, tile } = data;
   const room = rooms[roomId];
   if (!room || !room.gameState) return;
@@ -294,36 +294,58 @@ io.on('connection', (socket) => {
       // 輪到下家
       room.gameState.currentPlayer = (player.position + 1) % 4;
       
-      // 下家摸牌
+      // ✅ 下家摸牌 (從牌牆抽一張)
       const nextPlayer = room.players.find(p => p.position === room.gameState.currentPlayer);
       if (nextPlayer) {
-        if (!nextPlayer.isAI) {
-          // 真人下家：摸牌
+        // 檢查牌牆仲有冇牌
+        if (room.gameState.wall.length > 0) {
           const drawnTile = room.gameState.wall.pop();
-          room.gameState.hands[nextPlayer.position].push(drawnTile);
-          room.gameState.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
           
-          // 通知下家摸到牌
-          io.to(nextPlayer.id).emit('gameUpdate', {
-            type: 'DRAW',
-            player: nextPlayer.position,
-            hand: room.gameState.hands[nextPlayer.position],
-            drawnTile: drawnTile
-          });
+          if (!nextPlayer.isAI) {
+            // 真人下家：將摸到嘅牌加入手牌
+            room.gameState.hands[nextPlayer.position].push(drawnTile);
+            room.gameState.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+            
+            console.log(`🀄️ ${nextPlayer.name} 摸到 ${drawnTile}`);
+            
+            // 通知下家摸到牌
+            io.to(nextPlayer.id).emit('gameUpdate', {
+              type: 'DRAW',
+              player: nextPlayer.position,
+              hand: room.gameState.hands[nextPlayer.position],
+              drawnTile: drawnTile
+            });
+          } else {
+            // AI 下家：將摸到嘅牌加入手牌，然後觸發 AI 決策
+            room.gameState.hands[nextPlayer.position].push(drawnTile);
+            room.gameState.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+            
+            console.log(`🤖 AI ${nextPlayer.name} 摸到 ${drawnTile}`);
+            
+            // 延遲少少等 AI 思考
+            setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
+          }
         } else {
-          // 👇 AI 下家：直接觸發 AI 決策
-          setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
+          console.log('⚠️ 牌牆冇牌，遊戲結束');
+          // 流局處理
         }
       }
       
-      // 廣播更新
+      // 廣播更新 (俾所有玩家知道有人打牌)
       io.to(roomId).emit('gameUpdate', {
         type: 'DISCARD',
         player: player.position,
         tile: tile,
-        hand: hand,
         discards: room.gameState.discards,
         currentPlayer: room.gameState.currentPlayer
+      });
+      
+      // 同時更新所有玩家嘅手牌（只發送俾對應玩家）
+      room.players.forEach(p => {
+        if (!p.isAI && p.id !== player.id) {
+          // 其他真人玩家只需要知道有人打牌，唔需要知道手牌內容
+          // 但可以更新佢哋嘅公共狀態
+        }
       });
     }
   }
