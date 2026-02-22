@@ -124,7 +124,7 @@ io.on('connection', (socket) => {
       
       while (room.players.length < 4) {
         const ai = createAIPlayer(roomId, room.players.length);
-        console.log('嘗試加入AI'， ai);
+        console.log('嘗試加入AI', ai);
         room.players.push(ai);
       }
       startGame(room);
