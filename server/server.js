@@ -112,6 +112,7 @@ io.on('connection', (socket) => {
 
     p.ready = !p.ready;
     io.to(roomId).emit('roomUpdate', {
+      roomId:roomId,
       players: room.players.map(p => ({
         name: p.name, ready: p.ready, position: p.position, isAI: p.isAI
       }))
