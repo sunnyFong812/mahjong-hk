@@ -256,10 +256,7 @@ class MahjongGame {
 
   // TODO: 檢查是否可以食糊 (非常複雜，這裡只做簡單判斷)
   canMahjong(playerPosition, tile) {
-    // 為了測試，暫時讓玩家可以胡任意牌
-    // 警告：這不是正確的食糊邏輯，只是為了讓你能觸發「食糊」按鈕
-    console.log(`⚙️ 檢查 ${playerPosition} 是否可以胡 ${tile} (暫時返回 true)`);
-    return true; // 讓你可以測試按鈕
+    return false; // 讓你可以測試按鈕
   }
 
   // 輪到下一個玩家
