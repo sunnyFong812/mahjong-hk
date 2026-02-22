@@ -7,6 +7,7 @@ class MahjongGame {
     this.wall = [];         // 牌牆
     this.hands = {};        // 手牌 { 0: [牌], 1: [牌], 2: [牌], 3: [牌] }
     this.discards = {};     // 棄牌區 { 0: [牌], 1: [牌], 2: [牌], 3: [牌] }
+    this.melds = {};
     this.currentPlayer = 0; // 當前行動的玩家 (0:東, 1:南, 2:西, 3:北)
     this.lastDiscard = null;       // 最後一次被打出的牌 { tile: '牌', player: 位置 }
     this.winner = null;             // 贏家位置
@@ -16,6 +17,7 @@ class MahjongGame {
     for (let i = 0; i < 4; i++) {
       this.hands[i] = [];
       this.discards[i] = [];
+      this.melds[i] = [];
     }
   }
 
