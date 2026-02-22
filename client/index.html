@@ -481,12 +481,44 @@
 
         // ===== 遊戲更新 =====
 // ===== 遊戲更新 =====
+// ===== 遊戲更新 =====
 socket.on('gameUpdate', (data) => {
     console.log('🔄 遊戲更新', data);
     
+    // 處理自己打牌
+    if (data.type === 'DISCARD') {
+        if (data.player === window.myPosition) {
+            // 自己打牌：更新手牌
+            if (data.hand) {
+                window.myHand = sortTiles(data.hand);
+                console.log('🎯 自己打牌後手牌:', window.myHand);
+            }
+        }
+        
+        // 更新棄牌區
+        if (data.discards) {
+            window.discards = data.discards;
+        }
+        
+        // 更新當前玩家
+        if (data.currentPlayer !== undefined) {
+            window.currentPlayer = data.currentPlayer;
+        }
+        
+        // 取消選中狀態
+        if (window.gameRenderer) {
+            window.gameRenderer.selectedIndex = -1;
+        }
+        document.getElementById('selected-tile-hint').style.display = 'none';
+    }
+    
+    // 處理自己摸牌
     if (data.type === 'DRAW' && data.player === window.myPosition) {
-        // 自己摸牌
-        window.myHand = sortTiles(data.hand);
+        if (data.hand) {
+            window.myHand = sortTiles(data.hand);
+            console.log('🀄️ 摸牌後手牌:', window.myHand);
+        }
+        
         document.getElementById('selected-tile-hint').textContent = '🀄️ 摸到新牌，請選擇要打出的牌';
         document.getElementById('selected-tile-hint').style.display = 'block';
         setTimeout(() => {
@@ -494,20 +526,8 @@ socket.on('gameUpdate', (data) => {
         }, 3000);
     }
     
-    if (data.type === 'DISCARD') {
-        if (data.player === window.myPosition) {
-            // 自己打牌，更新手牌
-            window.myHand = sortTiles(data.hand);
-        }
-        
-        // 更新棄牌區
-        if (data.discards) {
-            window.discards = data.discards;
-        }
-    }
-    
-    // 更新當前玩家
-    if (data.currentPlayer !== undefined) {
+    // 更新當前玩家（如果上面未更新）
+    if (data.currentPlayer !== undefined && window.currentPlayer !== data.currentPlayer) {
         window.currentPlayer = data.currentPlayer;
     }
     
@@ -517,7 +537,7 @@ socket.on('gameUpdate', (data) => {
     }
     
     // 更新當前玩家提示
-    if (data.currentPlayer === window.myPosition) {
+    if (window.currentPlayer === window.myPosition) {
         document.getElementById('selected-tile-hint').style.display = 'block';
     } else {
         document.getElementById('selected-tile-hint').style.display = 'none';
