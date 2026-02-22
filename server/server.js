@@ -274,29 +274,31 @@ io.on('connection', (socket) => {
   });
   
   socket.on('playerAction', (data) => {
-    const { roomId, action, tile } = data;
-    const room = rooms[roomId];
-    if (!room || !room.gameState) return;
-    
-    const player = room.players.find(p => p.id === socket.id);
-    if (!player) return;
-    
-    if (action === 'DISCARD') {
-      // 從手牌移除
-      const hand = room.gameState.hands[player.position];
-      const index = hand.indexOf(tile);
-      if (index !== -1) {
-        hand.splice(index, 1);
-        
-        // 加入棄牌區
-        room.gameState.discards[player.position].push(tile);
-        
-        // 輪到下家
-        room.gameState.currentPlayer = (player.position + 1) % 4;
-        
-        // 下家摸牌（如果是真人）
-        const nextPlayer = room.players.find(p => p.position === room.gameState.currentPlayer);
-        if (nextPlayer && !nextPlayer.isAI) {
+  const { roomId, action, tile } = data;
+  const room = rooms[roomId];
+  if (!room || !room.gameState) return;
+  
+  const player = room.players.find(p => p.id === socket.id);
+  if (!player) return;
+  
+  if (action === 'DISCARD') {
+    // 從手牌移除
+    const hand = room.gameState.hands[player.position];
+    const index = hand.indexOf(tile);
+    if (index !== -1) {
+      hand.splice(index, 1);
+      
+      // 加入棄牌區
+      room.gameState.discards[player.position].push(tile);
+      
+      // 輪到下家
+      room.gameState.currentPlayer = (player.position + 1) % 4;
+      
+      // 下家摸牌
+      const nextPlayer = room.players.find(p => p.position === room.gameState.currentPlayer);
+      if (nextPlayer) {
+        if (!nextPlayer.isAI) {
+          // 真人下家：摸牌
           const drawnTile = room.gameState.wall.pop();
           room.gameState.hands[nextPlayer.position].push(drawnTile);
           room.gameState.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
@@ -308,20 +310,24 @@ io.on('connection', (socket) => {
             hand: room.gameState.hands[nextPlayer.position],
             drawnTile: drawnTile
           });
+        } else {
+          // 👇 AI 下家：直接觸發 AI 決策
+          setTimeout(() => aiMakeDecision(room, nextPlayer), 500);
         }
-        
-        // 廣播更新
-        io.to(roomId).emit('gameUpdate', {
-          type: 'DISCARD',
-          player: player.position,
-          tile: tile,
-          hand: room.gameState.hands[player.position],
-          discards: room.gameState.discards,
-          currentPlayer: room.gameState.currentPlayer
-        });
       }
+      
+      // 廣播更新
+      io.to(roomId).emit('gameUpdate', {
+        type: 'DISCARD',
+        player: player.position,
+        tile: tile,
+        hand: hand,
+        discards: room.gameState.discards,
+        currentPlayer: room.gameState.currentPlayer
+      });
     }
-  });
+  }
+});
   
   socket.on('disconnect', () => {
     console.log('❌ 斷線:', socket.id);
