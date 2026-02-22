@@ -716,16 +716,23 @@ socket.on('gameUpdate', (data) => {
 
         // ===== 按鈕函數 =====
         window.joinRoom = function() {
-            const name = document.getElementById('player-name').value;
-            const room = document.getElementById('room-id').value;
-            
-            if (socket && socket.connected) {
-                socket.emit('joinRoom', { roomId: room, playerName: name });
-            } else {
-                alert('❌ 未連接到伺服器');
-            }
-        };
+    const name = document.getElementById('player-name').value.trim();
+    const room = document.getElementById('room-id').value.trim();
 
+    if (!name || !room) {
+        alert('❌ 請輸入名字同房間號碼');
+        return;
+    }
+
+    if (!socket || !socket.connected) {
+        alert('❌ 未連接到伺服器');
+        return;
+    }
+
+    console.log('📤 發送 joinRoom:', room, name);
+    socket.emit('joinRoom', { roomId: room, playerName: name });
+
+};
         window.createRoom = function() {
             const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
             document.getElementById('room-id').value = roomId;
