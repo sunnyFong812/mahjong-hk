@@ -350,6 +350,7 @@
         window.gameRenderer = null;
         window.currentPlayer = -1;
         window.discards = {};  // 棄牌區
+        window.canPongTile = null; // 可以碰的牌
 
         // ===== 牌型排序函數 =====
         function sortTiles(tiles) {
@@ -403,44 +404,60 @@
             document.getElementById('connection-status').className = 'connection-status status-disconnected';
         });
 
+        socket.on('disconnect', () => {
+            console.log('❌ 與伺服器斷線');
+            document.getElementById('connection-status').textContent = '未連接';
+            document.getElementById('connection-status').className = 'connection-status status-disconnected';
+            window.currentRoom = '';
+            document.getElementById('lobby-screen').style.display = 'none';
+            document.getElementById('login-screen').style.display = 'block';
+        });
+
+        socket.on('reconnect', () => {
+            console.log('🔄 重新連線成功');
+            document.getElementById('connection-status').textContent = '已連接';
+            document.getElementById('connection-status').className = 'connection-status status-connected';
+        });
+
         // ===== 房間更新 =====
         socket.on('roomUpdate', (data) => {
-    console.log('📦 房間更新', data);
+            console.log('📦 房間更新', data);
 
-    // ✅ 強制記錄 currentRoom
-    window.currentRoom = data.roomId;
-    console.log('✅ currentRoom 已設為:', window.currentRoom);
+            // 強制記錄 currentRoom
+            window.currentRoom = data.roomId;
+            console.log('✅ currentRoom 已設為:', window.currentRoom);
 
-    for (let i = 0; i < 4; i++) {
-        const slot = document.getElementById(`player${i}`);
-        if (!slot) continue;
+            for (let i = 0; i < 4; i++) {
+                const slot = document.getElementById(`player${i}`);
+                if (!slot) continue;
 
-        const info = slot.querySelector('.player-info');
+                const info = slot.querySelector('.player-info');
 
-        if (data.players && data.players[i]) {
-            const player = data.players[i];
+                if (data.players && data.players[i]) {
+                    const player = data.players[i];
 
-            if (player.isAI) {
-                info.innerHTML = player.name + ' <span class="ai-badge">AI</span>';
-                slot.classList.add('ready');
-            } else {
-                info.textContent = player.name;
-                if (player.ready) {
-                    slot.classList.add('ready');
+                    if (player.isAI) {
+                        info.innerHTML = player.name + ' <span class="ai-badge">AI</span>';
+                        slot.classList.add('ready');
+                    } else {
+                        info.textContent = player.name;
+                        if (player.ready) {
+                            slot.classList.add('ready');
+                        } else {
+                            slot.classList.remove('ready');
+                        }
+                    }
                 } else {
+                    info.textContent = '等待中...';
                     slot.classList.remove('ready');
                 }
             }
-        } else {
-            info.textContent = '等待中...';
-            slot.classList.remove('ready');
-        }
-    }
 
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('lobby-screen').style.display = 'block';
-    document.getElementById('display-room-id').textContent = data.roomId;
-});
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('lobby-screen').style.display = 'block';
+            document.getElementById('display-room-id').textContent = data.roomId;
+        });
+
         // ===== 遊戲開始 =====
         socket.on('gameStart', (data) => {
             console.log('🎮 遊戲開始', data);
@@ -482,57 +499,55 @@
         });
 
         // ===== 遊戲更新 =====
-// ===== 遊戲更新 =====
-// ===== 遊戲更新 =====
-socket.on('gameUpdate', (data) => {
-  console.log('🔄 gameUpdate', data);
+        socket.on('gameUpdate', (data) => {
+            console.log('🔄 gameUpdate', data);
 
-  if (data.currentPlayer !== undefined) {
-    window.currentPlayer = data.currentPlayer;
-  }
+            if (data.currentPlayer !== undefined) {
+                window.currentPlayer = data.currentPlayer;
+            }
 
-  if (data.hand && data.player === window.myPosition) {
-    window.myHand = sortTiles(data.hand);
-  }
+            if (data.hand && data.player === window.myPosition) {
+                window.myHand = sortTiles(data.hand);
+            }
 
-  if (data.discards) {
-    window.discards = data.discards;
-  }
+            if (data.discards) {
+                window.discards = data.discards;
+            }
 
-  // ✅ 處理 reactions（碰、槓、糊按鈕）
-  if (data.reactions) {
-    const myReaction = data.reactions.find(r => r.player === window.myPosition);
-    if (myReaction) {
-      document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
-      document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
-      document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
-      document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
-      window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
-    } else {
-      document.getElementById('btn-pong').disabled = true;
-      document.getElementById('btn-chow').disabled = true;
-      document.getElementById('btn-kong').disabled = true;
-      document.getElementById('btn-mahjong').disabled = true;
-      window.canPongTile = null;
-    }
-  } else {
-    document.getElementById('btn-pong').disabled = true;
-    document.getElementById('btn-chow').disabled = true;
-    document.getElementById('btn-kong').disabled = true;
-    document.getElementById('btn-mahjong').disabled = true;
-    window.canPongTile = null;
-  }
+            // 處理 reactions（碰、槓、糊按鈕）
+            if (data.reactions) {
+                const myReaction = data.reactions.find(r => r.player === window.myPosition);
+                if (myReaction) {
+                    document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
+                    document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
+                    document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
+                    document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
+                    window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+                } else {
+                    document.getElementById('btn-pong').disabled = true;
+                    document.getElementById('btn-chow').disabled = true;
+                    document.getElementById('btn-kong').disabled = true;
+                    document.getElementById('btn-mahjong').disabled = true;
+                    window.canPongTile = null;
+                }
+            } else {
+                document.getElementById('btn-pong').disabled = true;
+                document.getElementById('btn-chow').disabled = true;
+                document.getElementById('btn-kong').disabled = true;
+                document.getElementById('btn-mahjong').disabled = true;
+                window.canPongTile = null;
+            }
 
-  if (window.gameRenderer) {
-    window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-  }
+            if (window.gameRenderer) {
+                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+            }
 
-  if (window.currentPlayer === window.myPosition) {
-    document.getElementById('selected-tile-hint').style.display = 'block';
-  } else {
-    document.getElementById('selected-tile-hint').style.display = 'none';
-  }
-});
+            if (window.currentPlayer === window.myPosition) {
+                document.getElementById('selected-tile-hint').style.display = 'block';
+            } else {
+                document.getElementById('selected-tile-hint').style.display = 'none';
+            }
+        });
 
         // ===== 渲染器 =====
         class MahjongRenderer {
@@ -706,23 +721,23 @@ socket.on('gameUpdate', (data) => {
 
         // ===== 按鈕函數 =====
         window.joinRoom = function() {
-    const name = document.getElementById('player-name').value.trim();
-    const room = document.getElementById('room-id').value.trim();
+            const name = document.getElementById('player-name').value.trim();
+            const room = document.getElementById('room-id').value.trim();
 
-    if (!name || !room) {
-        alert('❌ 請輸入名字同房間號碼');
-        return;
-    }
+            if (!name || !room) {
+                alert('❌ 請輸入名字同房間號碼');
+                return;
+            }
 
-    if (!socket || !socket.connected) {
-        alert('❌ 未連接到伺服器');
-        return;
-    }
+            if (!socket || !socket.connected) {
+                alert('❌ 未連接到伺服器');
+                return;
+            }
 
-    console.log('📤 發送 joinRoom:', room, name);
-    socket.emit('joinRoom', { roomId: room, playerName: name });
+            console.log('📤 發送 joinRoom:', room, name);
+            socket.emit('joinRoom', { roomId: room, playerName: name });
+        };
 
-};
         window.createRoom = function() {
             const roomId = Math.random().toString(36).substring(2, 8).toUpperCase();
             document.getElementById('room-id').value = roomId;
@@ -730,23 +745,25 @@ socket.on('gameUpdate', (data) => {
         };
 
         window.toggleReady = function() {
-    if (!socket || !socket.connected) {
-        alert('❌ 未連接到伺服器');
-        return;
-    }
+            if (!socket || !socket.connected) {
+                alert('❌ 未連接到伺服器');
+                return;
+            }
 
-    if (!window.currentRoom) {
-        alert('❌ 未加入房間 (currentRoom 係空)');
-        console.log('❌ currentRoom:', window.currentRoom);
-        return;
-    }
+            if (!window.currentRoom) {
+                alert('❌ 未加入房間 (currentRoom 係空)');
+                console.log('❌ currentRoom:', window.currentRoom);
+                return;
+            }
 
-    console.log('📤 發送 playerReady:', window.currentRoom);
-    socket.emit('playerReady', { roomId: window.currentRoom });
-};
+            console.log('📤 發送 playerReady:', window.currentRoom);
+            socket.emit('playerReady', { roomId: window.currentRoom });
+        };
+        
         window.leaveRoom = function() {
             document.getElementById('lobby-screen').style.display = 'none';
             document.getElementById('login-screen').style.display = 'block';
+            window.currentRoom = '';
         };
 
         window.closeWinModal = function() {
@@ -772,6 +789,54 @@ socket.on('gameUpdate', (data) => {
         handleOrientation();
 
         console.log('✅ 前端初始化完成');
+    </script>
+
+    <!-- ===== 按鈕事件綁定 ===== -->
+    <script>
+        // 碰按鈕
+        document.getElementById('btn-pong').addEventListener('click', () => {
+            if (!window.canPongTile) {
+                alert('冇牌可以碰');
+                return;
+            }
+            console.log('🫸 發送碰:', window.canPongTile);
+            socket.emit('playerAction', {
+                roomId: window.currentRoom,
+                action: 'PONG',
+                tile: window.canPongTile
+            });
+        });
+
+        // 食糊按鈕
+        document.getElementById('btn-mahjong').addEventListener('click', () => {
+            console.log('🏆 發送食糊');
+            socket.emit('playerAction', {
+                roomId: window.currentRoom,
+                action: 'MAHJONG',
+                tile: null
+            });
+        });
+
+        // 吃按鈕（暫時未實作）
+        document.getElementById('btn-chow').addEventListener('click', () => {
+            alert('吃功能尚未實作');
+        });
+
+        // 槓按鈕（暫時未實作）
+        document.getElementById('btn-kong').addEventListener('click', () => {
+            alert('槓功能尚未實作');
+        });
+
+        // 過按鈕
+        document.getElementById('btn-pass').addEventListener('click', () => {
+            console.log('⏭️ 發送過');
+            // 過其實就係咩都唔做，但可以清空 reactions
+            document.getElementById('btn-pong').disabled = true;
+            document.getElementById('btn-chow').disabled = true;
+            document.getElementById('btn-kong').disabled = true;
+            document.getElementById('btn-mahjong').disabled = true;
+            window.canPongTile = null;
+        });
     </script>
 </body>
 </html>
