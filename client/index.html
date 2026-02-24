@@ -500,58 +500,65 @@
 
         // ===== 遊戲更新 =====
         socket.on('gameUpdate', (data) => {
-            console.log('🔄 gameUpdate', data);
+    console.log('🔄 gameUpdate', data);
 
-            if (data.currentPlayer !== undefined) {
-                window.currentPlayer = data.currentPlayer;
-            }
+    if (data.currentPlayer !== undefined) {
+        window.currentPlayer = data.currentPlayer;
+    }
 
-            if (data.hand && data.player === window.myPosition) {
-                window.myHand = sortTiles(data.hand);
-            }
+    if (data.hand && data.player === window.myPosition) {
+        window.myHand = sortTiles(data.hand);
+    }
 
-            if (data.discards) {
-                window.discards = data.discards;
-            }
-            if (data.melds) {
-    window.melds = data.melds;
-}
+    if (data.discards) {
+        window.discards = data.discards;
+    }
+    if (data.melds) {
+        window.melds = data.melds;
+    }
 
-            // 處理 reactions（碰、槓、糊按鈕）
-            if (data.reactions) {
-                const myReaction = data.reactions.find(r => r.player === window.myPosition);
-                if (myReaction) {
-                    document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
-                    document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
-                    document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
-                    document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
-                    window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
-                } else {
-                    document.getElementById('btn-pong').disabled = true;
-                    document.getElementById('btn-chow').disabled = true;
-                    document.getElementById('btn-kong').disabled = true;
-                    document.getElementById('btn-mahjong').disabled = true;
-                    window.canPongTile = null;
-                }
-            } else {
-                document.getElementById('btn-pong').disabled = true;
-                document.getElementById('btn-chow').disabled = true;
-                document.getElementById('btn-kong').disabled = true;
-                document.getElementById('btn-mahjong').disabled = true;
-                window.canPongTile = null;
-            }
+    // ✅ 處理摸牌
+    if (data.drawnTile && data.player === window.myPosition) {
+        console.log('🀄️ 你摸到:', data.drawnTile);
+        if (data.nextPlayerHand) {
+            window.myHand = sortTiles(data.nextPlayerHand);
+        }
+    }
 
-            if (window.gameRenderer) {
-                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-            }
+    // 處理 reactions
+    if (data.reactions) {
+        const myReaction = data.reactions.find(r => r.player === window.myPosition);
+        if (myReaction) {
+            document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
+            document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
+            document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
+            document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
+            window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+        } else {
+            document.getElementById('btn-pong').disabled = true;
+            document.getElementById('btn-chow').disabled = true;
+            document.getElementById('btn-kong').disabled = true;
+            document.getElementById('btn-mahjong').disabled = true;
+            window.canPongTile = null;
+        }
+    } else {
+        document.getElementById('btn-pong').disabled = true;
+        document.getElementById('btn-chow').disabled = true;
+        document.getElementById('btn-kong').disabled = true;
+        document.getElementById('btn-mahjong').disabled = true;
+        window.canPongTile = null;
+    }
 
-            if (window.currentPlayer === window.myPosition) {
-                document.getElementById('selected-tile-hint').style.display = 'block';
-            } else {
-                document.getElementById('selected-tile-hint').style.display = 'none';
-            }
-        });
+    if (window.gameRenderer) {
+        window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+    }
 
+    if (window.currentPlayer === window.myPosition) {
+        document.getElementById('selected-tile-hint').style.display = 'block';
+    } else {
+        document.getElementById('selected-tile-hint').style.display = 'none';
+    }
+});
         // ===== 渲染器 =====
 class MahjongRenderer {
     constructor(canvasId) {
