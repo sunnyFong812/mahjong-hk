@@ -211,43 +211,45 @@ class MahjongGame {
 
   // ========== 動作處理 ==========
   handleDiscard(playerPosition, tile) {
-    if (playerPosition !== this.currentPlayer) {
-      return { error: 'not your turn' };
-    }
-    
-    const hand = this.hands[playerPosition];
-    const idx = hand.indexOf(tile);
-    if (idx === -1) return { error: 'no tile' };
-    
-    hand.splice(idx, 1);
-    this.discards[playerPosition].push(tile);
-    this.lastDiscard = { tile, player: playerPosition };
-    
-    const reactions = this.checkReactions(playerPosition, tile);
-    
-    const result = {
-      type: 'DISCARD',
-      player: playerPosition,
-      tile,
-      hand,
-      discards: this.discards,
-      lastDiscard: this.lastDiscard,
-      currentPlayer: this.currentPlayer,
-      melds: this.melds
-    };
-    
-    if (reactions.length) {
-      result.reactions = reactions;
-      this.pendingReaction = true;
-    } else {
-      this.currentPlayer = (playerPosition + 1) % 4;
-      result.currentPlayer = this.currentPlayer;
-      this.pendingReaction = false;
-    }
-    
-    return result;
+  if (playerPosition !== this.currentPlayer) {
+    return { error: 'not your turn' };
   }
 
+  const hand = this.hands[playerPosition];
+  const idx = hand.indexOf(tile);
+  if (idx === -1) return { error: 'no tile' };
+
+  hand.splice(idx, 1);
+  this.discards[playerPosition].push(tile);
+  this.lastDiscard = { tile, player: playerPosition };
+
+  // ✅ 如果之前有 pending reaction，打完牌就清返
+  this.pendingReaction = false;
+
+  const reactions = this.checkReactions(playerPosition, tile);
+
+  const result = {
+    type: 'DISCARD',
+    player: playerPosition,
+    tile,
+    hand,
+    discards: this.discards,
+    lastDiscard: this.lastDiscard,
+    currentPlayer: this.currentPlayer,
+    melds: this.melds
+  };
+
+  if (reactions.length) {
+    result.reactions = reactions;
+    this.pendingReaction = true; // 有 reaction，暫停
+  } else {
+    this.currentPlayer = (playerPosition + 1) % 4;
+    result.currentPlayer = this.currentPlayer;
+    this.pendingReaction = false;
+  }
+
+  return result;
+}
   handlePong(playerPosition, tile, targetPosition) {
     const hand = this.hands[playerPosition];
     const matching = hand.filter(t => t === tile);
