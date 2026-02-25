@@ -527,28 +527,36 @@
 
     // 處理 reactions
     if (data.reactions) {
-        const myReaction = data.reactions.find(r => r.player === window.myPosition);
-        if (myReaction) {
-            document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
-            document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
-            document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
-            document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
-            window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
-        } else {
-            document.getElementById('btn-pong').disabled = true;
-            document.getElementById('btn-chow').disabled = true;
-            document.getElementById('btn-kong').disabled = true;
-            document.getElementById('btn-mahjong').disabled = true;
-            window.canPongTile = null;
-        }
-    } else {
-        document.getElementById('btn-pong').disabled = true;
-        document.getElementById('btn-chow').disabled = true;
-        document.getElementById('btn-kong').disabled = true;
-        document.getElementById('btn-mahjong').disabled = true;
-        window.canPongTile = null;
-    }
-
+  const myReaction = data.reactions.find(r => r.player === window.myPosition);
+  if (myReaction) {
+    document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
+    document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
+    document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
+    document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
+    window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+    
+    // ✅ 有 reaction 時，唔可以打牌
+    window.canDiscard = false;
+  } else {
+    document.getElementById('btn-pong').disabled = true;
+    document.getElementById('btn-chow').disabled = true;
+    document.getElementById('btn-kong').disabled = true;
+    document.getElementById('btn-mahjong').disabled = true;
+    window.canPongTile = null;
+    
+    // ✅ 冇 reaction 時，可以打牌
+    window.canDiscard = true;
+  }
+} else {
+  document.getElementById('btn-pong').disabled = true;
+  document.getElementById('btn-chow').disabled = true;
+  document.getElementById('btn-kong').disabled = true;
+  document.getElementById('btn-mahjong').disabled = true;
+  window.canPongTile = null;
+  
+  // ✅ 冇 reaction 時，可以打牌
+  window.canDiscard = true;
+}
     if (window.gameRenderer) {
         window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
     }
