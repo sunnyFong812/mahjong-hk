@@ -603,11 +603,10 @@ class MahjongRenderer {
                 
                 console.log(`🎯 點擊手牌 ${i}: ${window.myHand[i]}, 當前選擇: ${this.selectedIndex}`);
                 
-              if (this.selectedIndex === i) {
-    // 同一張牌㩒兩次 = 打出
+        if (this.selectedIndex === i) {
+    console.log(`🔍 準備打牌 - canDiscard: ${window.canDiscard}, currentPlayer: ${window.currentPlayer}, myPosition: ${window.myPosition}`);
+    
     if (window.currentPlayer === window.myPosition) {
-        
-        // ✅ 加入 canDiscard 檢查
         if (!window.canDiscard) {
             alert('⚠️ 而家唔可以打牌（請先處理碰/槓/糊）');
             this.selectedIndex = -1;
@@ -615,8 +614,6 @@ class MahjongRenderer {
         }
         
         console.log('🎯 打出:', window.myHand[i]);
-        
-        // 發送打牌事件
         socket.emit('playerAction', {
             roomId: window.currentRoom,
             action: 'DISCARD',
