@@ -185,6 +185,7 @@ io.on('connection', (socket) => {
   // 處理 PASS
   if (action === 'PASS') {
     const result = room.game.processAction(player.position, 'PASS');
+    console.log(`👤 ${player.name} 按過，result.currentPlayer = ${result.currentPlayer}`);
     io.to(roomId).emit('gameUpdate', result);
 
     if (!room.game.gameOver && result.currentPlayer !== undefined) {
