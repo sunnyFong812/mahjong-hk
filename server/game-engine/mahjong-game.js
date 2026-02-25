@@ -223,10 +223,8 @@ class MahjongGame {
   this.discards[playerPosition].push(tile);
   this.lastDiscard = { tile, player: playerPosition };
 
-  // ✅ 如果之前有 pending reaction，打完牌就清返
-  this.pendingReaction = false;
-
   const reactions = this.checkReactions(playerPosition, tile);
+  console.log(`🧪 reactions length = ${reactions.length}`);
 
   const result = {
     type: 'DISCARD',
@@ -241,11 +239,13 @@ class MahjongGame {
 
   if (reactions.length) {
     result.reactions = reactions;
-    this.pendingReaction = true; // 有 reaction，暫停
+    this.pendingReaction = true;
+    console.log(`⏸️ 有 reaction，暫停回合`);
   } else {
     this.currentPlayer = (playerPosition + 1) % 4;
     result.currentPlayer = this.currentPlayer;
     this.pendingReaction = false;
+    console.log(`🔁 打完牌後 currentPlayer 由 ${playerPosition} 轉為 ${this.currentPlayer}`);
   }
 
   return result;
