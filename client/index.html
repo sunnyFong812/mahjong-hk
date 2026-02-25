@@ -502,7 +502,9 @@
         // ===== 遊戲更新 =====
         socket.on('gameUpdate', (data) => {
     console.log('🔄 gameUpdate', data);
-
+    if (data.type === 'PASS') {
+      console.log(`🔄 前端收到 PASS，currentPlayer 轉為 ${data.currentPlayer}`);
+    }
     if (data.currentPlayer !== undefined) {
         window.currentPlayer = data.currentPlayer;
     }
