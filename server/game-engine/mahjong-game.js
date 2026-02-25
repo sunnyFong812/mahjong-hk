@@ -359,7 +359,7 @@ class MahjongGame {
   handlePass(playerPosition) {
     this.currentPlayer = (playerPosition + 1) % 4;
     this.pendingReaction = false;
-    
+    console.log(`🔄 handlePass: 由 ${playerPosition} 轉為 ${(playerPosition + 1) % 4}`);
     return {
       type: 'PASS',
       player: playerPosition,
