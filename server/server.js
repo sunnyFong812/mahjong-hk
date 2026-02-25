@@ -43,7 +43,7 @@ function aiMove(room, aiPlayer) {
     io.to(room.id).emit('gameUpdate', result);
 
     if (!game.gameOver && game.currentPlayer !== undefined) {
-      const next = room.players.find(p => p.position === game.currentPlayer);
+      const next = room.players.find(p => p.position === result.currentPlayer);
       if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
     }
   }
