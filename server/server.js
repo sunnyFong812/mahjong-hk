@@ -42,17 +42,53 @@ function aiMove(room, aiPlayer) {
   if (result) {
     io.to(room.id).emit('gameUpdate', result);
 
-    // ✅ 如果有 reaction，立即停，等人按「過」或反應
+    // ✅ 如果有 reaction，AI 自動按「過」
     if (result.reactions) {
-      console.log('⏸️ 有 reaction，暫停 AI 循環');
+      console.log('⏸️ 有 reaction，AI 自動按過');
+      
+      // AI 自動 PASS
+      setTimeout(() => {
+        const passResult = game.processAction(aiPlayer.position, 'PASS');
+        io.to(room.id).emit('gameUpdate', passResult);
+
+        // PASS 之後，下家摸牌
+        const nextPlayer = room.players.find(p => p.position === passResult.currentPlayer);
+        if (nextPlayer && game.wall.length > 0) {
+          const drawnTile = game.wall.pop();
+          game.hands[nextPlayer.position].push(drawnTile);
+          game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+
+          io.to(room.id).emit('gameUpdate', {
+            type: 'DRAW',
+            player: nextPlayer.position,
+            hand: game.hands[nextPlayer.position],
+            drawnTile: drawnTile
+          });
+
+          if (nextPlayer.isAI) {
+            setTimeout(() => aiMove(room, nextPlayer), 600);
+          }
+        }
+      }, 800);
       return;
     }
 
-    // ✅ 冇 reaction 先繼續
-    if (!game.gameOver && result.currentPlayer !== undefined) {
-      const next = room.players.find(p => p.position === result.currentPlayer);
-      if (next?.isAI) {
-        setTimeout(() => aiMove(room, next), 600);
+    // 冇 reaction，下家摸牌
+    const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
+    if (nextPlayer && game.wall.length > 0) {
+      const drawnTile = game.wall.pop();
+      game.hands[nextPlayer.position].push(drawnTile);
+      game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+
+      io.to(room.id).emit('gameUpdate', {
+        type: 'DRAW',
+        player: nextPlayer.position,
+        hand: game.hands[nextPlayer.position],
+        drawnTile: drawnTile
+      });
+
+      if (nextPlayer.isAI) {
+        setTimeout(() => aiMove(room, nextPlayer), 600);
       }
     }
   }
