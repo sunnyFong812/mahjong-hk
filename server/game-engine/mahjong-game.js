@@ -240,7 +240,9 @@ class MahjongGame {
     if (reactions.length) {
       result.reactions = reactions;
       this.pendingReaction = true;
-      console.log(`⏸️ 有 reaction，暫停回合`);
+      // 收集有 reaction 嘅玩家
+const reactionPlayers = reactions.map(r => `玩家 ${r.player}`).join(', ');
+console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
     } else {
       this.currentPlayer = (playerPosition + 1) % 4;
       result.currentPlayer = this.currentPlayer;
