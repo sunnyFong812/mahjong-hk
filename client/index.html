@@ -602,31 +602,38 @@ class MahjongRenderer {
                 
                 console.log(`🎯 點擊手牌 ${i}: ${window.myHand[i]}, 當前選擇: ${this.selectedIndex}`);
                 
-                if (this.selectedIndex === i) {
-                    // 同一張牌㩒兩次 = 打出
-                    if (window.currentPlayer === window.myPosition) {
-                        console.log('🎯 打出:', window.myHand[i]);
-                        
-                        // 發送打牌事件
-                        socket.emit('playerAction', {
-                            roomId: window.currentRoom,
-                            action: 'DISCARD',
-                            tile: window.myHand[i]
-                        });
-                        
-                        this.selectedIndex = -1;
-                        document.getElementById('selected-tile-hint').style.display = 'none';
-                    } else {
-                        alert('⚠️ 唔係你嘅回合');
-                        this.selectedIndex = -1;
-                    }
-                } else {
-                    // 選擇新牌
-                    this.selectedIndex = i;
-                    document.getElementById('selected-tile-hint').style.display = 'block';
-                    document.getElementById('selected-tile-hint').textContent = `✅ 已選中 ${this.getTileDisplay(window.myHand[i])}，再點擊打出`;
-                }
-                
+              if (this.selectedIndex === i) {
+    // 同一張牌㩒兩次 = 打出
+    if (window.currentPlayer === window.myPosition) {
+        
+        // ✅ 加入 canDiscard 檢查
+        if (!window.canDiscard) {
+            alert('⚠️ 而家唔可以打牌（請先處理碰/槓/糊）');
+            this.selectedIndex = -1;
+            return;
+        }
+        
+        console.log('🎯 打出:', window.myHand[i]);
+        
+        // 發送打牌事件
+        socket.emit('playerAction', {
+            roomId: window.currentRoom,
+            action: 'DISCARD',
+            tile: window.myHand[i]
+        });
+        
+        this.selectedIndex = -1;
+        document.getElementById('selected-tile-hint').style.display = 'none';
+    } else {
+        alert('⚠️ 唔係你嘅回合');
+        this.selectedIndex = -1;
+    }
+} else {
+    // 選擇新牌
+    this.selectedIndex = i;
+    document.getElementById('selected-tile-hint').style.display = 'block';
+    document.getElementById('selected-tile-hint').textContent = `✅ 已選中 ${this.getTileDisplay(window.myHand[i])}，再點擊打出`;
+}
                 this.render(window.myHand, window.myPosition, window.discards);
                 break;
             }
