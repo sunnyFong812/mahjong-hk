@@ -42,28 +42,15 @@ function aiMove(room, aiPlayer) {
   if (result) {
     io.to(room.id).emit('gameUpdate', result);
 
-    const result = game.processAction(aiPlayer.position, 'DISCARD', tile);
-if (result) {
-  io.to(room.id).emit('gameUpdate', result);
-
-  // ✅ 如果有 reaction，就停，等人反應
-  if (result.reactions) {
-    console.log('⏸️ 有 reaction，暫停 AI 循環');
-    return;
-  }
-
-  if (!game.gameOver && result.currentPlayer !== undefined) {
-    const next = room.players.find(p => p.position === result.currentPlayer);
-    if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
-  }
-}
-    if (!game.gameOver && game.currentPlayer !== undefined) {
+    // ✅ 強制繼續，唔理有冇 reaction
+    if (!game.gameOver && result.currentPlayer !== undefined) {
       const next = room.players.find(p => p.position === result.currentPlayer);
-      if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
+      if (next?.isAI) {
+        setTimeout(() => aiMove(room, next), 600);
+      }
     }
   }
 }
-
 function startGame(room) {
   console.log(`🎮 房間 ${room.id} 遊戲開始`);
   room.game = new MahjongGame(room.players);
