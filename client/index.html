@@ -896,6 +896,11 @@ class MahjongRenderer {
         // 過按鈕
         document.getElementById('btn-pass').addEventListener('click', () => {
             console.log('⏭️ 發送過');
+             socket.emit('playerAction', {
+        roomId: window.currentRoom,
+        action: 'PASS',
+        tile: null
+    });
             // 過其實就係咩都唔做，但可以清空 reactions
             document.getElementById('btn-pong').disabled = true;
             document.getElementById('btn-chow').disabled = true;
