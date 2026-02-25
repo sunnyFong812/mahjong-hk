@@ -211,45 +211,46 @@ class MahjongGame {
 
   // ========== 動作處理 ==========
   handleDiscard(playerPosition, tile) {
-  if (playerPosition !== this.currentPlayer) {
-    return { error: 'not your turn' };
+    if (playerPosition !== this.currentPlayer) {
+      return { error: 'not your turn' };
+    }
+
+    const hand = this.hands[playerPosition];
+    const idx = hand.indexOf(tile);
+    if (idx === -1) return { error: 'no tile' };
+
+    hand.splice(idx, 1);
+    this.discards[playerPosition].push(tile);
+    this.lastDiscard = { tile, player: playerPosition };
+
+    const reactions = this.checkReactions(playerPosition, tile);
+    console.log(`🧪 reactions length = ${reactions.length}`);
+
+    const result = {
+      type: 'DISCARD',
+      player: playerPosition,
+      tile,
+      hand,
+      discards: this.discards,
+      lastDiscard: this.lastDiscard,
+      currentPlayer: this.currentPlayer,
+      melds: this.melds
+    };
+
+    if (reactions.length) {
+      result.reactions = reactions;
+      this.pendingReaction = true;
+      console.log(`⏸️ 有 reaction，暫停回合`);
+    } else {
+      this.currentPlayer = (playerPosition + 1) % 4;
+      result.currentPlayer = this.currentPlayer;
+      this.pendingReaction = false;
+      console.log(`🔁 打完牌後 currentPlayer 由 ${playerPosition} 轉為 ${this.currentPlayer}`);
+    }
+
+    return result;
   }
 
-  const hand = this.hands[playerPosition];
-  const idx = hand.indexOf(tile);
-  if (idx === -1) return { error: 'no tile' };
-
-  hand.splice(idx, 1);
-  this.discards[playerPosition].push(tile);
-  this.lastDiscard = { tile, player: playerPosition };
-
-  const reactions = this.checkReactions(playerPosition, tile);
-  console.log(`🧪 reactions length = ${reactions.length}`);
-
-  const result = {
-    type: 'DISCARD',
-    player: playerPosition,
-    tile,
-    hand,
-    discards: this.discards,
-    lastDiscard: this.lastDiscard,
-    currentPlayer: this.currentPlayer,
-    melds: this.melds
-  };
-
-  if (reactions.length) {
-    result.reactions = reactions;
-    this.pendingReaction = true;
-    console.log(`⏸️ 有 reaction，暫停回合`);
-  } else {
-    this.currentPlayer = (playerPosition + 1) % 4;
-    result.currentPlayer = this.currentPlayer;
-    this.pendingReaction = false;
-    console.log(`🔁 打完牌後 currentPlayer 由 ${playerPosition} 轉為 ${this.currentPlayer}`);
-  }
-
-  return result;
-}
   handlePong(playerPosition, tile, targetPosition) {
     const hand = this.hands[playerPosition];
     const matching = hand.filter(t => t === tile);
@@ -280,6 +281,57 @@ class MahjongGame {
       type: 'PONG',
       player: playerPosition,
       tile,
+      from: targetPosition,
+      hand: this.hands[playerPosition],
+      melds: this.melds,
+      currentPlayer: this.currentPlayer
+    };
+  }
+
+  // ========== 新增：吃牌處理 ==========
+  handleChow(playerPosition, tile, targetPosition) {
+    // 檢查是否可以吃（只能吃上家）
+    const isUpperSeat = (targetPosition + 1) % 4 === playerPosition;
+    if (!isUpperSeat) return { error: '只能吃上家' };
+
+    const suit = tile.match(/[mps]/)?.[0];
+    if (!suit) return { error: '不能吃字牌' };
+
+    const num = parseInt(tile);
+    const hand = this.hands[playerPosition];
+
+    // 找出可以吃嘅組合
+    let tilesToRemove = [];
+    if (num >= 3 && hand.includes(`${num-2}${suit}`) && hand.includes(`${num-1}${suit}`)) {
+      tilesToRemove = [`${num-2}${suit}`, `${num-1}${suit}`];
+    } else if (num >= 2 && num <= 8 && hand.includes(`${num-1}${suit}`) && hand.includes(`${num+1}${suit}`)) {
+      tilesToRemove = [`${num-1}${suit}`, `${num+1}${suit}`];
+    } else if (num <= 7 && hand.includes(`${num+1}${suit}`) && hand.includes(`${num+2}${suit}`)) {
+      tilesToRemove = [`${num+1}${suit}`, `${num+2}${suit}`];
+    } else {
+      return { error: 'cannot chow' };
+    }
+
+    // 移除嗰兩張牌
+    const newHand = hand.filter(t => !tilesToRemove.includes(t));
+    this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+
+    // 記錄吃
+    this.melds[playerPosition].push({
+      type: 'CHOW',
+      tiles: [...tilesToRemove, tile],
+      from: targetPosition
+    });
+
+    // 吃完之後輪到自己出牌
+    this.currentPlayer = playerPosition;
+    this.lastDiscard = null;
+    this.pendingReaction = false;
+
+    return {
+      type: 'CHOW',
+      player: playerPosition,
+      tiles: [...tilesToRemove, tile],
       from: targetPosition,
       hand: this.hands[playerPosition],
       melds: this.melds,
@@ -323,6 +375,8 @@ class MahjongGame {
         return this.handleDiscard(playerPosition, tile);
       case 'PONG':
         return this.handlePong(playerPosition, tile, targetPosition);
+      case 'CHOW':
+        return this.handleChow(playerPosition, tile, targetPosition);
       case 'MAHJONG':
         return this.handleMahjong(playerPosition, tile);
       case 'PASS':
