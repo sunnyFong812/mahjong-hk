@@ -42,7 +42,13 @@ function aiMove(room, aiPlayer) {
   if (result) {
     io.to(room.id).emit('gameUpdate', result);
 
-    // ✅ 強制繼續，唔理有冇 reaction
+    // ✅ 如果有 reaction，立即停，等人按「過」或反應
+    if (result.reactions) {
+      console.log('⏸️ 有 reaction，暫停 AI 循環');
+      return;
+    }
+
+    // ✅ 冇 reaction 先繼續
     if (!game.gameOver && result.currentPlayer !== undefined) {
       const next = room.players.find(p => p.position === result.currentPlayer);
       if (next?.isAI) {
