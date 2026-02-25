@@ -140,23 +140,35 @@ io.on('connection', (socket) => {
   });
 
   socket.on('playerAction', ({ roomId, action, tile }) => {
-    const room = rooms[roomId];
-    if (!room?.game) return;
+  const room = rooms[roomId];
+  if (!room?.game) return;
 
-    const player = room.players.find(p => p.id === socket.id);
-    if (!player) return;
+  const player = room.players.find(p => p.id === socket.id);
+  if (!player) return;
 
-    const result = room.game.processAction(player.position, action, tile);
-    if (result) {
-      io.to(roomId).emit('gameUpdate', result);
+  // 處理 PASS
+  if (action === 'PASS') {
+    const result = room.game.processAction(player.position, 'PASS');
+    io.to(roomId).emit('gameUpdate', result);
 
-      if (!room.game.gameOver && room.game.currentPlayer !== undefined) {
-        const next = room.players.find(p => p.position === room.game.currentPlayer);
-        if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
-      }
+    if (!room.game.gameOver && result.currentPlayer !== undefined) {
+      const next = room.players.find(p => p.position === result.currentPlayer);
+      if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
     }
-  });
+    return;
+  }
 
+  // 處理其他動作
+  const result = room.game.processAction(player.position, action, tile);
+  if (result) {
+    io.to(roomId).emit('gameUpdate', result);
+
+    if (!room.game.gameOver && result.currentPlayer !== undefined) {
+      const next = room.players.find(p => p.position === result.currentPlayer);
+      if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
+    }
+  }
+});
   socket.on('disconnect', () => {
     for (const rid in rooms) {
       const room = rooms[rid];
