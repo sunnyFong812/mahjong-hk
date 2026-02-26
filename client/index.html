@@ -5,385 +5,490 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>港式麻雀 - 16張牌</title>
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            -webkit-tap-highlight-color: transparent;
-            user-select: none;
-        }
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        -webkit-tap-highlight-color: transparent;
+        user-select: none;
+    }
 
-        body {
-            font-family: 'PingFang HK', Arial, sans-serif;
-            background: #1a4d2a;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            touch-action: manipulation;
-        }
+    body {
+        font-family: 'PingFang HK', Arial, sans-serif;
+        background: #1a4d2a;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        touch-action: manipulation;
+    }
 
-        .container {
-            width: 100%;
-            max-width: 1200px;
-            height: 100vh;
-            background-color: #2a6f2a;
-            position: relative;
-            overflow: hidden;
-            border: 4px solid #8b5a2b;
-        }
+    .container {
+        width: 100%;
+        max-width: 1200px;
+        height: 100vh;
+        background-color: #2a6f2a;
+        position: relative;
+        overflow: hidden;
+        border: 4px solid #8b5a2b;
+    }
 
-        .screen {
-            width: 100%;
-            height: 100%;
-            position: absolute;
-            top: 0;
-            left: 0;
-            background: rgba(42, 111, 42, 0.95);
-        }
+    .screen {
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        top: 0;
+        left: 0;
+        background: rgba(42, 111, 42, 0.95);
+    }
 
-        .login-box {
-            width: 90%;
-            max-width: 400px;
-            margin: 20% auto;
-            background: rgba(255, 255, 255, 0.98);
-            padding: 30px;
-            border-radius: 20px;
-            text-align: center;
-        }
+    /* 登入畫面 */
+    .login-box {
+        width: 90%;
+        max-width: 400px;
+        margin: 20% auto;
+        background: rgba(255, 255, 255, 0.98);
+        padding: 30px;
+        border-radius: 20px;
+        text-align: center;
+    }
 
-        .login-box h1 {
-            color: #d4a373;
-            margin-bottom: 30px;
-            font-size: 36px;
-        }
+    .login-box h1 {
+        color: #d4a373;
+        margin-bottom: 30px;
+        font-size: 36px;
+    }
 
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
+    .input-group {
+        margin-bottom: 20px;
+        text-align: left;
+    }
 
-        .input-group label {
-            display: block;
-            margin-bottom: 5px;
-            color: #555;
-            font-size: 16px;
-            font-weight: bold;
-        }
+    .input-group label {
+        display: block;
+        margin-bottom: 5px;
+        color: #555;
+        font-size: 16px;
+        font-weight: bold;
+    }
 
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 10px;
-            font-size: 16px;
-        }
+    .input-group input {
+        width: 100%;
+        padding: 12px;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        font-size: 16px;
+    }
 
-        .btn {
-            padding: 12px 25px;
-            border-radius: 10px;
-            font-size: 18px;
-            margin: 5px;
-            font-weight: bold;
-            border: none;
-            cursor: pointer;
-        }
+    .btn {
+        padding: 12px 25px;
+        border-radius: 10px;
+        font-size: 18px;
+        margin: 5px;
+        font-weight: bold;
+        border: none;
+        cursor: pointer;
+    }
 
-        .btn-primary {
-            background: #d4a373;
-            color: white;
-        }
+    .btn-primary {
+        background: #d4a373;
+        color: white;
+    }
 
-        .btn-secondary {
-            background: #6c757d;
-            color: white;
-        }
+    .btn-secondary {
+        background: #6c757d;
+        color: white;
+    }
 
-        .btn-danger {
-            background: #dc3545;
-            color: white;
-        }
+    .btn-danger {
+        background: #dc3545;
+        color: white;
+    }
 
-        .lobby-box {
-            width: 90%;
-            max-width: 600px;
-            margin: 15% auto;
-            background: rgba(255, 255, 255, 0.98);
-            padding: 30px;
-            border-radius: 20px;
-        }
+    /* 大廳畫面 */
+    .lobby-box {
+        width: 90%;
+        max-width: 600px;
+        margin: 15% auto;
+        background: rgba(255, 255, 255, 0.98);
+        padding: 30px;
+        border-radius: 20px;
+    }
 
-        .players-container {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
-        }
+    .players-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 15px;
+        margin: 20px 0;
+    }
 
-        .player-slot {
-            background: #f8f9fa;
-            border: 3px solid #dee2e6;
-            border-radius: 15px;
-            padding: 15px;
-            position: relative;
-            min-height: 100px;
-        }
+    .player-slot {
+        background: #f8f9fa;
+        border: 3px solid #dee2e6;
+        border-radius: 15px;
+        padding: 15px;
+        position: relative;
+        min-height: 100px;
+    }
 
-        .player-slot.ready {
-            border-color: #28a745;
-            background: #d4edda;
-        }
+    .player-slot.ready {
+        border-color: #28a745;
+        background: #d4edda;
+    }
 
-        .player-slot .position {
-            position: absolute;
-            top: -12px;
-            left: 15px;
-            background: #d4a373;
-            color: white;
-            padding: 4px 12px;
-            border-radius: 20px;
-            font-size: 14px;
-        }
+    .player-slot .position {
+        position: absolute;
+        top: -12px;
+        left: 15px;
+        background: #d4a373;
+        color: white;
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 14px;
+    }
 
-        .player-slot .player-info {
-            font-size: 18px;
-            font-weight: bold;
-            margin-top: 10px;
-        }
+    .player-slot .player-info {
+        font-size: 18px;
+        font-weight: bold;
+        margin-top: 10px;
+    }
 
-        .ai-badge {
-            background: #6c5ce7;
-            color: white;
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-            margin-left: 5px;
-            display: inline-block;
-        }
+    .ai-badge {
+        background: #6c5ce7;
+        color: white;
+        padding: 2px 8px;
+        border-radius: 10px;
+        font-size: 12px;
+        margin-left: 5px;
+        display: inline-block;
+    }
 
-        /* ===== 新遊戲佈局 ===== */
-        /* 手牌區域 - 下方正中間 */
-        .hand-area {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 80%;
-            text-align: center;
-            z-index: 10;
-        }
+    /* ===== 新遊戲佈局 - 高度比例 ===== */
+    :root {
+        --bottom: 12.5vh;           /* 下 1/8 */
+        --bottom-second: 25vh;       /* 下第二 1/8 */
+        --middle: 50vh;              /* 中 1/2 */
+        --top-quarter: 25vh;         /* 上 1/4 */
+    }
 
-        #game-canvas {
-            width: 100%;
-            height: auto;
-            max-height: 200px;
-            display: block;
-            touch-action: none;
-        }
+    /* 手牌區域 - 下 1/8 */
+    .hand-area {
+        position: absolute;
+        bottom: calc(var(--bottom) / 2);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        text-align: center;
+        z-index: 10;
+    }
 
-        /* 過按鈕 - 手牌上方正中 */
-        .btn-pass-new {
-            position: absolute;
-            bottom: 240px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 100px;
-            padding: 12px 20px;
-            background: #6c757d;
-            color: white;
-            border: none;
-            border-radius: 30px;
-            font-size: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-            z-index: 30;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-        }
+    #game-canvas {
+        width: 100%;
+        height: auto;
+        max-height: 200px;
+        display: block;
+        touch-action: none;
+    }
 
-        .btn-pass-new.active {
-            display: block;
-        }
+    /* 過按鈕 - 下第二 1/8 */
+    .btn-pass-new {
+        position: absolute;
+        bottom: var(--bottom-second);
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        padding: 12px 20px;
+        background: #6c757d;
+        color: white;
+        border: none;
+        border-radius: 30px;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        display: none;
+        z-index: 30;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    }
 
-        /* 副露區 - 手牌正左邊 */
-        .meld-area {
-            position: absolute;
-            bottom: 20px;
-            right: 50%;
-            margin-right: 30px;
-            width: 150px;
-            min-height: 120px;
-            background: rgba(0,0,0,0.3);
-            border: 2px solid #d4a373;
-            border-radius: 10px;
-            padding: 10px;
-            z-index: 20;
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-        }
+    .btn-pass-new.active {
+        display: block;
+    }
 
-        .meld-item {
-            display: flex;
-            gap: 2px;
-            background: rgba(255,255,255,0.1);
-            padding: 5px;
-            border-radius: 5px;
-        }
+    /* 副露區 - 下 1/8 左手牌左邊 */
+    .meld-area {
+        position: absolute;
+        bottom: calc(var(--bottom) / 2);
+        right: 50%;
+        margin-right: 30px;
+        width: 150px;
+        min-height: 120px;
+        background: rgba(0,0,0,0.3);
+        border: 2px solid #d4a373;
+        border-radius: 10px;
+        padding: 10px;
+        z-index: 20;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+    }
 
-        .meld-tile {
-            width: 30px;
-            height: 40px;
-            background: #f8f9fa;
-            border: 1px solid #333;
-            border-radius: 5px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 16px;
-            font-weight: bold;
-        }
+    .meld-item {
+        display: flex;
+        gap: 2px;
+        background: rgba(255,255,255,0.1);
+        padding: 5px;
+        border-radius: 5px;
+    }
 
-        /* 左邊按鈕區域（碰/槓） */
-        .left-buttons {
-            position: absolute;
-            bottom: 280px;
-            left: calc(50% - 380px);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 30;
-        }
+    .meld-tile {
+        width: 30px;
+        height: 40px;
+        background: #f8f9fa;
+        border: 1px solid #333;
+        border-radius: 5px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: bold;
+    }
 
-        /* 右邊按鈕區域（吃） */
-        .right-buttons {
-            position: absolute;
-            bottom: 280px;
-            right: calc(50% - 380px);
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 30;
-        }
+    /* 左邊按鈕（碰/槓）- 下第二 1/8 左手牌左邊上方 */
+    .left-buttons {
+        position: absolute;
+        bottom: var(--bottom-second);
+        left: calc(50% - 300px);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 30;
+    }
 
-        /* 牌型按鈕 */
+    /* 右邊按鈕（吃）- 下第二 1/8 右手牌右邊上方 */
+    .right-buttons {
+        position: absolute;
+        bottom: var(--bottom-second);
+        right: calc(50% - 300px);
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        z-index: 30;
+    }
+
+    /* 牌型按鈕 */
+    .btn-tile-group {
+        width: 140px;
+        padding: 10px;
+        background: #ffd966;
+        border: 2px solid #b5835a;
+        border-radius: 20px;
+        font-size: 18px;
+        font-weight: bold;
+        cursor: pointer;
+        display: none;
+        text-align: center;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    }
+
+    .btn-tile-group.active {
+        display: block;
+    }
+
+    /* 糊按鈕 - 上 1/4 */
+    .btn-mahjong-new {
+        position: absolute;
+        top: 12.5vh;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80px;
+        height: 80px;
+        background: #ff6b6b;
+        color: white;
+        border: 3px solid #c92a2a;
+        border-radius: 50%;
+        font-size: 28px;
+        font-weight: bold;
+        cursor: pointer;
+        display: none;
+        z-index: 40;
+        box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        align-items: center;
+        justify-content: center;
+    }
+
+    .btn-mahjong-new.active {
+        display: flex;
+    }
+
+    /* 棄牌區 - 中 1/2 */
+    .discard-area {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 300px;
+        height: 200px;
+        background: rgba(0,0,0,0.3);
+        border: 2px solid #d4a373;
+        border-radius: 10px;
+        z-index: 5;
+    }
+
+    /* 隱藏舊嘅 action-buttons */
+    .action-buttons {
+        display: none;
+    }
+
+    /* 遊戲資訊 - 左上角 */
+    .game-info {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        color: white;
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-size: 14px;
+        z-index: 10;
+    }
+
+    /* 連接狀態 */
+    .connection-status {
+        position: fixed;
+        top: 10px;
+        right: 10px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        font-size: 12px;
+        z-index: 9999;
+        color: white;
+    }
+    .status-connected { background: #28a745; }
+    .status-disconnected { background: #dc3545; }
+
+    /* 提示文字 - 過按鈕同手牌之間 */
+    #selected-tile-hint {
+        position: absolute;
+        bottom: calc(var(--bottom-second) + 20px);
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(0,0,0,0.7);
+        color: gold;
+        padding: 8px 15px;
+        border-radius: 20px;
+        display: none;
+        z-index: 200;
+    }
+
+    /* 彈窗 */
+    .modal {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 1000;
+    }
+
+    .modal-content {
+        background: white;
+        padding: 30px;
+        border-radius: 20px;
+        max-width: 400px;
+        width: 90%;
+        text-align: center;
+    }
+
+    .win-total {
+        font-size: 36px;
+        color: #d4a373;
+        margin: 20px 0;
+        font-weight: bold;
+    }
+
+    #win-details {
+        margin: 20px 0;
+        max-height: 200px;
+        overflow-y: auto;
+    }
+
+    .win-detail-item {
+        display: flex;
+        justify-content: space-between;
+        padding: 8px;
+        border-bottom: 1px solid #eee;
+        font-size: 18px;
+    }
+
+    .countdown {
+        text-align: center;
+        margin-top: 20px;
+        font-size: 24px;
+        color: #d4a373;
+        font-weight: bold;
+    }
+
+    /* 響應式 - 細屏幕 */
+    @media (max-width: 600px) {
         .btn-tile-group {
-            width: 140px;
-            padding: 10px;
-            background: #ffd966;
-            border: 2px solid #b5835a;
-            border-radius: 20px;
-            font-size: 18px;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-            text-align: center;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-        }
-
-        .btn-tile-group.active {
-            display: block;
-        }
-
-        /* 糊按鈕 - 棄牌區上方 */
-        .btn-mahjong-new {
-            position: absolute;
-            top: 45%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 80px;
-            height: 80px;
-            background: #ff6b6b;
-            color: white;
-            border: 3px solid #c92a2a;
-            border-radius: 50%;
-            font-size: 28px;
-            font-weight: bold;
-            cursor: pointer;
-            display: none;
-            z-index: 40;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-            align-items: center;
-            justify-content: center;
-        }
-
-        .btn-mahjong-new.active {
-            display: flex;
-        }
-
-        /* 隱藏舊嘅 action-buttons */
-        .action-buttons {
-            display: none;
-        }
-
-        .game-info {
-            position: absolute;
-            top: 10px;
-            left: 10px;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            padding: 10px 15px;
-            border-radius: 10px;
+            width: 100px;
             font-size: 14px;
-            z-index: 10;
+            padding: 8px;
         }
-
-        .connection-status {
-            position: fixed;
-            top: 10px;
-            right: 10px;
-            padding: 5px 10px;
-            border-radius: 5px;
+        
+        .btn-pass-new, .btn-mahjong-new {
+            width: 70px;
+            height: 70px;
+            font-size: 18px;
+        }
+        
+        .meld-area {
+            width: 100px;
+            margin-right: 10px;
+        }
+        
+        .meld-tile {
+            width: 22px;
+            height: 30px;
             font-size: 12px;
-            z-index: 9999;
-            color: white;
         }
-        .status-connected { background: #28a745; }
-        .status-disconnected { background: #dc3545; }
+        
+        .left-buttons {
+            left: calc(50% - 200px);
+        }
+        
+        .right-buttons {
+            right: calc(50% - 200px);
+        }
+    }
 
-        .modal {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+    /* 橫屏調整 */
+    @media (orientation: landscape) {
+        .hand-area {
+            bottom: 2vh;
         }
-
-        .modal-content {
-            background: white;
-            padding: 30px;
-            border-radius: 20px;
-            max-width: 400px;
-            width: 90%;
-            text-align: center;
+        
+        .btn-pass-new {
+            bottom: 15vh;
         }
-
-        .countdown {
-            text-align: center;
-            margin-top: 20px;
-            font-size: 24px;
-            color: #d4a373;
-            font-weight: bold;
+        
+        .left-buttons, .right-buttons {
+            bottom: 15vh;
         }
-
-        #selected-tile-hint {
-            position: absolute;
-            bottom: 260px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(0,0,0,0.7);
-            color: gold;
-            padding: 8px 15px;
-            border-radius: 20px;
-            display: none;
-            z-index: 200;
+        
+        .left-buttons {
+            left: calc(50% - 250px);
         }
-    </style>
+        
+        .right-buttons {
+            right: calc(50% - 250px);
+        }
+    }
+</style>
 </head>
 <body>
     <div id="connection-status" class="connection-status status-disconnected">未連接</div>
