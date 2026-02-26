@@ -359,15 +359,19 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
   }
 
   handlePass(playerPosition) {
-    this.currentPlayer = (this.lastDiscard.player + 1) % 4;
-    this.pendingReaction = false;
-    console.log(`🔄 handlePass: 由 ${playerPosition} 轉為 ${(playerPosition + 1) % 4}`);
-    return {
-      type: 'PASS',
-      player: playerPosition,
-      currentPlayer: this.currentPlayer
-    };
-  }
+  // 由最後打出牌嘅人嘅下家開始
+  const nextPlayer = (this.lastDiscard.player + 1) % 4;
+  this.currentPlayer = nextPlayer;
+  this.pendingReaction = false;
+  
+  console.log(`🔄 handlePass: 最後打出牌嘅人係 ${this.lastDiscard.player}，下家係 ${nextPlayer}`);
+  
+  return {
+    type: 'PASS',
+    player: playerPosition,
+    currentPlayer: this.currentPlayer
+  };
+}
 
   processAction(playerPosition, action, tile, targetPosition) {
     console.log(`⚙️ 引擎處理: 玩家 ${playerPosition} 動作 ${action} 牌 ${tile}`);
