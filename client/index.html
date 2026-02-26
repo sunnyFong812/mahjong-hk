@@ -538,6 +538,8 @@
     document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
     document.getElementById('btn-pass').disabled = false;
     window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+      window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
+      window.chowFrom = data.player;
     
     // ✅ 有 reaction 時，唔可以打牌
     window.canDiscard = false;
