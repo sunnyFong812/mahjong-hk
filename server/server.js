@@ -75,7 +75,7 @@ function aiMove(room, aiPlayer) {
   if (result) {
     io.to(room.id).emit('gameUpdate', result);
 
-    // ✅ 如果有 reaction，等人反應，AI 唔做嘢
+    // 如果有 reaction，等人反應
     if (result.reactions) {
       console.log('⏸️ 有 reaction，等人按碰/食/糊/過');
       return;
@@ -101,7 +101,6 @@ function aiMove(room, aiPlayer) {
     }
   }
 }
-
 function startGame(room) {
   console.log(`🎮 房間 ${room.id} 遊戲開始`);
   room.game = new MahjongGame(room.players);
