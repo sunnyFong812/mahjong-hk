@@ -1014,6 +1014,21 @@ socket.on('gameUpdate', (data) => {
         window.myHand = sortTiles(data.hand);
     }
 
+    // 喺 gameUpdate 入面，收到其他玩家手牌時要儲存
+if (data.hand && data.player !== window.myPosition) {
+    if (!window.gameState) window.gameState = {};
+    if (!window.gameState.hands) window.gameState.hands = {};
+    window.gameState.hands[data.player] = data.hand;
+}
+
+     // 如果有 nextPlayerHand，都係用嚟更新手牌數
+    if (data.nextPlayerHand && data.currentPlayer !== undefined) {
+        if (!window.gameState) window.gameState = {};
+        if (!window.gameState.hands) window.gameState.hands = {};
+        window.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
+        console.log(`📊 更新下家 ${data.currentPlayer} 手牌: ${data.nextPlayerHand.length} 張`);
+    }
+    
     if (data.discards) {
         window.discards = data.discards;
     }
@@ -1029,6 +1044,7 @@ socket.on('gameUpdate', (data) => {
             window.myHand = sortTiles(data.nextPlayerHand);
         }
     }
+
 
     // 更新 gameRenderer 嘅 gameState
     if (window.gameRenderer) {
