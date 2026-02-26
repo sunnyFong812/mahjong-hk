@@ -886,8 +886,14 @@ class MahjongRenderer {
         });
 
         //吃按鈕
-        document.getElementById('btn-chow').addEventListener('click', () => {
-  if (!window.canChowTile) return;
+       document.getElementById('btn-chow').addEventListener('click', () => {
+  if (!window.canChowTile) {
+    alert('冇牌可以吃');
+    return;
+  }
+  
+  console.log('🍽️ 發送吃:', window.canChowTile, '來自:', window.chowFrom);
+  
   socket.emit('playerAction', {
     roomId: window.currentRoom,
     action: 'CHOW',
@@ -895,7 +901,6 @@ class MahjongRenderer {
     targetPosition: window.chowFrom
   });
 });
-        });
 
         // 槓按鈕（暫時未實作）
         document.getElementById('btn-kong').addEventListener('click', () => {
