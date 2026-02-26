@@ -664,7 +664,7 @@ class MahjongRenderer {
             this.ctx.strokeRect(x - 5, startY - 5, 100, 70);
             
             // 畫牌
-            if (meld.type === 'PONG') {
+            if (meld.type === 'CHOW' || meld.type === 'PONG'|| meld.type === 'KONG') {
                 for (let i = 0; i < 3; i++) {
                     this.ctx.fillStyle = '#f8f9fa';
                     this.ctx.fillRect(x + i * 30, startY, 25, 35);
