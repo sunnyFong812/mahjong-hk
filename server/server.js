@@ -185,6 +185,7 @@ io.on('connection', (socket) => {
   });
 
   socket.on('playerAction', ({ roomId, action, tile, targetPosition }) => {
+    console.log(`📨 收到 playerAction: ${action}, tile: ${tile}, target: ${targetPosition}`);
   const room = rooms[roomId];
   if (!room?.game) return;
 
@@ -193,8 +194,10 @@ io.on('connection', (socket) => {
 
   // 所有動作都用同一個 call
   const result = room.game.processAction(player.position, action, tile, targetPosition);
+    console.log(`📨 收到 playerAction: ${action}, tile: ${tile}, target: ${targetPosition}`);
   
   if (result) {
+    console.log(`🔍 result.reactions =`, result.reactions);
     io.to(roomId).emit('gameUpdate', result);
 
     // ✅ 如果係 DISCARD 或者 PASS 而且冇 reaction，下家要摸牌
