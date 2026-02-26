@@ -883,9 +883,16 @@ class MahjongRenderer {
             });
         });
 
-        // 吃按鈕（暫時未實作）
+        //吃按鈕
         document.getElementById('btn-chow').addEventListener('click', () => {
-            alert('吃功能尚未實作');
+  if (!window.canChowTile) return;
+  socket.emit('playerAction', {
+    roomId: window.currentRoom,
+    action: 'CHOW',
+    tile: window.canChowTile,
+    targetPosition: window.chowFrom
+  });
+});
         });
 
         // 槓按鈕（暫時未實作）
