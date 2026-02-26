@@ -38,6 +38,7 @@ function aiHandleReaction(room, aiPlayer) {
     const result = game.processAction(aiPlayer.position, 'PASS');
     io.to(room.id).emit('gameUpdate', result);
 
+    // PASS 之後，下家摸牌
     if (!game.gameOver && result.currentPlayer !== undefined) {
       const next = room.players.find(p => p.position === result.currentPlayer);
       if (next && game.wall.length > 0) {
