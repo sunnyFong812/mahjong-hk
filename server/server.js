@@ -78,20 +78,37 @@ function aiMove(room, aiPlayer) {
 
     // 如果有 reaction，處理 reaction
     if (result.reactions) {
-      console.log('🎯 AI reactions players:', result.reactions.map(r => r.player));
+  console.log('🎯 AI reactions players:', result.reactions.map(r => r.player));
+  
+  result.reactions.forEach(r => {
+    const reactionPlayer = room.players.find(p => p.position === r.player);
+    if (reactionPlayer?.isAI) {
+      console.log(`🤖 AI ${reactionPlayer.name} 自動按過`);
       
-      result.reactions.forEach(r => {
-        const reactionPlayer = room.players.find(p => p.position === r.player);
-        if (reactionPlayer?.isAI) {
-          console.log(`🤖 AI ${reactionPlayer.name} 自動按過`);
-          setTimeout(() => {
-            const passResult = game.processAction(reactionPlayer.position, 'PASS');
-            io.to(room.id).emit('gameUpdate', passResult);
-          }, 500);
-        }
-      });
-      return;
+      // 先 PASS
+      const passResult = game.processAction(reactionPlayer.position, 'PASS');
+      io.to(room.id).emit('gameUpdate', passResult);
+      
+      // 然後摸牌
+      if (game.wall.length > 0) {
+        const drawnTile = game.wall.pop();
+        game.hands[reactionPlayer.position].push(drawnTile);
+        game.hands[reactionPlayer.position].sort((a, b) => a.localeCompare(b));
+        
+        io.to(room.id).emit('gameUpdate', {
+          type: 'DRAW',
+          player: reactionPlayer.position,
+          hand: game.hands[reactionPlayer.position],
+          drawnTile: drawnTile
+        });
+        
+        // 然後 AI 打牌
+        setTimeout(() => aiMove(room, reactionPlayer), 600);
+      }
     }
+  });
+  return;
+}
 
     // 冇 reaction，下家摸牌
     const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
