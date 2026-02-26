@@ -1032,6 +1032,10 @@ if (data.hand && data.player !== window.myPosition) {
     if (data.discards) {
         window.discards = data.discards;
     }
+
+    if (data.wallSize !== undefined) {
+        document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
+    }
     
     if (data.melds) {
         window.melds = data.melds;
