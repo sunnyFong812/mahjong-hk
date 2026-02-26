@@ -665,18 +665,19 @@ class MahjongRenderer {
             
             // 畫牌
             if (meld.type === 'CHOW' || meld.type === 'PONG'|| meld.type === 'KONG') {
-                for (let i = 0; i < 3; i++) {
-                    this.ctx.fillStyle = '#f8f9fa';
-                    this.ctx.fillRect(x + i * 30, startY, 25, 35);
-                    this.ctx.strokeStyle = '#333';
-                    this.ctx.strokeRect(x + i * 30, startY, 25, 35);
-                    
-                    this.ctx.fillStyle = this.getTileColor(meld.tile);
-                    this.ctx.font = '14px Arial';
-                    this.ctx.fillText(this.getTileDisplay(meld.tile), x + i * 30 + 3, startY + 22);
-                }
-            }
-        });
+      for (let i = 0; i < 3; i++) {
+        const tile = meld.type === 'CHOW' ? meld.tiles[i] : meld.tile;
+        this.ctx.fillStyle = '#f8f9fa';
+        this.ctx.fillRect(x + i * 30, startY, 25, 35);
+        this.ctx.strokeStyle = '#333';
+        this.ctx.strokeRect(x + i * 30, startY, 25, 35);
+        
+        this.ctx.fillStyle = this.getTileColor(tile);
+        this.ctx.font = '14px Arial';
+        this.ctx.fillText(this.getTileDisplay(tile), x + i * 30 + 3, startY + 22);
+      }
+    }
+  });
     }
     
     render(hand, myPosition, discards) {
