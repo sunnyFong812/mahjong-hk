@@ -184,49 +184,36 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('playerAction', ({ roomId, action, tile }) => {
-    const room = rooms[roomId];
-    if (!room?.game) return;
+  socket.on('playerAction', ({ roomId, action, tile, targetPosition }) => {
+  const room = rooms[roomId];
+  if (!room?.game) return;
 
-    const player = room.players.find(p => p.id === socket.id);
-    if (!player) return;
+  const player = room.players.find(p => p.id === socket.id);
+  if (!player) return;
 
-    // 處理 PASS
-    if (action === 'PASS') {
-      const result = room.game.processAction(player.position, 'PASS');
-      console.log(`👤 ${player.name} 按過，result.currentPlayer = ${result.currentPlayer}`);
-      io.to(roomId).emit('gameUpdate', result);
+  // 所有動作都用同一個 call，包括 PASS
+  const result = room.game.processAction(player.position, action, tile, targetPosition);
+  
+  if (result) {
+    io.to(roomId).emit('gameUpdate', result);
 
-      if (!room.game.gameOver && result.currentPlayer !== undefined) {
-        const next = room.players.find(p => p.position === result.currentPlayer);
-        if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
-      }
-      return;
+    // 如果有 reaction，檢查 AI 是否需要自動按過
+    if (result.reactions) {
+      result.reactions.forEach(r => {
+        const aiPlayer = room.players.find(p => p.isAI && p.position === r.player);
+        if (aiPlayer) {
+          aiHandleReaction(room, aiPlayer);
+        }
+      });
     }
 
-    // 處理其他動作
-    const result = room.game.processAction(player.position, action, tile);
-    if (result) {
-      io.to(roomId).emit('gameUpdate', result);
-
-      // 如果有 reaction，檢查 AI 是否需要自動按過
-      if (result.reactions) {
-        result.reactions.forEach(r => {
-          const aiPlayer = room.players.find(p => p.isAI && p.position === r.player);
-          if (aiPlayer) {
-            // AI 作為 reaction 人，自動按過
-            aiHandleReaction(room, aiPlayer);
-          }
-        });
-      }
-
-      if (!room.game.gameOver && result.currentPlayer !== undefined) {
-        const next = room.players.find(p => p.position === result.currentPlayer);
-        if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
-      }
+    if (!room.game.gameOver && result.currentPlayer !== undefined) {
+      const next = room.players.find(p => p.position === result.currentPlayer);
+      if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
     }
-  });
-
+  }
+});
+  
   socket.on('disconnect', () => {
     for (const rid in rooms) {
       const room = rooms[rid];
