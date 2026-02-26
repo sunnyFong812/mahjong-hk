@@ -104,25 +104,6 @@
             color: white;
         }
 
-        .btn-action {
-            background: #ffd966;
-            color: #333;
-            border: 2px solid #b5835a;
-            padding: 10px 15px;
-            border-radius: 8px;
-            font-size: 16px;
-            min-width: 60px;
-        }
-
-        .btn-action.mahjong {
-            background: #ff6b6b;
-            color: white;
-        }
-
-        .btn-action:disabled {
-            opacity: 0.4;
-        }
-
         .lobby-box {
             width: 90%;
             max-width: 600px;
@@ -180,25 +161,159 @@
             display: inline-block;
         }
 
-        #game-canvas {
-            width: 100%;
-            height: 100%;
-            display: block;
-            touch-action: none;
-        }
-
-        .action-buttons {
+        /* ===== 新遊戲佈局 ===== */
+        /* 手牌區域 - 下方正中間 */
+        .hand-area {
             position: absolute;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            display: flex;
-            gap: 8px;
-            z-index: 100;
-            background: rgba(0, 0, 0, 0.7);
-            padding: 10px 15px;
+            width: 80%;
+            text-align: center;
+            z-index: 10;
+        }
+
+        #game-canvas {
+            width: 100%;
+            height: auto;
+            max-height: 200px;
+            display: block;
+            touch-action: none;
+        }
+
+        /* 過按鈕 - 手牌上方正中 */
+        .btn-pass-new {
+            position: absolute;
+            bottom: 240px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            padding: 12px 20px;
+            background: #6c757d;
+            color: white;
+            border: none;
             border-radius: 30px;
-            backdrop-filter: blur(10px);
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            z-index: 30;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+
+        .btn-pass-new.active {
+            display: block;
+        }
+
+        /* 副露區 - 手牌正左邊 */
+        .meld-area {
+            position: absolute;
+            bottom: 20px;
+            right: 50%;
+            margin-right: 30px;
+            width: 150px;
+            min-height: 120px;
+            background: rgba(0,0,0,0.3);
+            border: 2px solid #d4a373;
+            border-radius: 10px;
+            padding: 10px;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .meld-item {
+            display: flex;
+            gap: 2px;
+            background: rgba(255,255,255,0.1);
+            padding: 5px;
+            border-radius: 5px;
+        }
+
+        .meld-tile {
+            width: 30px;
+            height: 40px;
+            background: #f8f9fa;
+            border: 1px solid #333;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        /* 左邊按鈕區域（碰/槓） */
+        .left-buttons {
+            position: absolute;
+            bottom: 280px;
+            left: calc(50% - 380px);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 30;
+        }
+
+        /* 右邊按鈕區域（吃） */
+        .right-buttons {
+            position: absolute;
+            bottom: 280px;
+            right: calc(50% - 380px);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 30;
+        }
+
+        /* 牌型按鈕 */
+        .btn-tile-group {
+            width: 140px;
+            padding: 10px;
+            background: #ffd966;
+            border: 2px solid #b5835a;
+            border-radius: 20px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .btn-tile-group.active {
+            display: block;
+        }
+
+        /* 糊按鈕 - 棄牌區上方 */
+        .btn-mahjong-new {
+            position: absolute;
+            top: 45%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: #ff6b6b;
+            color: white;
+            border: 3px solid #c92a2a;
+            border-radius: 50%;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            z-index: 40;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-mahjong-new.active {
+            display: flex;
+        }
+
+        /* 隱藏舊嘅 action-buttons */
+        .action-buttons {
+            display: none;
         }
 
         .game-info {
@@ -254,6 +369,19 @@
             font-size: 24px;
             color: #d4a373;
             font-weight: bold;
+        }
+
+        #selected-tile-hint {
+            position: absolute;
+            bottom: 260px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: gold;
+            padding: 8px 15px;
+            border-radius: 20px;
+            display: none;
+            z-index: 200;
         }
     </style>
 </head>
@@ -315,9 +443,28 @@
         
         <!-- 遊戲畫面 -->
         <div id="game-screen" class="screen" style="display: none;">
-            <canvas id="game-canvas" width="1200" height="700"></canvas>
+            <!-- 手牌區域 - 下方正中間 -->
+            <div class="hand-area">
+                <canvas id="game-canvas" width="1200" height="700"></canvas>
+            </div>
             
-            <div class="action-buttons">
+            <!-- 過按鈕 - 手牌上方 -->
+            <button id="btn-pass-new" class="btn-pass-new">過</button>
+            
+            <!-- 副露區 - 手牌左邊 -->
+            <div class="meld-area" id="meld-area"></div>
+            
+            <!-- 糊按鈕 - 棄牌區上方 -->
+            <button id="btn-mahjong-new" class="btn-mahjong-new">糊</button>
+            
+            <!-- 左邊按鈕（碰/槓） -->
+            <div class="left-buttons" id="left-buttons"></div>
+            
+            <!-- 右邊按鈕（吃） -->
+            <div class="right-buttons" id="right-buttons"></div>
+            
+            <!-- 舊嘅 action-buttons 隱藏咗，但留喺度避免 js 出錯 -->
+            <div class="action-buttons" style="display: none;">
                 <button id="btn-chow" class="btn-action" disabled>吃</button>
                 <button id="btn-pong" class="btn-action" disabled>碰</button>
                 <button id="btn-kong" class="btn-action" disabled>槓</button>
@@ -331,7 +478,7 @@
                 <div id="wall-size">剩牌: 68</div>
             </div>
             
-            <div id="selected-tile-hint" style="position: absolute; bottom: 100px; left: 50%; transform: translateX(-50%); background: rgba(0,0,0,0.7); color: gold; padding: 8px 15px; border-radius: 20px; display: none; z-index: 200;">
+            <div id="selected-tile-hint">
                 👆 點擊手牌選擇，再點擊同一張打出
             </div>
         </div>
@@ -349,9 +496,12 @@
         window.selectedTileIndex = -1;
         window.gameRenderer = null;
         window.currentPlayer = -1;
-        window.discards = {};  // 棄牌區
-        window.canPongTile = null; // 可以碰的牌
-        window.canDiscard = true;  // 一開始可以打牌
+        window.discards = {};
+        window.canPongTile = null;
+        window.canChowTile = null;
+        window.chowFrom = null;
+        window.canDiscard = true;
+        window.melds = {};
 
         // ===== 牌型排序函數 =====
         function sortTiles(tiles) {
@@ -424,7 +574,6 @@
         socket.on('roomUpdate', (data) => {
             console.log('📦 房間更新', data);
 
-            // 強制記錄 currentRoom
             window.currentRoom = data.roomId;
             console.log('✅ currentRoom 已設為:', window.currentRoom);
 
@@ -467,30 +616,19 @@
             document.getElementById('game-screen').style.display = 'block';
             
             window.myPosition = data.position;
-            
-            // 莊家（東位）有17張，其他16張
-            if (data.position === 0) {
-                window.myHand = sortTiles(data.hand || []);
-                console.log('🎲 你是莊家，有 17 張牌');
-            } else {
-                window.myHand = sortTiles(data.hand || []);
-            }
-            
+            window.myHand = sortTiles(data.hand || []);
             window.currentPlayer = data.currentPlayer;
             window.discards = data.discards || { 0: [], 1: [], 2: [], 3: [] };
             
             document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
             document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
             
-            // 初始化渲染器
             if (!window.gameRenderer) {
                 window.gameRenderer = new MahjongRenderer('game-canvas');
             }
             
-            // 渲染
             window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
             
-            // 如果係自己回合，顯示提示
             if (data.currentPlayer === window.myPosition) {
                 document.getElementById('selected-tile-hint').style.display = 'block';
                 setTimeout(() => {
@@ -499,295 +637,348 @@
             }
         });
 
-        // ===== 遊戲更新 =====
-        socket.on('gameUpdate', (data) => {
-    console.log('🔄 gameUpdate', data);
-    if (data.type === 'PASS') {
-      console.log(`🔄 前端收到 PASS，currentPlayer 轉為 ${data.currentPlayer}`);
-    }
-    if (data.currentPlayer !== undefined) {
-        window.currentPlayer = data.currentPlayer;
-    }
-
-    if (data.hand && data.player === window.myPosition) {
-        window.myHand = sortTiles(data.hand);
-    }
-
-    if (data.discards) {
-        window.discards = data.discards;
-    }
-    if (data.melds) {
-        window.melds = data.melds;
-    }
-
-    // ✅ 處理摸牌
-    if (data.drawnTile && data.player === window.myPosition) {
-        console.log('🀄️ 你摸到:', data.drawnTile);
-        if (data.nextPlayerHand) {
-            window.myHand = sortTiles(data.nextPlayerHand);
+        // ===== 輔助函數 =====
+        function getTileDisplay(tile) {
+            if (!tile) return '';
+            if (tile.includes('m')) return tile.replace('m', '萬');
+            if (tile.includes('p')) return tile.replace('p', '筒');
+            if (tile.includes('s')) return tile.replace('s', '條');
+            return tile;
         }
-    }
 
-    // 處理 reactions
-    if (data.reactions) {
-  const myReaction = data.reactions.find(r => r.player === window.myPosition);
-  if (myReaction) {
-    document.getElementById('btn-pong').disabled = !myReaction.actions.includes('PONG');
-    document.getElementById('btn-chow').disabled = !myReaction.actions.includes('CHOW');
-    document.getElementById('btn-kong').disabled = !myReaction.actions.includes('KONG');
-    document.getElementById('btn-mahjong').disabled = !myReaction.actions.includes('MAHJONG');
-    document.getElementById('btn-pass').disabled = false;
-    window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
-      window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
-      window.chowFrom = data.player;
-    
-    // ✅ 有 reaction 時，唔可以打牌
-    window.canDiscard = false;
-  } else {
-    document.getElementById('btn-pong').disabled = true;
-    document.getElementById('btn-chow').disabled = true;
-    document.getElementById('btn-kong').disabled = true;
-    document.getElementById('btn-mahjong').disabled = true;
-    document.getElementById('btn-pass').disabled = true;
-    window.canPongTile = null;
-    
-    // ✅ 冇 reaction 時，可以打牌
-    window.canDiscard = true;
-  }
-} else {
-  document.getElementById('btn-pong').disabled = true;
-  document.getElementById('btn-chow').disabled = true;
-  document.getElementById('btn-kong').disabled = true;
-  document.getElementById('btn-mahjong').disabled = true;
-  document.getElementById('btn-pass').disabled = true;
-  window.canPongTile = null;
-  
-  // ✅ 冇 reaction 時，可以打牌
-  window.canDiscard = true;
-}
-    if (window.gameRenderer) {
-        window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-    }
-
-    if (window.currentPlayer === window.myPosition) {
-        document.getElementById('selected-tile-hint').style.display = 'block';
-    } else {
-        document.getElementById('selected-tile-hint').style.display = 'none';
-    }
-});
-        // ===== 渲染器 =====
-class MahjongRenderer {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.tileWidth = 45;
-        this.tileHeight = 60;
-        this.selectedIndex = -1;
-        
-        // 綁定點擊事件
-        this.canvas.addEventListener('click', (e) => this.handleClick(e));
-    }
-    
-    handleClick(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-        
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-        
-        console.log(`🖱️ 點擊位置: (${x}, ${y})`);
-        
-        // 檢查手牌區域 (最多17張)
-        const startX = 50;
-        const startY = 550;
-        
-        for (let i = 0; i < window.myHand.length; i++) {
-            const tileX = startX + i * (this.tileWidth + 3);
+        function renderMelds(melds) {
+            const meldArea = document.getElementById('meld-area');
+            if (!meldArea) return;
             
-            if (x >= tileX && x <= tileX + this.tileWidth &&
-                y >= startY && y <= startY + this.tileHeight) {
+            meldArea.innerHTML = '';
+            
+            if (!melds || !melds[window.myPosition]) return;
+            
+            const myMelds = melds[window.myPosition];
+            
+            myMelds.forEach(meld => {
+                const meldItem = document.createElement('div');
+                meldItem.className = 'meld-item';
                 
-                console.log(`🎯 點擊手牌 ${i}: ${window.myHand[i]}, 當前選擇: ${this.selectedIndex}`);
+                let tiles = [];
+                if (meld.type === 'PONG') {
+                    tiles = [meld.tile, meld.tile, meld.tile];
+                } else if (meld.type === 'CHOW') {
+                    tiles = meld.tiles;
+                } else if (meld.type === 'KONG') {
+                    tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
+                }
                 
-        if (this.selectedIndex === i) {
-    console.log(`🔍 準備打牌 - canDiscard: ${window.canDiscard}, currentPlayer: ${window.currentPlayer}, myPosition: ${window.myPosition}`);
-    
-    if (window.currentPlayer === window.myPosition) {
-        if (!window.canDiscard) {
-            alert('⚠️ 而家唔可以打牌（請先處理碰/槓/糊）');
-            this.selectedIndex = -1;
-            return;
-        }
-        
-        console.log('🎯 打出:', window.myHand[i]);
-        socket.emit('playerAction', {
-            roomId: window.currentRoom,
-            action: 'DISCARD',
-            tile: window.myHand[i]
-        });
-        
-        this.selectedIndex = -1;
-        document.getElementById('selected-tile-hint').style.display = 'none';
-    } else {
-        alert('⚠️ 唔係你嘅回合');
-        this.selectedIndex = -1;
-    }
-} else {
-    // 選擇新牌
-    this.selectedIndex = i;
-    document.getElementById('selected-tile-hint').style.display = 'block';
-    document.getElementById('selected-tile-hint').textContent = `✅ 已選中 ${this.getTileDisplay(window.myHand[i])}，再點擊打出`;
-}
-                this.render(window.myHand, window.myPosition, window.discards);
-                break;
-            }
-        }
-    }
-    
-    // 新增：畫副露（碰、槓嘅牌）
-    renderMelds(melds, myPosition) {
-        if (!melds || !melds[myPosition]) return;
-        
-        const myMelds = melds[myPosition];
-        const startX = 200;
-        const startY = 400;
-        
-        myMelds.forEach((meld, index) => {
-            const x = startX + index * 120;
-            
-            // 畫框
-            this.ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
-            this.ctx.fillRect(x - 5, startY - 5, 100, 70);
-            this.ctx.strokeStyle = '#d4a373';
-            this.ctx.lineWidth = 2;
-            this.ctx.strokeRect(x - 5, startY - 5, 100, 70);
-            
-            // 畫牌
-            if (meld.type === 'CHOW' || meld.type === 'PONG'|| meld.type === 'KONG') {
-      for (let i = 0; i < 3; i++) {
-        const tile = meld.type === 'CHOW' ? meld.tiles[i] : meld.tile;
-        this.ctx.fillStyle = '#f8f9fa';
-        this.ctx.fillRect(x + i * 30, startY, 25, 35);
-        this.ctx.strokeStyle = '#333';
-        this.ctx.strokeRect(x + i * 30, startY, 25, 35);
-        
-        this.ctx.fillStyle = this.getTileColor(tile);
-        this.ctx.font = '14px Arial';
-        this.ctx.fillText(this.getTileDisplay(tile), x + i * 30 + 3, startY + 22);
-      }
-    }
-  });
-    }
-    
-    render(hand, myPosition, discards) {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // 背景
-        this.ctx.fillStyle = '#2a6f2a';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // 畫棄牌區 (台中間)
-        this.renderDiscardArea(discards);
-        
-        // 畫副露 (自己面前)
-        if (window.melds) {
-            this.renderMelds(window.melds, myPosition);
-        }
-        
-        // 顯示手牌數量
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
-        
-        // 手牌 (最多17張)
-        const startX = 50;
-        const startY = 550;
-        
-        hand.forEach((tile, i) => {
-            const x = startX + i * (this.tileWidth + 3);
-            
-            // 牌面
-            this.ctx.fillStyle = '#f8f9fa';
-            this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
-            
-            // 邊框 - 選中時金色
-            this.ctx.strokeStyle = (i === this.selectedIndex) ? 'gold' : '#333';
-            this.ctx.lineWidth = (i === this.selectedIndex) ? 4 : 1;
-            this.ctx.strokeRect(x, startY, this.tileWidth, this.tileHeight);
-            
-            // 牌面文字
-            this.ctx.fillStyle = this.getTileColor(tile);
-            this.ctx.font = 'bold 24px "PingFang HK"';
-            this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
-        });
-        
-        // 其他玩家 (簡單表示)
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '18px Arial';
-        this.ctx.fillText('其他玩家', 500, 200);
-        
-        // 顯示當前玩家
-        this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
-        this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 250);
-        
-        // 顯示誰是莊家
-        this.ctx.fillStyle = '#ffd700';
-        this.ctx.fillText('莊家: 東位', 500, 300);
-    }
-    
-    renderDiscardArea(discards) {
-        if (!discards) return;
-        
-        const centerX = 500;
-        const centerY = 350;
-        
-        this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
-        this.ctx.fillRect(centerX - 200, centerY - 100, 400, 200);
-        
-        this.ctx.strokeStyle = '#d4a373';
-        this.ctx.lineWidth = 2;
-        this.ctx.strokeRect(centerX - 200, centerY - 100, 400, 200);
-        
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '16px Arial';
-        this.ctx.fillText('棄牌區', centerX - 30, centerY - 80);
-        
-        // 顯示最近打出的牌
-        let x = centerX - 180;
-        let y = centerY - 50;
-        
-        for (let i = 0; i < 4; i++) {
-            const playerDiscards = discards[i] || [];
-            const lastTiles = playerDiscards.slice(-6);
-            
-            lastTiles.forEach((tile, index) => {
-                this.ctx.fillStyle = '#f8f9fa';
-                this.ctx.fillRect(x + index * 30, y + i * 40, 25, 35);
-                this.ctx.strokeStyle = '#333';
-                this.ctx.strokeRect(x + index * 30, y + i * 40, 25, 35);
+                tiles.forEach(tile => {
+                    const tileEl = document.createElement('div');
+                    tileEl.className = 'meld-tile';
+                    tileEl.textContent = getTileDisplay(tile);
+                    tileEl.style.color = window.gameRenderer?.getTileColor(tile) || '#333';
+                    meldItem.appendChild(tileEl);
+                });
                 
-                this.ctx.fillStyle = this.getTileColor(tile);
-                this.ctx.font = '14px Arial';
-                this.ctx.fillText(this.getTileDisplay(tile), x + index * 30 + 3, y + i * 40 + 22);
+                meldArea.appendChild(meldItem);
             });
         }
-    }
-    
-    getTileColor(tile) {
-        if (tile.includes('m')) return '#d32f2f';
-        if (tile.includes('p')) return '#2e7d32';
-        if (tile.includes('s')) return '#1976d2';
-        return '#7b1fa2';
-    }
-    
-    getTileDisplay(tile) {
-        if (tile.includes('m')) return tile.replace('m', '萬');
-        if (tile.includes('p')) return tile.replace('p', '筒');
-        if (tile.includes('s')) return tile.replace('s', '條');
-        return tile;
-    }
-}
+
+        function updateReactionButtons(reactions, dataTile, dataPlayer) {
+            const leftButtons = document.getElementById('left-buttons');
+            const rightButtons = document.getElementById('right-buttons');
+            const passBtn = document.getElementById('btn-pass-new');
+            const mahjongBtn = document.getElementById('btn-mahjong-new');
+            
+            leftButtons.innerHTML = '';
+            rightButtons.innerHTML = '';
+            
+            if (!reactions) {
+                passBtn.classList.remove('active');
+                mahjongBtn.classList.remove('active');
+                return;
+            }
+            
+            const myReaction = reactions.find(r => r.player === window.myPosition);
+            
+            if (myReaction) {
+                if (myReaction.actions.includes('MAHJONG')) {
+                    mahjongBtn.classList.add('active');
+                } else {
+                    mahjongBtn.classList.remove('active');
+                }
+                
+                if (myReaction.actions.includes('PONG')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-tile-group active';
+                    btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
+                    btn.onclick = () => {
+                        socket.emit('playerAction', {
+                            roomId: window.currentRoom,
+                            action: 'PONG',
+                            tile: dataTile,
+                            targetPosition: dataPlayer
+                        });
+                    };
+                    leftButtons.appendChild(btn);
+                }
+                
+                if (myReaction.actions.includes('KONG')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-tile-group active';
+                    btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
+                    btn.onclick = () => {
+                        socket.emit('playerAction', {
+                            roomId: window.currentRoom,
+                            action: 'KONG',
+                            tile: dataTile,
+                            targetPosition: dataPlayer
+                        });
+                    };
+                    leftButtons.appendChild(btn);
+                }
+                
+                if (myReaction.actions.includes('CHOW') && dataTile && dataTile.match(/^\d+[mps]$/)) {
+                    const num = parseInt(dataTile);
+                    const suit = dataTile.slice(-1);
+                    const combos = [];
+                    
+                    if (num >= 3) combos.push([`${num-2}${suit}`, `${num-1}${suit}`, dataTile]);
+                    if (num >= 2 && num <= 8) combos.push([`${num-1}${suit}`, dataTile, `${num+1}${suit}`]);
+                    if (num <= 7) combos.push([dataTile, `${num+1}${suit}`, `${num+2}${suit}`]);
+                    
+                    combos.forEach((combo, idx) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-tile-group active';
+                        btn.innerHTML = `<span>[${combo.map(t => getTileDisplay(t)).join('')}]</span>`;
+                        btn.onclick = () => {
+                            socket.emit('playerAction', {
+                                roomId: window.currentRoom,
+                                action: 'CHOW',
+                                tile: dataTile,
+                                targetPosition: dataPlayer
+                            });
+                        };
+                        rightButtons.appendChild(btn);
+                    });
+                }
+                
+                passBtn.classList.add('active');
+                
+            } else {
+                passBtn.classList.remove('active');
+                mahjongBtn.classList.remove('active');
+            }
+        }
+
+        // ===== 遊戲更新 =====
+        socket.on('gameUpdate', (data) => {
+            console.log('🔄 gameUpdate', data);
+            
+            if (data.currentPlayer !== undefined) {
+                window.currentPlayer = data.currentPlayer;
+            }
+
+            if (data.hand && data.player === window.myPosition) {
+                window.myHand = sortTiles(data.hand);
+            }
+
+            if (data.discards) {
+                window.discards = data.discards;
+            }
+            
+            if (data.melds) {
+                window.melds = data.melds;
+                renderMelds(data.melds);
+            }
+
+            if (data.drawnTile && data.player === window.myPosition) {
+                console.log('🀄️ 你摸到:', data.drawnTile);
+                if (data.nextPlayerHand) {
+                    window.myHand = sortTiles(data.nextPlayerHand);
+                }
+            }
+
+            if (data.reactions) {
+                updateReactionButtons(data.reactions, data.tile, data.player);
+                
+                const myReaction = data.reactions.find(r => r.player === window.myPosition);
+                if (myReaction) {
+                    window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+                    window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
+                    window.chowFrom = data.player;
+                    window.canDiscard = false;
+                } else {
+                    window.canPongTile = null;
+                    window.canChowTile = null;
+                    window.canDiscard = true;
+                }
+            } else {
+                updateReactionButtons(null);
+                window.canPongTile = null;
+                window.canChowTile = null;
+                window.canDiscard = true;
+            }
+
+            if (window.gameRenderer) {
+                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+            }
+
+            if (window.currentPlayer === window.myPosition) {
+                document.getElementById('selected-tile-hint').style.display = 'block';
+            } else {
+                document.getElementById('selected-tile-hint').style.display = 'none';
+            }
+        });
+
+        // ===== 渲染器 =====
+        class MahjongRenderer {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.tileWidth = 45;
+                this.tileHeight = 60;
+                this.selectedIndex = -1;
+                
+                this.canvas.addEventListener('click', (e) => this.handleClick(e));
+            }
+            
+            getTileColor(tile) {
+                if (tile.includes('m')) return '#d32f2f';
+                if (tile.includes('p')) return '#2e7d32';
+                if (tile.includes('s')) return '#1976d2';
+                return '#7b1fa2';
+            }
+            
+            handleClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                
+                const startX = 50;
+                const startY = 550;
+                
+                for (let i = 0; i < window.myHand.length; i++) {
+                    const tileX = startX + i * (this.tileWidth + 3);
+                    
+                    if (x >= tileX && x <= tileX + this.tileWidth &&
+                        y >= startY && y <= startY + this.tileHeight) {
+                        
+                        if (this.selectedIndex === i) {
+                            if (window.currentPlayer === window.myPosition) {
+                                if (!window.canDiscard) {
+                                    alert('⚠️ 而家唔可以打牌（請先處理碰/槓/糊）');
+                                    this.selectedIndex = -1;
+                                    return;
+                                }
+                                
+                                socket.emit('playerAction', {
+                                    roomId: window.currentRoom,
+                                    action: 'DISCARD',
+                                    tile: window.myHand[i]
+                                });
+                                
+                                this.selectedIndex = -1;
+                                document.getElementById('selected-tile-hint').style.display = 'none';
+                            } else {
+                                alert('⚠️ 唔係你嘅回合');
+                                this.selectedIndex = -1;
+                            }
+                        } else {
+                            this.selectedIndex = i;
+                            document.getElementById('selected-tile-hint').style.display = 'block';
+                            document.getElementById('selected-tile-hint').textContent = `✅ 已選中 ${this.getTileDisplay(window.myHand[i])}，再點擊打出`;
+                        }
+                        
+                        this.render(window.myHand, window.myPosition, window.discards);
+                        break;
+                    }
+                }
+            }
+            
+            getTileDisplay(tile) {
+                if (tile.includes('m')) return tile.replace('m', '萬');
+                if (tile.includes('p')) return tile.replace('p', '筒');
+                if (tile.includes('s')) return tile.replace('s', '條');
+                return tile;
+            }
+            
+            renderDiscardArea(discards) {
+                if (!discards) return;
+                
+                const centerX = 500;
+                const centerY = 350;
+                
+                this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                this.ctx.fillRect(centerX - 200, centerY - 100, 400, 200);
+                
+                this.ctx.strokeStyle = '#d4a373';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(centerX - 200, centerY - 100, 400, 200);
+                
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '16px Arial';
+                this.ctx.fillText('棄牌區', centerX - 30, centerY - 80);
+                
+                let x = centerX - 180;
+                let y = centerY - 50;
+                
+                for (let i = 0; i < 4; i++) {
+                    const playerDiscards = discards[i] || [];
+                    const lastTiles = playerDiscards.slice(-6);
+                    
+                    lastTiles.forEach((tile, index) => {
+                        this.ctx.fillStyle = '#f8f9fa';
+                        this.ctx.fillRect(x + index * 30, y + i * 40, 25, 35);
+                        this.ctx.strokeStyle = '#333';
+                        this.ctx.strokeRect(x + index * 30, y + i * 40, 25, 35);
+                        
+                        this.ctx.fillStyle = this.getTileColor(tile);
+                        this.ctx.font = '14px Arial';
+                        this.ctx.fillText(this.getTileDisplay(tile), x + index * 30 + 3, y + i * 40 + 22);
+                    });
+                }
+            }
+            
+            render(hand, myPosition, discards) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.ctx.fillStyle = '#2a6f2a';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.renderDiscardArea(discards);
+                
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '20px Arial';
+                this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
+                
+                const startX = 50;
+                const startY = 550;
+                
+                hand.forEach((tile, i) => {
+                    const x = startX + i * (this.tileWidth + 3);
+                    
+                    this.ctx.fillStyle = '#f8f9fa';
+                    this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
+                    
+                    this.ctx.strokeStyle = (i === this.selectedIndex) ? 'gold' : '#333';
+                    this.ctx.lineWidth = (i === this.selectedIndex) ? 4 : 1;
+                    this.ctx.strokeRect(x, startY, this.tileWidth, this.tileHeight);
+                    
+                    this.ctx.fillStyle = this.getTileColor(tile);
+                    this.ctx.font = 'bold 24px "PingFang HK"';
+                    this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
+                });
+                
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '18px Arial';
+                this.ctx.fillText('其他玩家', 500, 200);
+                
+                this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
+                this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 250);
+            }
+        }
+
         // ===== 按鈕函數 =====
         window.joinRoom = function() {
             const name = document.getElementById('player-name').value.trim();
@@ -803,7 +994,6 @@ class MahjongRenderer {
                 return;
             }
 
-            console.log('📤 發送 joinRoom:', room, name);
             socket.emit('joinRoom', { roomId: room, playerName: name });
         };
 
@@ -820,12 +1010,10 @@ class MahjongRenderer {
             }
 
             if (!window.currentRoom) {
-                alert('❌ 未加入房間 (currentRoom 係空)');
-                console.log('❌ currentRoom:', window.currentRoom);
+                alert('❌ 未加入房間');
                 return;
             }
 
-            console.log('📤 發送 playerReady:', window.currentRoom);
             socket.emit('playerReady', { roomId: window.currentRoom });
         };
         
@@ -857,28 +1045,16 @@ class MahjongRenderer {
         window.addEventListener('resize', handleOrientation);
         handleOrientation();
 
-        console.log('✅ 前端初始化完成');
-    </script>
-
-    <!-- ===== 按鈕事件綁定 ===== -->
-    <script>
-        // 碰按鈕
-        document.getElementById('btn-pong').addEventListener('click', () => {
-            if (!window.canPongTile) {
-                alert('冇牌可以碰');
-                return;
-            }
-            console.log('🫸 發送碰:', window.canPongTile);
+        // ===== 新按鈕事件 =====
+        document.getElementById('btn-pass-new').addEventListener('click', () => {
             socket.emit('playerAction', {
                 roomId: window.currentRoom,
-                action: 'PONG',
-                tile: window.canPongTile
+                action: 'PASS',
+                tile: null
             });
         });
 
-        // 食糊按鈕
-        document.getElementById('btn-mahjong').addEventListener('click', () => {
-            console.log('🏆 發送食糊');
+        document.getElementById('btn-mahjong-new').addEventListener('click', () => {
             socket.emit('playerAction', {
                 roomId: window.currentRoom,
                 action: 'MAHJONG',
@@ -886,44 +1062,7 @@ class MahjongRenderer {
             });
         });
 
-        //吃按鈕
-       document.getElementById('btn-chow').addEventListener('click', () => {
-  if (!window.canChowTile) {
-    alert('冇牌可以吃');
-    return;
-  }
-  
-  console.log('🍽️ 發送吃:', window.canChowTile, '來自:', window.chowFrom);
-  
-  socket.emit('playerAction', {
-    roomId: window.currentRoom,
-    action: 'CHOW',
-    tile: window.canChowTile,
-    targetPosition: window.chowFrom
-  });
-});
-
-        // 槓按鈕（暫時未實作）
-        document.getElementById('btn-kong').addEventListener('click', () => {
-            alert('槓功能尚未實作');
-        });
-
-        // 過按鈕
-        document.getElementById('btn-pass').addEventListener('click', () => {
-            console.log('⏭️ 發送過');
-             socket.emit('playerAction', {
-        roomId: window.currentRoom,
-        action: 'PASS',
-        tile: null
-    });
-            // 過其實就係咩都唔做，但可以清空 reactions
-            document.getElementById('btn-pong').disabled = true;
-            document.getElementById('btn-chow').disabled = true;
-            document.getElementById('btn-kong').disabled = true;
-            document.getElementById('btn-mahjong').disabled = true;
-             document.getElementById('btn-pass').disabled = true;
-            window.canPongTile = null;
-        });
+        console.log('✅ 前端初始化完成');
     </script>
 </body>
 </html>
