@@ -191,11 +191,28 @@ io.on('connection', (socket) => {
   const player = room.players.find(p => p.id === socket.id);
   if (!player) return;
 
-  // 所有動作都用同一個 call，包括 PASS
+  // 所有動作都用同一個 call
   const result = room.game.processAction(player.position, action, tile, targetPosition);
   
   if (result) {
     io.to(roomId).emit('gameUpdate', result);
+
+    // ✅ 如果係 DISCARD 或者 PASS 而且冇 reaction，下家要摸牌
+    if ((action === 'DISCARD' || action === 'PASS') && !result.reactions) {
+      const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
+      if (nextPlayer && room.game.wall.length > 0) {
+        const drawnTile = room.game.wall.pop();
+        room.game.hands[nextPlayer.position].push(drawnTile);
+        room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+
+        io.to(room.id).emit('gameUpdate', {
+          type: 'DRAW',
+          player: nextPlayer.position,
+          hand: room.game.hands[nextPlayer.position],
+          drawnTile: drawnTile
+        });
+      }
+    }
 
     // 如果有 reaction，檢查 AI 是否需要自動按過
     if (result.reactions) {
