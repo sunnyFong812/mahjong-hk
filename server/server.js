@@ -216,9 +216,12 @@ io.on('connection', (socket) => {
 
     // 如果有 reaction，檢查 AI 是否需要自動按過
     if (result.reactions) {
+      console.log('🎯 reactions players:', result.reactions.map(r => r.player));
       result.reactions.forEach(r => {
         const aiPlayer = room.players.find(p => p.isAI && p.position === r.player);
+        console.log(`🎯 玩家 ${r.player} 係 AI?`, !!aiPlayer);
         if (aiPlayer) {
+          console.log(`🤖 準備 call aiHandleReaction for ${aiPlayer.name}`);
           aiHandleReaction(room, aiPlayer);
         }
       });
