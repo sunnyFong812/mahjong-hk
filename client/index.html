@@ -913,7 +913,9 @@ setInterval(updateAllHandsCount, 1000);
             
             leftButtons.innerHTML = '';
             rightButtons.innerHTML = '';
-            
+            console.log('🎨 updateReactionButtons 被 call');
+console.log('🎨 reactions =', reactions);
+console.log('🎨 myPosition =', window.myPosition);
             if (!reactions) {
                 passBtn.classList.remove('active');
                 mahjongBtn.classList.remove('active');
@@ -1065,9 +1067,13 @@ if (data.hand && data.player !== window.myPosition) {
     }
 
     if (data.reactions) {
+        console.log('🔍 有 reaction，準備顯示按鈕');
+    console.log('🔍 myPosition =', window.myPosition);
+    console.log('🔍 reactions =', data.reactions);
         updateReactionButtons(data.reactions, data.tile, data.player);
         
         const myReaction = data.reactions.find(r => r.player === window.myPosition);
+        console.log('🔍 myReaction =', myReaction);
         if (myReaction) {
             window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
             window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
