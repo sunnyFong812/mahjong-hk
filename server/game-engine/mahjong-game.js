@@ -210,6 +210,7 @@ getChowCombinations(playerPosition, tile) {
 }
   // ========== 檢查 reaction ==========
   checkReactions(discardPlayer, tile, level = 'mahjong') {
+    // 胡
     if (level === 'mahjong') {
         for (let i = 0; i < 4; i++) {
             if (i === discardPlayer) continue;
@@ -218,10 +219,11 @@ getChowCombinations(playerPosition, tile) {
                 return [{ player: i, actions: ['MAHJONG'] }];
             }
         }
-        // 冇胡，進入下一個級別
+        // 冇胡，自動去下一級
         return this.checkReactions(discardPlayer, tile, 'pongkong');
     }
     
+    // 碰/槓
     if (level === 'pongkong') {
         const pongKongReactions = [];
         for (let i = 0; i < 4; i++) {
@@ -237,10 +239,11 @@ getChowCombinations(playerPosition, tile) {
             this.currentReactionLevel = 'pongkong';
             return pongKongReactions;
         }
-        // 冇碰/槓，進入下一個級別
+        // 冇碰/槓，自動去下一級
         return this.checkReactions(discardPlayer, tile, 'chow');
     }
     
+    // 吃
     if (level === 'chow') {
         const chowReactions = [];
         const upperPlayer = (discardPlayer + 1) % 4;
@@ -251,7 +254,11 @@ getChowCombinations(playerPosition, tile) {
                 chowCombos: this.getChowCombinations(upperPlayer, tile)
             });
         }
-        this.currentReactionLevel = chowReactions.length ? 'chow' : null;
+        if (chowReactions.length) {
+            this.currentReactionLevel = 'chow';
+        } else {
+            this.currentReactionLevel = null;
+        }
         return chowReactions;
     }
     
@@ -407,24 +414,46 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
   }
 
   handlePass(playerPosition) {
-    // 如果當前仲有 reaction，繼續檢查下一級別
-    if (this.lastDiscard) {
-        const nextReactions = this.checkReactions(
-            this.lastDiscard.player, 
-            this.lastDiscard.tile,
-            this.getNextLevel(this.currentReactionLevel)
-        );
-        
-        if (nextReactions.length) {
-            // 仲有 reaction，唔轉回合，繼續等人反應
-            this.pendingReaction = true;
-            return {
-                type: 'PASS',
-                player: playerPosition,
-                reactions: nextReactions,
-                currentPlayer: this.currentPlayer
-            };
-        }
+    // 如果冇 lastDiscard，正常轉下家
+    if (!this.lastDiscard) {
+        this.currentPlayer = (playerPosition + 1) % 4;
+        this.pendingReaction = false;
+        this.currentReactionLevel = null;
+        return {
+            type: 'PASS',
+            player: playerPosition,
+            currentPlayer: this.currentPlayer
+        };
+    }
+    
+    // 根據當前 reaction level 決定下一級要檢查咩
+    let nextLevel = null;
+    if (this.currentReactionLevel === 'pongkong') {
+        nextLevel = 'chow';  // 碰/槓處理完，下一級檢查吃
+    } else if (this.currentReactionLevel === 'mahjong') {
+        nextLevel = 'pongkong';  // 胡處理完，下一級檢查碰/槓
+    } else {
+        // 如果冇 reaction level，就由最高級開始
+        nextLevel = 'mahjong';
+    }
+    
+    // 檢查下一級 reaction
+    const nextReactions = this.checkReactions(
+        this.lastDiscard.player,
+        this.lastDiscard.tile,
+        nextLevel
+    );
+    
+    if (nextReactions.length > 0) {
+        // 仲有 reaction，更新 level 同繼續等
+        this.currentReactionLevel = nextLevel;
+        this.pendingReaction = true;
+        return {
+            type: 'PASS',
+            player: playerPosition,
+            reactions: nextReactions,
+            currentPlayer: this.currentPlayer
+        };
     }
     
     // 冇晒 reaction，轉下家
