@@ -221,56 +221,103 @@ io.on('connection', (socket) => {
     const player = room.players.find(p => p.id === socket.id);
     if (!player) return;
 
-    // 所有動作都用同一個 call
+    // 特別處理 PASS
+    if (action === 'PASS') {
+        // 執行 PASS 動作
+        const passResult = room.game.processAction(player.position, 'PASS');
+        console.log(`🔍 PASS 結果 =`, passResult);
+        
+        // 如果有新 reaction（例如之前被遮住嘅「吃」），直接回傳
+        if (passResult.reactions) {
+            io.to(roomId).emit('gameUpdate', passResult);
+            
+            // 檢查新 reaction 中有冇 AI 需要自動按過
+            passResult.reactions.forEach(r => {
+                const aiPlayer = room.players.find(p => p.isAI && p.position === r.player);
+                if (aiPlayer) {
+                    console.log(`🤖 AI ${aiPlayer.name} 需要處理新 reaction`);
+                    aiHandleReaction(room, aiPlayer);
+                }
+            });
+            return;
+        }
+        
+        // 冇新 reaction，正常處理摸牌同轉回合
+        io.to(roomId).emit('gameUpdate', passResult);
+        
+        // 下家摸牌
+        const nextPlayer = room.players.find(p => p.position === passResult.currentPlayer);
+        if (nextPlayer && room.game.wall.length > 0) {
+            const drawnTile = room.game.wall.pop();
+            room.game.hands[nextPlayer.position].push(drawnTile);
+            room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+
+            io.to(room.id).emit('gameUpdate', {
+                type: 'DRAW',
+                player: nextPlayer.position,
+                hand: room.game.hands[nextPlayer.position],
+                drawnTile: drawnTile
+            });
+        }
+
+        // 如果下家係 AI，觸發 AI 行動
+        if (!room.game.gameOver && passResult.currentPlayer !== undefined) {
+            const next = room.players.find(p => p.position === passResult.currentPlayer);
+            if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
+        }
+        return;
+    }
+
+    // 處理其他動作 (DISCARD, PONG, CHOW, MAHJONG...)
     const result = room.game.processAction(player.position, action, tile, targetPosition);
     
     if (result) {
-      console.log(`🔍 result.reactions =`, result.reactions);
-      io.to(roomId).emit('gameUpdate', result);
+        console.log(`🔍 result.reactions =`, result.reactions);
+        io.to(roomId).emit('gameUpdate', result);
 
-      // ✅ 如果係 DISCARD 或者 PASS 而且冇 reaction，下家要摸牌
-      if ((action === 'DISCARD' || action === 'PASS') && !result.reactions) {
-        const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
-        if (nextPlayer && room.game.wall.length > 0) {
-          const drawnTile = room.game.wall.pop();
-          room.game.hands[nextPlayer.position].push(drawnTile);
-          room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+        // 如果係 DISCARD 而且冇 reaction，下家要摸牌
+        if (action === 'DISCARD' && !result.reactions) {
+            const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
+            if (nextPlayer && room.game.wall.length > 0) {
+                const drawnTile = room.game.wall.pop();
+                room.game.hands[nextPlayer.position].push(drawnTile);
+                room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
 
-          io.to(room.id).emit('gameUpdate', {
-            type: 'DRAW',
-            player: nextPlayer.position,
-            hand: room.game.hands[nextPlayer.position],
-            drawnTile: drawnTile
-          });
+                io.to(room.id).emit('gameUpdate', {
+                    type: 'DRAW',
+                    player: nextPlayer.position,
+                    hand: room.game.hands[nextPlayer.position],
+                    drawnTile: drawnTile
+                });
+            }
         }
-      }
 
-      // 如果有 reaction，檢查 AI 是否需要自動按過
-      if (result.reactions) {
-        console.log('🎯 reactions players:', result.reactions.map(r => r.player));
-        console.log('👥 所有玩家狀態:', room.players.map(p => ({
-          pos: p.position,
-          name: p.name,
-          isAI: p.isAI
-        })));
-        
-        result.reactions.forEach(r => {
-          const aiPlayer = room.players.find(p => p.isAI && p.position === r.player);
-          console.log(`🎯 玩家 ${r.player} 搵到 AI?`, aiPlayer ? aiPlayer.name : '無');
-          
-          if (aiPlayer) {
-            console.log(`🤖 準備 call aiHandleReaction for ${aiPlayer.name}`);
-            aiHandleReaction(room, aiPlayer);
-          }
-        });
-      }
+        // 如果有 reaction，檢查 AI 是否需要自動按過
+        if (result.reactions) {
+            console.log('🎯 reactions players:', result.reactions.map(r => r.player));
+            console.log('👥 所有玩家狀態:', room.players.map(p => ({
+                pos: p.position,
+                name: p.name,
+                isAI: p.isAI
+            })));
+            
+            result.reactions.forEach(r => {
+                const aiPlayer = room.players.find(p => p.isAI && p.position === r.player);
+                console.log(`🎯 玩家 ${r.player} 搵到 AI?`, aiPlayer ? aiPlayer.name : '無');
+                
+                if (aiPlayer) {
+                    console.log(`🤖 準備 call aiHandleReaction for ${aiPlayer.name}`);
+                    aiHandleReaction(room, aiPlayer);
+                }
+            });
+        }
 
-      if (!room.game.gameOver && result.currentPlayer !== undefined) {
-        const next = room.players.find(p => p.position === result.currentPlayer);
-        if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
-      }
+        if (!room.game.gameOver && result.currentPlayer !== undefined) {
+            const next = room.players.find(p => p.position === result.currentPlayer);
+            if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
+        }
     }
-  });
+});
   
   socket.on('disconnect', () => {
     for (const rid in rooms) {
