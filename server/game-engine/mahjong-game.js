@@ -187,28 +187,39 @@ class MahjongGame {
 
   // ========== 檢查 reaction ==========
   checkReactions(discardPlayer, tile) {
-    const reactions = [];
-    
-    for (let i = 0; i < 4; i++) {
-      if (i === discardPlayer) continue;
-      
-      const actions = [];
-      
-      if (this.canMahjong(i, tile)) actions.push('MAHJONG');
-      if (this.canKong(i, tile)) actions.push('KONG');
-      if (this.canPong(i, tile)) actions.push('PONG');
-      
-      const isUpper = (discardPlayer + 1) % 4 === i;
-      if (isUpper && this.canChow(i, tile)) actions.push('CHOW');
-      
-      if (actions.length) {
-        reactions.push({ player: i, actions });
-      }
+  // 先檢查糊
+  for (let i = 0; i < 4; i++) {
+    if (i === discardPlayer) continue;
+    if (this.canMahjong(i, tile)) {
+      return [{ player: i, actions: ['MAHJONG'] }];
     }
-    
-    return reactions;
   }
-
+  
+  // 再檢查碰/槓
+  const pongKongReactions = [];
+  for (let i = 0; i < 4; i++) {
+    if (i === discardPlayer) continue;
+    const actions = [];
+    if (this.canKong(i, tile)) actions.push('KONG');
+    if (this.canPong(i, tile)) actions.push('PONG');
+    if (actions.length) {
+      pongKongReactions.push({ player: i, actions });
+    }
+  }
+  if (pongKongReactions.length) return pongKongReactions;
+  
+  // 最後先檢查吃
+  const chowReactions = [];
+  const upperPlayer = (discardPlayer + 1) % 4;
+  if (this.canChow(upperPlayer, tile)) {
+    chowReactions.push({ 
+      player: upperPlayer, 
+      actions: ['CHOW'],
+      chowCombos: this.getChowCombinations(upperPlayer, tile)
+    });
+  }
+  return chowReactions;
+}
   // ========== 動作處理 ==========
   handleDiscard(playerPosition, tile) {
     if (playerPosition !== this.currentPlayer) {
