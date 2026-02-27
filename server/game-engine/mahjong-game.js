@@ -7,7 +7,7 @@ class MahjongGame {
     this.melds = { 0: [], 1: [], 2: [], 3: [] };
     this.currentPlayer = 0;
     this.lastDiscard = null;
-    this.winner = null
+    this.winner = null;
       // 喺 constructor 入面加
     this.currentReactionLevel = null; // 可以係 'mahjong', 'pongkong', 'chow';
     this.gameOver = false;
@@ -187,7 +187,29 @@ class MahjongGame {
     return false;
   }
 
-  // ========== 檢查 reaction ==========checkReactions(discardPlayer, tile, level = 'mahjong') {
+  // 獲取所有可能嘅吃組合
+getChowCombinations(playerPosition, tile) {
+  const combos = [];
+  const suit = tile.slice(-1);
+  const num = parseInt(tile);
+  const hand = this.hands[playerPosition];
+  
+  if (num >= 3 && hand.includes(`${num-2}${suit}`) && hand.includes(`${num-1}${suit}`)) {
+    combos.push([`${num-2}${suit}`, `${num-1}${suit}`, tile]);
+  }
+  
+  if (num >= 2 && num <= 8 && hand.includes(`${num-1}${suit}`) && hand.includes(`${num+1}${suit}`)) {
+    combos.push([`${num-1}${suit}`, tile, `${num+1}${suit}`]);
+  }
+  
+  if (num <= 7 && hand.includes(`${num+1}${suit}`) && hand.includes(`${num+2}${suit}`)) {
+    combos.push([tile, `${num+1}${suit}`, `${num+2}${suit}`]);
+  }
+  
+  return combos;
+}
+  // ========== 檢查 reaction ==========
+  checkReactions(discardPlayer, tile, level = 'mahjong') {
     if (level === 'mahjong') {
         for (let i = 0; i < 4; i++) {
             if (i === discardPlayer) continue;
