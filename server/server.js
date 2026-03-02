@@ -213,7 +213,7 @@ io.on('connection', (socket) => {
     }
   });
 
-  socket.on('playerAction', ({ roomId, action, tile, targetPosition }) => {
+  socket.on('playerAction', ({ roomId, action, tile, targetPosition, combination }) => {
     console.log(`📨 收到 playerAction: ${action}, tile: ${tile}, target: ${targetPosition}`);
     const room = rooms[roomId];
     if (!room?.game) return;
@@ -269,7 +269,7 @@ io.on('connection', (socket) => {
     }
 
     // 處理其他動作 (DISCARD, PONG, CHOW, MAHJONG...)
-    const result = room.game.processAction(player.position, action, tile, targetPosition);
+    const result = room.game.processAction(player.position, action, tile, targetPosition, combination);
     
     if (result) {
         console.log(`🔍 result.reactions =`, result.reactions);
