@@ -349,6 +349,8 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
   handleChow(playerPosition, tile, targetPosition, combination) {
     // 檢查是否可以吃（只能吃上家）
     console.log('🔥 handleChow 被 call!', {playerPosition, tile, targetPosition, combination});
+    console.log(`🔍 targetPosition: ${targetPosition}, playerPosition: ${playerPosition}`);
+console.log(`🔍 計算上家: (${targetPosition} + 1) % 4 = ${(targetPosition + 1) % 4}`);
     const isUpperSeat = (targetPosition + 1) % 4 === playerPosition;
     console.log('🔥 isUpperSeat:', isUpperSeat);
     if (!isUpperSeat) return { error: '只能吃上家' };
