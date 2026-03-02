@@ -524,7 +524,7 @@ getNextLevel(currentLevel) {
       case 'PONG':
         return this.handlePong(playerPosition, tile, targetPosition);
       case 'CHOW':
-        return this.handleChow(playerPosition, tile, targetPosition);
+        return this.handleChow(playerPosition, tile, targetPosition, combination);
       case 'MAHJONG':
         return this.handleMahjong(playerPosition, tile);
       case 'PASS':
