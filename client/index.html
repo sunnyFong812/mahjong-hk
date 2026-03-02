@@ -1066,31 +1066,39 @@ if (data.hand && data.player !== window.myPosition) {
         }
     }
 
-    if (data.reactions) {
-        console.log('🔍 有 reaction，準備顯示按鈕');
+    // 喺 index.html 嘅 socket.on('gameUpdate', ...) 入面
+if (data.reactions) {
+    console.log('🔍 有 reaction，準備顯示按鈕');
     console.log('🔍 myPosition =', window.myPosition);
     console.log('🔍 reactions =', data.reactions);
-        updateReactionButtons(data.reactions, data.tile, data.player);
-        
-        const myReaction = data.reactions.find(r => r.player === window.myPosition);
-        console.log('🔍 myReaction =', myReaction);
-        if (myReaction) {
-            window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
-            window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
-            window.chowFrom = data.player;
-            window.canDiscard = false;
-        } else {
-            window.canPongTile = null;
-            window.canChowTile = null;
-            window.canDiscard = false;
-        }
+
+    // 1. 永遠根據 data.reactions 去更新 UI 按鈕 (為所有有 reaction 嘅玩家顯示)
+    updateReactionButtons(data.reactions, data.tile, data.player);
+
+    // 2. 搵下自己有冇 reaction，用嚟更新自己嘅狀態變數 (e.g., canPongTile, canDiscard)
+    const myReaction = data.reactions.find(r => r.player === window.myPosition);
+    console.log('🔍 myReaction =', myReaction);
+
+    if (myReaction) {
+        // 有自己嘅 reaction
+        window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+        window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
+        window.chowFrom = data.player;
+        window.canDiscard = false; // 有 reaction，唔可以打牌
     } else {
-        updateReactionButtons(null);
+        // 冇自己嘅 reaction，但 game 仲係 pending 狀態，所以都唔可以打牌
         window.canPongTile = null;
         window.canChowTile = null;
-        window.canDiscard = true;
+        window.canDiscard = false; // 都係唔可以打牌
     }
-
+} else {
+    // 沒有 reaction，可以打牌，並隱藏所有按鈕
+    updateReactionButtons(null);
+    window.canPongTile = null;
+    window.canChowTile = null;
+    window.canDiscard = true;
+}
+    
     if (window.gameRenderer) {
         window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
         // 立即更新手牌數
