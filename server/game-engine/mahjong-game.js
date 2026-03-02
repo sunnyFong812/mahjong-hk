@@ -251,7 +251,8 @@ getChowCombinations(playerPosition, tile) {
             chowReactions.push({
                 player: upperPlayer,
                 actions: ['CHOW'],
-                chowCombos: this.getChowCombinations(upperPlayer, tile)
+                chowCombos: this.getChowCombinations(upperPlayer, tile),
+                discardPlayer: discardPlayer
             });
         }
         if (chowReactions.length) {
