@@ -380,49 +380,7 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
         currentPlayer: this.currentPlayer
     };
 }  
-    // 舊版相容性（如果冇傳 combination）
-    console.warn('⚠️ 冇收到 combination，用舊方法');
-    const suit = tile.match(/[mps]/)?.[0];
-    if (!suit) return { error: '不能吃字牌' };
-
-    const num = parseInt(tile);
-    const hand = this.hands[playerPosition];
-
-    let tilesToRemove = [];
-    if (num >= 3 && hand.includes(`${num-2}${suit}`) && hand.includes(`${num-1}${suit}`)) {
-        tilesToRemove = [`${num-2}${suit}`, `${num-1}${suit}`];
-    } else if (num >= 2 && num <= 8 && hand.includes(`${num-1}${suit}`) && hand.includes(`${num+1}${suit}`)) {
-        tilesToRemove = [`${num-1}${suit}`, `${num+1}${suit}`];
-    } else if (num <= 7 && hand.includes(`${num+1}${suit}`) && hand.includes(`${num+2}${suit}`)) {
-        tilesToRemove = [`${num+1}${suit}`, `${num+2}${suit}`];
-    } else {
-        return { error: 'cannot chow' };
-    }
-
-    const newHand = hand.filter(t => !tilesToRemove.includes(t));
-    this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
-
-    this.melds[playerPosition].push({
-        type: 'CHOW',
-        tiles: [...tilesToRemove, tile],
-        from: targetPosition
-    });
-
-    this.currentPlayer = playerPosition;
-    this.lastDiscard = null;
-    this.pendingReaction = false;
-
-    return {
-        type: 'CHOW',
-        player: playerPosition,
-        tiles: [...tilesToRemove, tile],
-        from: targetPosition,
-        hand: this.hands[playerPosition],
-        melds: this.melds,
-        currentPlayer: this.currentPlayer
-    };
-}
-  
+    
   handleMahjong(playerPosition, tile) {
     if (!this.canMahjong(playerPosition, tile)) {
       return { error: 'cannot mahjong' };
