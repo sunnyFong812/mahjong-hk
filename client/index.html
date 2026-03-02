@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>港式麻雀 - 16張牌</title>
     <style>
-        /* ===== 基礎設定 ===== */
+      /* ===== 基礎設定 ===== */
 * {
     margin: 0;
     padding: 0;
@@ -43,7 +43,7 @@ body {
     background: rgba(42, 111, 42, 0.95);
 }
 
-/* ===== 登入畫面 ===== */
+/* ===== 登入畫面 - 響應式 ===== */
 .login-box {
     width: min(90%, 400px);
     position: absolute;
@@ -51,8 +51,8 @@ body {
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.98);
-    padding: 30px;
-    border-radius: 20px;
+    padding: clamp(20px, 5vw, 40px);
+    border-radius: clamp(15px, 3vw, 25px);
     text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
     max-height: 90vh;
@@ -61,42 +61,42 @@ body {
 
 .login-box h1 {
     color: #d4a373;
-    margin-bottom: 30px;
-    font-size: 36px;
+    margin-bottom: clamp(15px, 4vh, 30px);
+    font-size: clamp(24px, 8vw, 42px);
 }
 
 .input-group {
-    margin-bottom: 20px;
+    margin-bottom: clamp(12px, 3vh, 25px);
     text-align: left;
 }
 
 .input-group label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: clamp(3px, 1vh, 8px);
     color: #555;
-    font-size: 16px;
+    font-size: clamp(14px, 4vw, 18px);
     font-weight: bold;
 }
 
 .input-group input {
     width: 100%;
-    padding: 12px;
+    padding: clamp(8px, 2vh, 15px);
     border: 2px solid #ddd;
-    border-radius: 10px;
-    font-size: 16px;
+    border-radius: clamp(5px, 1.5vw, 12px);
+    font-size: clamp(14px, 4vw, 18px);
     background: white;
 }
 
-/* ===== 大廳畫面 ===== */
+/* ===== 大廳畫面 - 響應式 ===== */
 .lobby-box {
-    width: min(95%, 600px);
+    width: min(95%, 650px);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.98);
-    padding: 30px;
-    border-radius: 20px;
+    padding: clamp(20px, 4vh, 35px);
+    border-radius: clamp(15px, 3vw, 25px);
     text-align: center;
     max-height: 90vh;
     overflow-y: auto;
@@ -104,24 +104,25 @@ body {
 
 .lobby-box h2 {
     color: #d4a373;
-    font-size: 24px;
-    margin-bottom: 20px;
+    font-size: clamp(20px, 6vw, 28px);
+    margin-bottom: clamp(10px, 3vh, 20px);
 }
 
 .players-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 15px;
-    margin: 20px 0;
+    gap: clamp(8px, 2vh, 15px);
+    margin: clamp(10px, 3vh, 20px) 0;
 }
 
 .player-slot {
     background: #f8f9fa;
     border: 3px solid #dee2e6;
-    border-radius: 15px;
-    padding: 15px;
+    border-radius: clamp(10px, 2vw, 18px);
+    padding: clamp(10px, 2vh, 18px);
     position: relative;
-    min-height: 100px;
+    min-height: 80px;
+    aspect-ratio: 4/3;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -134,18 +135,18 @@ body {
 
 .player-slot .position {
     position: absolute;
-    top: -12px;
-    left: 15px;
+    top: -10px;
+    left: 10px;
     background: #d4a373;
     color: white;
-    padding: 4px 12px;
+    padding: 2px clamp(8px, 2vw, 12px);
     border-radius: 20px;
-    font-size: 14px;
+    font-size: clamp(10px, 3vw, 14px);
     font-weight: bold;
 }
 
 .player-slot .player-info {
-    font-size: 18px;
+    font-size: clamp(12px, 4vw, 18px);
     font-weight: bold;
     text-align: center;
 }
@@ -153,9 +154,9 @@ body {
 .ai-badge {
     background: #6c5ce7;
     color: white;
-    padding: 2px 8px;
+    padding: 2px 6px;
     border-radius: 10px;
-    font-size: 12px;
+    font-size: clamp(8px, 2.5vw, 12px);
     margin-left: 5px;
     display: inline-block;
 }
@@ -163,23 +164,23 @@ body {
 .lobby-controls {
     display: flex;
     justify-content: center;
-    gap: 15px;
-    margin-top: 20px;
+    gap: clamp(8px, 2vh, 15px);
+    margin-top: clamp(10px, 3vh, 20px);
     flex-wrap: wrap;
 }
 
 .countdown {
-    margin-top: 20px;
-    font-size: 24px;
+    margin-top: clamp(10px, 3vh, 20px);
+    font-size: clamp(18px, 6vw, 26px);
     color: #d4a373;
     font-weight: bold;
 }
 
-/* ===== 按鈕 ===== */
+/* ===== 按鈕 - 響應式 ===== */
 .btn {
-    padding: 12px 25px;
-    border-radius: 10px;
-    font-size: 18px;
+    padding: clamp(8px, 2vh, 14px) clamp(12px, 4vw, 28px);
+    border-radius: clamp(5px, 1.5vw, 12px);
+    font-size: clamp(14px, 4vw, 20px);
     font-weight: bold;
     border: none;
     cursor: pointer;
@@ -207,19 +208,20 @@ body {
     color: white;
 }
 
-/* ===== 遊戲畫面 - 簡單佈局 ===== */
+/* ===== 遊戲畫面 - 穩定版（之前版本） ===== */
 #game-screen {
     position: relative;
     width: 100%;
     height: 100%;
 }
 
-/* 手牌區域 - 最下方 */
+/* 手牌區域 */
 .hand-area {
     position: absolute;
-    bottom: 10px;
-    left: 0;
-    width: 100%;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
     text-align: center;
     z-index: 10;
 }
@@ -227,33 +229,19 @@ body {
 #game-canvas {
     width: 100%;
     height: auto;
-    max-height: 140px;
+    max-height: 200px;
     display: block;
-    margin: 0 auto;
+    touch-action: none;
 }
 
-/* 棄牌區 - 中央偏上 */
-.discard-area {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 260px;
-    height: 180px;
-    background: rgba(0,0,0,0.3);
-    border: 2px solid #d4a373;
-    border-radius: 10px;
-    z-index: 5;
-}
-
-/* 過按鈕 - 手牌上方中間 */
+/* 過按鈕 */
 .btn-pass-new {
     position: absolute;
-    bottom: 160px;
+    bottom: 240px;
     left: 50%;
     transform: translateX(-50%);
     width: 100px;
-    padding: 12px 0;
+    padding: 12px 20px;
     background: #6c757d;
     color: white;
     border: none;
@@ -264,43 +252,56 @@ body {
     display: none;
     z-index: 30;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    text-align: center;
 }
 
 .btn-pass-new.active {
     display: block;
 }
 
-/* 糊按鈕 - 棄牌區上方 */
-.btn-mahjong-new {
+/* 副露區 */
+.meld-area {
     position: absolute;
-    top: 35%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 70px;
-    height: 70px;
-    background: #ff6b6b;
-    color: white;
-    border: 3px solid #c92a2a;
-    border-radius: 50%;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none;
-    z-index: 40;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    align-items: center;
+    bottom: 20px;
+    right: 50%;
+    margin-right: 30px;
+    width: 150px;
+    min-height: 120px;
+    background: rgba(0,0,0,0.3);
+    border: 2px solid #d4a373;
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.meld-item {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.1);
+    padding: 5px;
+    border-radius: 5px;
     justify-content: center;
 }
 
-.btn-mahjong-new.active {
+.meld-tile {
+    width: 30px;
+    height: 40px;
+    background: #f8f9fa;
+    border: 1px solid #333;
+    border-radius: 5px;
     display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: bold;
 }
 
-/* 左邊按鈕區域 - 碰/槓 */
+/* 左邊按鈕 */
 .left-buttons {
     position: absolute;
-    bottom: 220px;
+    bottom: 280px;
     left: 20px;
     display: flex;
     flex-direction: column;
@@ -309,10 +310,10 @@ body {
     width: 120px;
 }
 
-/* 右邊按鈕區域 - 吃 */
+/* 右邊按鈕 */
 .right-buttons {
     position: absolute;
-    bottom: 220px;
+    bottom: 280px;
     right: 20px;
     display: flex;
     flex-direction: column;
@@ -341,70 +342,71 @@ body {
     display: block;
 }
 
-/* 副露區 - 左邊 */
-.meld-area {
+/* 糊按鈕 */
+.btn-mahjong-new {
     position: absolute;
-    bottom: 120px;
-    left: 20px;
-    width: 140px;
-    min-height: 100px;
+    top: 45%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 80px;
+    height: 80px;
+    background: #ff6b6b;
+    color: white;
+    border: 3px solid #c92a2a;
+    border-radius: 50%;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    z-index: 40;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    align-items: center;
+    justify-content: center;
+}
+
+.btn-mahjong-new.active {
+    display: flex;
+}
+
+/* 棄牌區 */
+.discard-area {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 300px;
+    height: 200px;
     background: rgba(0,0,0,0.3);
     border: 2px solid #d4a373;
     border-radius: 10px;
-    padding: 8px;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
+    z-index: 5;
 }
 
-.meld-item {
-    display: flex;
-    gap: 3px;
-    background: rgba(255,255,255,0.1);
-    padding: 5px;
-    border-radius: 5px;
-    justify-content: center;
-}
-
-.meld-tile {
-    width: 30px;
-    height: 40px;
-    background: #f8f9fa;
-    border: 1px solid #333;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-/* 遊戲資訊 - 右上角 */
+/* 遊戲資訊 */
 .game-info {
     position: absolute;
-    top: 20px;
-    right: 20px;
+    top: 10px;
+    right: 10px;
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 12px 20px;
+    padding: 10px 15px;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 14px;
     z-index: 100;
     line-height: 1.8;
     min-width: 150px;
 }
 
-/* 手牌數顯示 - 左上角 */
+/* 手牌數顯示 */
 .players-hand-count {
     position: absolute;
-    top: 20px;
-    left: 20px;
+    top: 10px;
+    left: 10px;
     background: rgba(0, 0, 0, 0.6);
     color: white;
-    padding: 12px 20px;
+    padding: 10px 15px;
     border-radius: 10px;
-    font-size: 16px;
+    font-size: 14px;
     z-index: 100;
     border: 1px solid #d4a373;
     line-height: 1.8;
@@ -414,7 +416,7 @@ body {
 .player-hand {
     display: flex;
     justify-content: space-between;
-    gap: 20px;
+    gap: 15px;
 }
 
 .player-hand.ai-hand {
@@ -439,12 +441,12 @@ body {
 /* 提示文字 */
 #selected-tile-hint {
     position: absolute;
-    bottom: 180px;
+    bottom: 200px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0,0,0,0.7);
     color: gold;
-    padding: 10px 20px;
+    padding: 8px 15px;
     border-radius: 20px;
     display: none;
     z-index: 200;
@@ -482,28 +484,10 @@ body {
     font-weight: bold;
 }
 
-#win-details {
-    margin: 20px 0;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.win-detail-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    font-size: 18px;
-}
-
-/* ===== 橫屏優化 ===== */
+/* 橫屏優化 */
 @media (orientation: landscape) {
     .hand-area {
-        bottom: 20px;
-    }
-    
-    #game-canvas {
-        max-height: 160px;
+        bottom: 10px;
     }
     
     .btn-pass-new {
@@ -511,120 +495,54 @@ body {
     }
     
     .left-buttons, .right-buttons {
-        bottom: 280px;
-    }
-    
-    .meld-area {
-        bottom: 180px;
-    }
-    
-    #selected-tile-hint {
         bottom: 240px;
     }
     
-    .discard-area {
-        width: 300px;
-        height: 200px;
+    .meld-area {
+        bottom: 10px;
     }
     
-    .btn-mahjong-new {
-        top: 35%;
+    #selected-tile-hint {
+        bottom: 160px;
     }
 }
 
-/* ===== 手機直屏優化 ===== */
+/* 手機直屏優化 */
 @media (max-width: 600px) {
-    .login-box, .lobby-box {
-        padding: 20px;
-    }
-    
-    .login-box h1 {
-        font-size: 28px;
+    .left-buttons, .right-buttons {
+        width: 90px;
     }
     
     .btn-tile-group {
-        font-size: 14px;
-        padding: 6px 3px;
+        font-size: 12px;
+        padding: 6px 2px;
+    }
+    
+    .meld-area {
+        width: 110px;
     }
     
     .meld-tile {
-        width: 24px;
-        height: 32px;
+        width: 22px;
+        height: 30px;
         font-size: 12px;
-    }
-    
-    .game-info, .players-hand-count {
-        font-size: 12px;
-        padding: 8px 12px;
-    }
-    
-    .discard-area {
-        width: 200px;
-        height: 140px;
     }
     
     .btn-pass-new {
         width: 80px;
         font-size: 16px;
-        padding: 8px 0;
-        bottom: 140px;
+        padding: 8px 15px;
     }
     
     .btn-mahjong-new {
         width: 60px;
         height: 60px;
-        font-size: 20px;
+        font-size: 22px;
     }
     
-    .left-buttons, .right-buttons {
-        bottom: 200px;
-        width: 90px;
-    }
-    
-    .meld-area {
-        bottom: 100px;
-        width: 110px;
-    }
-    
-    #selected-tile-hint {
-        bottom: 160px;
-        font-size: 14px;
-        padding: 8px 15px;
-    }
-}
-
-/* ===== 超小屏幕 ===== */
-@media (max-width: 380px) {
     .discard-area {
-        width: 160px;
-        height: 120px;
-    }
-    
-    .btn-pass-new {
-        bottom: 130px;
-        width: 70px;
-        font-size: 14px;
-    }
-    
-    .left-buttons, .right-buttons {
-        bottom: 180px;
-        width: 80px;
-    }
-    
-    .btn-tile-group {
-        font-size: 12px;
-        padding: 4px 2px;
-    }
-    
-    .meld-area {
-        bottom: 90px;
-        width: 90px;
-    }
-    
-    .meld-tile {
-        width: 20px;
-        height: 26px;
-        font-size: 10px;
+        width: 220px;
+        height: 150px;
     }
 }
     </style>
