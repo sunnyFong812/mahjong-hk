@@ -974,16 +974,18 @@ setInterval(updateAllHandsCount, 1000);
                 btn.className = 'btn-tile-group active';
                 btn.innerHTML = `<span>[${combo.map(t => getTileDisplay(t)).join('')}]</span>`;
                 btn.onclick = () => {
-                    socket.emit('playerAction', {
-                        roomId: window.currentRoom,
-                        action: 'CHOW',
-                        tile: dataTile,
-                        targetPosition: dataPlayer,
-                        combination: combo
-                    });
-                    hideAllReactionButtons();
-                };
-                rightButtons.appendChild(btn);
+    // 確保 tile 係 combo 入面嘅中間牌（即係上家打出嘅牌）
+    const tileToEat = combo[1]; // combo 係 [num-1, num, num+1] 咁樣
+    
+    socket.emit('playerAction', {
+        roomId: window.currentRoom,
+        action: 'CHOW',
+        tile: tileToEat,
+        targetPosition: dataPlayer,
+        combination: combo
+    });
+    hideAllReactionButtons();
+};                rightButtons.appendChild(btn);
             });
         }
         
