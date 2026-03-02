@@ -515,7 +515,7 @@ getNextLevel(currentLevel) {
     return index < levels.length - 1 ? levels[index + 1] : null;
 }
 
-  processAction(playerPosition, action, tile, targetPosition) {
+  processAction(playerPosition, action, tile, targetPosition, combination) {
     console.log(`⚙️ 引擎處理: 玩家 ${playerPosition} 動作 ${action} 牌 ${tile}`);
     
     switch (action) {
