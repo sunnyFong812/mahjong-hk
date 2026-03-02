@@ -352,10 +352,12 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
     if (!isUpperSeat) return { error: '只能吃上家' };
 
     // 直接用前端傳嚟嘅組合移除牌
+    console.log(`🍽️ 食牌前手牌: ${this.hands[playerPosition].length}張`);
+    console.log(`🍽️ tilesToRemove:`, combination.filter(t => t !== tile));
     const tilesToRemove = combination.filter(t => t !== tile);
-    
-    // 移除牌
     const newHand = this.hands[playerPosition].filter(t => !tilesToRemove.includes(t));
+    console.log(`🍽️ 食牌後手牌: ${newHand.length}張`);
+    
     this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
 
     // 記錄吃
