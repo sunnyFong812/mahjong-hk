@@ -980,7 +980,7 @@ setInterval(updateAllHandsCount, 1000);
     socket.emit('playerAction', {
         roomId: window.currentRoom,
         action: 'CHOW',
-        tile: tileToEat,
+        tile: dataTile,
         targetPosition: myReaction.discardPlayer,
         combination: combo
     });
