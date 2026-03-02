@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>港式麻雀 - 16張牌</title>
     <style>
-    /* ===== 基礎設定 ===== */
+   /* ===== 基礎設定 ===== */
 * {
     margin: 0;
     padding: 0;
@@ -43,94 +43,87 @@ body {
     background: rgba(42, 111, 42, 0.95);
 }
 
-/* ===== 登入畫面 - 一頁過 ===== */
+/* ===== 登入畫面 ===== */
 .login-box {
-    width: min(80%, 400px);
+    width: min(90%, 400px);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.98);
-    padding: min(4vh, 30px);
-    border-radius: min(2vw, 20px);
+    padding: 30px;
+    border-radius: 20px;
     text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-height: 90vh;
 }
 
 .login-box h1 {
     color: #d4a373;
-    margin-bottom: min(3vh, 20px);
-    font-size: min(6vh, 42px);
+    margin-bottom: 30px;
+    font-size: 36px;
 }
 
 .input-group {
-    margin-bottom: min(2.5vh, 20px);
+    margin-bottom: 20px;
     text-align: left;
 }
 
 .input-group label {
     display: block;
-    margin-bottom: min(1vh, 8px);
+    margin-bottom: 5px;
     color: #555;
-    font-size: min(2.2vh, 18px);
+    font-size: 16px;
     font-weight: bold;
 }
 
 .input-group input {
     width: 100%;
-    padding: min(2vh, 15px);
+    padding: 12px;
     border: 2px solid #ddd;
-    border-radius: min(1.5vw, 12px);
-    font-size: min(2.2vh, 18px);
+    border-radius: 10px;
+    font-size: 16px;
     background: white;
 }
 
-/* ===== 大廳畫面 - 一頁過 (更積極縮放) ===== */
+/* ===== 大廳畫面 - 字體正常 + 格仔縮細 ===== */
 .lobby-box {
-    width: min(85%, 500px);
+    width: min(90%, 500px);
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
     background: rgba(255, 255, 255, 0.98);
-    padding: min(2vh, 15px);
-    border-radius: min(1.8vw, 15px);
+    padding: 20px;
+    border-radius: 20px;
     text-align: center;
-    max-height: 95vh;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .lobby-box h2 {
     color: #d4a373;
-    font-size: min(3vh, 22px);
-    margin-bottom: min(1vh, 8px);
-    flex-shrink: 0;
+    font-size: 24px;
+    margin-bottom: 15px;
 }
 
 .players-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: min(0.8vh, 5px);
-    margin: min(0.6vh, 4px) 0;
-    flex-shrink: 1;
-    min-height: 0;
+    gap: 8px;
+    margin: 10px 0;
 }
 
 .player-slot {
     background: #f8f9fa;
     border: 2px solid #dee2e6;
-    border-radius: min(1vw, 8px);
-    padding: min(0.6vh, 5px);
+    border-radius: 12px;
+    padding: 8px;
     position: relative;
-    min-height: 0;
     aspect-ratio: 4/3;
     display: flex;
     flex-direction: column;
     justify-content: center;
-    width: 100%;
+    transition: border-color 0.3s, background 0.3s;
 }
 
 .player-slot.ready {
@@ -140,65 +133,59 @@ body {
 
 .player-slot .position {
     position: absolute;
-    top: -0.8vh;
-    left: 0.5vw;
+    top: -8px;
+    left: 8px;
     background: #d4a373;
     color: white;
-    padding: 0.2vh 0.8vw;
-    border-radius: 2vh;
-    font-size: min(1.4vh, 10px);
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 14px;
     font-weight: bold;
-    line-height: 1.2;
-    white-space: nowrap;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .player-slot .player-info {
-    font-size: min(1.8vh, 13px);
+    font-size: 16px;
     font-weight: bold;
     text-align: center;
     word-break: break-word;
-    line-height: 1.2;
-    padding: 0 2px;
 }
 
 .ai-badge {
     background: #6c5ce7;
     color: white;
-    padding: 0.2vh 0.4vw;
-    border-radius: 1vh;
-    font-size: min(1.2vh, 9px);
-    margin-left: 2px;
+    padding: 2px 6px;
+    border-radius: 10px;
+    font-size: 12px;
+    margin-left: 5px;
     display: inline-block;
-    line-height: 1.2;
 }
 
 .lobby-controls {
     display: flex;
     justify-content: center;
-    gap: min(1vh, 8px);
-    margin-top: min(1vh, 8px);
+    gap: 10px;
+    margin-top: 15px;
     flex-wrap: wrap;
-    flex-shrink: 0;
 }
 
 .countdown {
-    margin-top: min(1vh, 8px);
-    font-size: min(2.5vh, 20px);
+    margin-top: 15px;
+    font-size: 24px;
     color: #d4a373;
     font-weight: bold;
-    flex-shrink: 0;
 }
 
-/* ===== 按鈕 - 響應式 ===== */
+/* ===== 按鈕 ===== */
 .btn {
-    padding: min(0.8vh, 7px) min(1.8vw, 16px);
-    border-radius: min(0.8vw, 6px);
-    font-size: min(1.8vh, 15px);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-size: 16px;
     font-weight: bold;
     border: none;
     cursor: pointer;
-    white-space: nowrap;
     transition: transform 0.2s, opacity 0.2s;
+    white-space: nowrap;
 }
 
 .btn:active {
@@ -570,85 +557,6 @@ body {
     .discard-area {
         width: 220px;
         height: 150px;
-    }
-}
-
-/* ===== 超小屏幕 ===== */
-@media (max-width: 400px) {
-    .lobby-box {
-        width: 95%;
-        padding: 1.5vh 2vw;
-    }
-    
-    .lobby-box h2 {
-        font-size: 2.2vh;
-        margin-bottom: 0.8vh;
-    }
-    
-    .players-container {
-        gap: 0.6vh;
-        margin: 0.5vh 0;
-    }
-    
-    .player-slot .position {
-        font-size: 1.2vh;
-        top: -0.6vh;
-        padding: 0.1vh 1vw;
-    }
-    
-    .player-slot .player-info {
-        font-size: 1.5vh;
-    }
-    
-    .ai-badge {
-        font-size: 1vh;
-        padding: 0.1vh 0.3vw;
-    }
-    
-    .btn {
-        font-size: 1.6vh;
-        padding: 0.6vh 3vw;
-    }
-}
-
-/* 超矮屏幕（橫屏手機） */
-@media (max-height: 500px) {
-    .lobby-box {
-        padding: 1vh 2vw;
-    }
-    
-    .players-container {
-        gap: 0.5vh;
-    }
-    
-    .player-slot .player-info {
-        font-size: 1.6vh;
-    }
-    
-    .lobby-box h2 {
-        font-size: 2vh;
-        margin-bottom: 0.5vh;
-    }
-    
-    .btn {
-        padding: 0.5vh 2vw;
-        font-size: 1.6vh;
-    }
-}
-
-/* 極細屏幕 */
-@media (max-width: 320px) {
-    .player-slot .position {
-        font-size: 1vh;
-        padding: 0.1vh 0.8vw;
-    }
-    
-    .player-slot .player-info {
-        font-size: 1.3vh;
-    }
-    
-    .ai-badge {
-        font-size: 0.9vh;
     }
 }
     </style>
