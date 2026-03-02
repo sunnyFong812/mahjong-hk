@@ -362,10 +362,13 @@ console.log(`🔍 計算上家: (${targetPosition} + 1) % 4 = ${(targetPosition 
     console.log('🔥 tile:', tile);
     const tilesToRemove = combination.filter(t => t !== tile);
     console.log('🔥 tilesToRemove:', tilesToRemove);
-    const newHand = this.hands[playerPosition].filter(t => !tilesToRemove.includes(t));
-    console.log('🔥 newHand length:', newHand.length);
-    
-    this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+    // 用迴圈逐張移除（確保只移除一張）
+let newHand = [...this.hands[playerPosition]];  // 複製手牌
+for (let t of tilesToRemove) {
+    const index = newHand.indexOf(t);
+    if (index !== -1) newHand.splice(index, 1);  // 只移除第一張找到的
+}
+this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
 
     // 記錄吃
     this.melds[playerPosition].push({
