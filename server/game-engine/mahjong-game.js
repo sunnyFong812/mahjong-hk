@@ -346,56 +346,96 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
   }
 
   // ========== 新增：吃牌處理 ==========
-  handleChow(playerPosition, tile, targetPosition) {
+  handleChow(playerPosition, tile, targetPosition, combination) {
     // 檢查是否可以吃（只能吃上家）
     const isUpperSeat = (targetPosition + 1) % 4 === playerPosition;
     if (!isUpperSeat) return { error: '只能吃上家' };
 
+    // 如果前端有傳 combination，直接用
+    if (combination && Array.isArray(combination) && combination.length === 3) {
+        // 檢查組合係咪包含打出嘅牌
+        if (!combination.includes(tile)) {
+            return { error: 'invalid chow combination' };
+        }
+        
+        // 檢查手牌係咪有另外兩張牌
+        const tilesToRemove = combination.filter(t => t !== tile);
+        for (let t of tilesToRemove) {
+            if (!this.hands[playerPosition].includes(t)) {
+                return { error: 'missing tiles for chow' };
+            }
+        }
+        
+        // 移除嗰兩張牌
+        const newHand = this.hands[playerPosition].filter(t => !tilesToRemove.includes(t));
+        this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+        
+        // 記錄吃
+        this.melds[playerPosition].push({
+            type: 'CHOW',
+            tiles: combination,
+            from: targetPosition
+        });
+        
+        // 吃完之後輪到自己出牌
+        this.currentPlayer = playerPosition;
+        this.lastDiscard = null;
+        this.pendingReaction = false;
+        
+        return {
+            type: 'CHOW',
+            player: playerPosition,
+            tiles: combination,
+            from: targetPosition,
+            hand: this.hands[playerPosition],
+            melds: this.melds,
+            currentPlayer: this.currentPlayer
+        };
+    }
+    
+    // 舊版相容性（如果冇傳 combination）
+    console.warn('⚠️ 冇收到 combination，用舊方法');
     const suit = tile.match(/[mps]/)?.[0];
     if (!suit) return { error: '不能吃字牌' };
 
     const num = parseInt(tile);
     const hand = this.hands[playerPosition];
 
-    // 找出可以吃嘅組合
     let tilesToRemove = [];
     if (num >= 3 && hand.includes(`${num-2}${suit}`) && hand.includes(`${num-1}${suit}`)) {
-      tilesToRemove = [`${num-2}${suit}`, `${num-1}${suit}`];
+        tilesToRemove = [`${num-2}${suit}`, `${num-1}${suit}`];
     } else if (num >= 2 && num <= 8 && hand.includes(`${num-1}${suit}`) && hand.includes(`${num+1}${suit}`)) {
-      tilesToRemove = [`${num-1}${suit}`, `${num+1}${suit}`];
+        tilesToRemove = [`${num-1}${suit}`, `${num+1}${suit}`];
     } else if (num <= 7 && hand.includes(`${num+1}${suit}`) && hand.includes(`${num+2}${suit}`)) {
-      tilesToRemove = [`${num+1}${suit}`, `${num+2}${suit}`];
+        tilesToRemove = [`${num+1}${suit}`, `${num+2}${suit}`];
     } else {
-      return { error: 'cannot chow' };
+        return { error: 'cannot chow' };
     }
 
-    // 移除嗰兩張牌
     const newHand = hand.filter(t => !tilesToRemove.includes(t));
     this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
 
-    // 記錄吃
     this.melds[playerPosition].push({
-      type: 'CHOW',
-      tiles: [...tilesToRemove, tile],
-      from: targetPosition
+        type: 'CHOW',
+        tiles: [...tilesToRemove, tile],
+        from: targetPosition
     });
 
-    // 吃完之後輪到自己出牌
     this.currentPlayer = playerPosition;
     this.lastDiscard = null;
     this.pendingReaction = false;
 
     return {
-      type: 'CHOW',
-      player: playerPosition,
-      tiles: [...tilesToRemove, tile],
-      from: targetPosition,
-      hand: this.hands[playerPosition],
-      melds: this.melds,
-      currentPlayer: this.currentPlayer
+        type: 'CHOW',
+        player: playerPosition,
+        tiles: [...tilesToRemove, tile],
+        from: targetPosition,
+        hand: this.hands[playerPosition],
+        melds: this.melds,
+        currentPlayer: this.currentPlayer
     };
-  }
-
+}
+  
   handleMahjong(playerPosition, tile) {
     if (!this.canMahjong(playerPosition, tile)) {
       return { error: 'cannot mahjong' };
