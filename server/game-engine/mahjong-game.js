@@ -351,48 +351,35 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
     const isUpperSeat = (targetPosition + 1) % 4 === playerPosition;
     if (!isUpperSeat) return { error: '只能吃上家' };
 
-    // 如果前端有傳 combination，直接用
-    if (combination && Array.isArray(combination) && combination.length === 3) {
-        // 檢查組合係咪包含打出嘅牌
-        if (!combination.includes(tile)) {
-            return { error: 'invalid chow combination' };
-        }
-        
-        // 檢查手牌係咪有另外兩張牌
-        const tilesToRemove = combination.filter(t => t !== tile);
-        for (let t of tilesToRemove) {
-            if (!this.hands[playerPosition].includes(t)) {
-                return { error: 'missing tiles for chow' };
-            }
-        }
-        
-        // 移除嗰兩張牌
-        const newHand = this.hands[playerPosition].filter(t => !tilesToRemove.includes(t));
-        this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
-        
-        // 記錄吃
-        this.melds[playerPosition].push({
-            type: 'CHOW',
-            tiles: combination,
-            from: targetPosition
-        });
-        
-        // 吃完之後輪到自己出牌
-        this.currentPlayer = playerPosition;
-        this.lastDiscard = null;
-        this.pendingReaction = false;
-        
-        return {
-            type: 'CHOW',
-            player: playerPosition,
-            tiles: combination,
-            from: targetPosition,
-            hand: this.hands[playerPosition],
-            melds: this.melds,
-            currentPlayer: this.currentPlayer
-        };
-    }
+    // 直接用前端傳嚟嘅組合移除牌
+    const tilesToRemove = combination.filter(t => t !== tile);
     
+    // 移除牌
+    const newHand = this.hands[playerPosition].filter(t => !tilesToRemove.includes(t));
+    this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+
+    // 記錄吃
+    this.melds[playerPosition].push({
+        type: 'CHOW',
+        tiles: combination,
+        from: targetPosition
+    });
+
+    // 吃完之後輪到自己出牌
+    this.currentPlayer = playerPosition;
+    this.lastDiscard = null;
+    this.pendingReaction = false;
+
+    return {
+        type: 'CHOW',
+        player: playerPosition,
+        tiles: combination,
+        from: targetPosition,
+        hand: this.hands[playerPosition],
+        melds: this.melds,
+        currentPlayer: this.currentPlayer
+    };
+}  
     // 舊版相容性（如果冇傳 combination）
     console.warn('⚠️ 冇收到 combination，用舊方法');
     const suit = tile.match(/[mps]/)?.[0];
