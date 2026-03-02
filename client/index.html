@@ -906,108 +906,96 @@ setInterval(updateAllHandsCount, 1000);
         }
 
         function updateReactionButtons(reactions, dataTile, dataPlayer) {
-            const leftButtons = document.getElementById('left-buttons');
-            const rightButtons = document.getElementById('right-buttons');
-            const passBtn = document.getElementById('btn-pass-new');
-            const mahjongBtn = document.getElementById('btn-mahjong-new');
-            
-            leftButtons.innerHTML = '';
-            rightButtons.innerHTML = '';
-            console.log('🎨 updateReactionButtons 被 call');
-console.log('🎨 reactions =', reactions);
-console.log('🎨 myPosition =', window.myPosition);
-            if (!reactions) {
-                passBtn.classList.remove('active');
-                mahjongBtn.classList.remove('active');
-                return;
-            }
-            
-            const myReaction = reactions.find(r => r.player === window.myPosition);
-            
-            if (myReaction) {
-                if (myReaction.actions.includes('MAHJONG')) {
-                    mahjongBtn.classList.add('active');
-                } else {
-                    mahjongBtn.classList.remove('active');
-                }
-                
-                if (myReaction.actions.includes('PONG')) {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-tile-group active';
-                    btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
-                    btn.onclick = () => {
-                        socket.emit('playerAction', {
-                            roomId: window.currentRoom,
-                            action: 'PONG',
-                            tile: dataTile,
-                            targetPosition: dataPlayer
-                        });
-                        hideAllReactionButtons();
-                    };
-                    leftButtons.appendChild(btn);
-                }
-                
-                if (myReaction.actions.includes('KONG')) {
-                    const btn = document.createElement('button');
-                    btn.className = 'btn-tile-group active';
-                    btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
-                    btn.onclick = () => {
-                        socket.emit('playerAction', {
-                            roomId: window.currentRoom,
-                            action: 'KONG',
-                            tile: dataTile,
-                            targetPosition: dataPlayer
-                        });
-                        hideAllReactionButtons();
-                    };
-                    leftButtons.appendChild(btn);
-                }
-                
-                if (myReaction.actions.includes('CHOW')) {
-    // 1. 優先使用 engine 傳過嚟嘅 chowCombos
-    let combos = myReaction.chowCombos;
-
-    // 2. 如果冇 chowCombos (for debugging)，先用番舊方法
-    if (!combos || combos.length === 0) {
-        console.warn('⚠️ 冇收到 chowCombos，用舊方法計算');
-        if (dataTile && dataTile.match(/^\d+[mps]$/)) {
-            const num = parseInt(dataTile);
-            const suit = dataTile.slice(-1);
-            combos = [];
-            if (num >= 3) combos.push([`${num-2}${suit}`, `${num-1}${suit}`, dataTile]);
-            if (num >= 2 && num <= 8) combos.push([`${num-1}${suit}`, dataTile, `${num+1}${suit}`]);
-            if (num <= 7) combos.push([dataTile, `${num+1}${suit}`, `${num+2}${suit}`]);
-        } else {
-            return; // 唔係數字牌，唔洗顯示
-        }
+    const leftButtons = document.getElementById('left-buttons');
+    const rightButtons = document.getElementById('right-buttons');
+    const passBtn = document.getElementById('btn-pass-new');
+    const mahjongBtn = document.getElementById('btn-mahjong-new');
+    
+    leftButtons.innerHTML = '';
+    rightButtons.innerHTML = '';
+    console.log('🎨 updateReactionButtons 被 call');
+    console.log('🎨 reactions =', reactions);
+    console.log('🎨 myPosition =', window.myPosition);
+    
+    if (!reactions) {
+        passBtn.classList.remove('active');
+        mahjongBtn.classList.remove('active');
+        return;
     }
-
-    // 3. 用 combos 建立按鈕
-    combos.forEach((combo, idx) => {
-        const btn = document.createElement('button');
-        btn.className = 'btn-tile-group active';
-        btn.innerHTML = `<span>[${combo.map(t => getTileDisplay(t)).join('')}]</span>`;
-        btn.onclick = () => {
-            socket.emit('playerAction', {
-                roomId: window.currentRoom,
-                action: 'CHOW',
-                tile: dataTile,
-                targetPosition: dataPlayer,
-                combination: combo // 傳返完整組合
-            });
-            hideAllReactionButtons();
-        };
-        rightButtons.appendChild(btn);
-    });
-}
-                passBtn.classList.add('active');
-                
-            } else {
-                passBtn.classList.remove('active');
-                mahjongBtn.classList.remove('active');
-            }
+    
+    const myReaction = reactions.find(r => r.player === window.myPosition);
+    
+    if (myReaction) {
+        // 糊
+        if (myReaction.actions.includes('MAHJONG')) {
+            mahjongBtn.classList.add('active');
+        } else {
+            mahjongBtn.classList.remove('active');
         }
-
+        
+        // 碰
+        if (myReaction.actions.includes('PONG')) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-tile-group active';
+            btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
+            btn.onclick = () => {
+                socket.emit('playerAction', {
+                    roomId: window.currentRoom,
+                    action: 'PONG',
+                    tile: dataTile,
+                    targetPosition: dataPlayer
+                });
+                hideAllReactionButtons();
+            };
+            leftButtons.appendChild(btn);
+        }
+        
+        // 槓
+        if (myReaction.actions.includes('KONG')) {
+            const btn = document.createElement('button');
+            btn.className = 'btn-tile-group active';
+            btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
+            btn.onclick = () => {
+                socket.emit('playerAction', {
+                    roomId: window.currentRoom,
+                    action: 'KONG',
+                    tile: dataTile,
+                    targetPosition: dataPlayer
+                });
+                hideAllReactionButtons();
+            };
+            leftButtons.appendChild(btn);
+        }
+        
+        // 吃 - 直接用 chowCombos，唔靠 actions
+        if (myReaction.chowCombos && myReaction.chowCombos.length > 0) {
+            myReaction.chowCombos.forEach((combo, idx) => {
+                const btn = document.createElement('button');
+                btn.className = 'btn-tile-group active';
+                btn.innerHTML = `<span>[${combo.map(t => getTileDisplay(t)).join('')}]</span>`;
+                btn.onclick = () => {
+                    socket.emit('playerAction', {
+                        roomId: window.currentRoom,
+                        action: 'CHOW',
+                        tile: dataTile,
+                        targetPosition: dataPlayer,
+                        combination: combo
+                    });
+                    hideAllReactionButtons();
+                };
+                rightButtons.appendChild(btn);
+            });
+        }
+        
+        // 過按鈕
+        passBtn.classList.add('active');
+        
+    } else {
+        passBtn.classList.remove('active');
+        mahjongBtn.classList.remove('active');
+    }
+}
+        
         function hideAllReactionButtons() {
             document.getElementById('left-buttons').innerHTML = '';
             document.getElementById('right-buttons').innerHTML = '';
