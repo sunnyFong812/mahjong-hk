@@ -348,15 +348,19 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
   // ========== 新增：吃牌處理 ==========
   handleChow(playerPosition, tile, targetPosition, combination) {
     // 檢查是否可以吃（只能吃上家）
+    console.log('🔥 handleChow 被 call!', {playerPosition, tile, targetPosition, combination});
     const isUpperSeat = (targetPosition + 1) % 4 === playerPosition;
+    console.log('🔥 isUpperSeat:', isUpperSeat);
     if (!isUpperSeat) return { error: '只能吃上家' };
+    
 
     // 直接用前端傳嚟嘅組合移除牌
-    console.log(`🍽️ 食牌前手牌: ${this.hands[playerPosition].length}張`);
-    console.log(`🍽️ tilesToRemove:`, combination.filter(t => t !== tile));
+    console.log('🔥 combination:', combination);
+    console.log('🔥 tile:', tile);
     const tilesToRemove = combination.filter(t => t !== tile);
+    console.log('🔥 tilesToRemove:', tilesToRemove);
     const newHand = this.hands[playerPosition].filter(t => !tilesToRemove.includes(t));
-    console.log(`🍽️ 食牌後手牌: ${newHand.length}張`);
+    console.log('🔥 newHand length:', newHand.length);
     
     this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
 
