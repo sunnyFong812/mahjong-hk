@@ -1068,6 +1068,23 @@
                 if (tile.includes('s')) return tile.replace('s', '條');
                 return tile;
             }
+
+// 計算副露牌總寬度
+getMeldsWidth(melds, myPosition) {
+    if (!melds || !melds[myPosition]) return 0;
+    
+    const myMelds = melds[myPosition];
+    let totalWidth = 0;
+    
+    myMelds.forEach((meld) => {
+        // 每組牌嘅數量 (PONG:3, CHOW:3, KONG:4)
+        const tileCount = meld.type === 'KONG' ? 4 : 3;
+        totalWidth += tileCount * 30;  // 每張牌 30px (28寬 + 2間距)
+        totalWidth += 5;  // 組之間間距
+    });
+    
+    return totalWidth;
+}
             
             handleClick(e) {
                 const rect = this.canvas.getBoundingClientRect();
@@ -1225,7 +1242,9 @@
                 this.ctx.font = '20px Arial';
                 this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
                 
-                const startX = 50;
+                // 計算手牌起始位置 (根據副露寬度)
+const meldsWidth = this.getMeldsWidth(window.melds, myPosition);
+const startX = 50 + meldsWidth;  // 喺副露後面開始畫手牌
                 const startY = 550;
                 
                 hand.forEach((tile, i) => {
