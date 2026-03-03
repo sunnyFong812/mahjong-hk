@@ -1191,7 +1191,7 @@ getMeldsWidth(melds, myPosition) {
                 
                 const centerX = this.canvas.width / 2;
                 const centerY = this.canvas.height / 2;
-                const width = 560;
+                const width = 1200;
                 const height = 360;
                 
                 this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
@@ -1205,8 +1205,8 @@ getMeldsWidth(melds, myPosition) {
                 this.ctx.font = '20px Arial';
                 this.ctx.fillText('棄牌區', centerX - 45, centerY - height/2 + 35);
                 
-                let startX = centerX - width/2 + 15;
-                let startY = centerY - height/2 + 45;
+                let startX = centerX - width/2 + 20;
+                let startY = centerY - height/2 + 60;
 
                 const tileWidth = 36;
                 const tileHeight = 48;
@@ -1215,7 +1215,7 @@ getMeldsWidth(melds, myPosition) {
                 
                 for (let i = 0; i < 4; i++) {
                     const playerDiscards = discards[i] || [];
-                    const lastTiles = playerDiscards.slice(-6);
+                    const lastTiles = playerDiscards.slice(-30);
                     
                     lastTiles.forEach((tile, index) => {
                         const x = startX + index * tileSpacing;
@@ -1228,7 +1228,7 @@ getMeldsWidth(melds, myPosition) {
                         
                         this.ctx.fillStyle = this.getTileColor(tile);
                         this.ctx.font = '18px Arial';
-                        this.ctx.fillText(this.getTileDisplay(tile), x + 5, y + 32);
+                        this.ctx.fillText(this.getTileDisplay(tile), x + 6, y + 32);
                     });
                 }
             }
