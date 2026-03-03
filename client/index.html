@@ -218,24 +218,27 @@
 
         /* 手牌區域 */
         .hand-area {
-            position: absolute;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 90%;
-            text-align: center;
-            z-index: 10;
-        }
+    position: absolute;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    height: 60vh;        /* 用 60% 畫面高度 */
+    min-height: 400px;   /* 最少 400px */
+    text-align: center;
+    z-index: 10;
+    pointer-events: none;
+}
 
-        #game-canvas {
-            width: 100%;
-            height: auto;
-            max-height: 180px;
-            min-height: 120px;
-            display: block;
-            margin: 0 auto;
-            touch-action: none;
-        }
+#game-canvas {
+    width: 100%;
+    height: 100%;        /* 填滿成個 .hand-area */
+    display: block;
+    margin: 0 auto;
+    touch-action: none;
+    pointer-events: auto;
+    background: rgba(255,255,255,0.05); /* 測試用，可刪 */
+}
 
         /* 過按鈕 */
         .btn-pass-new {
