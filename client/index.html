@@ -1191,8 +1191,8 @@ getMeldsWidth(melds, myPosition) {
                 
                 const centerX = this.canvas.width / 2;
                 const centerY = this.canvas.height / 2;
-                const width = 700;
-                const height = 450;
+                const width = 560;
+                const height = 360;
                 
                 this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
                 this.ctx.fillRect(centerX - width/2, centerY - height/2, width, height);
@@ -1213,17 +1213,17 @@ getMeldsWidth(melds, myPosition) {
                     const lastTiles = playerDiscards.slice(-6);
                     
                     lastTiles.forEach((tile, index) => {
-                        const x = startX + index * 28;
-                        const y = startY + i * 38;
+                        const x = startX + index * 34;
+                        const y = startY + i * 46;
                         
                         this.ctx.fillStyle = '#f8f9fa';
-                        this.ctx.fillRect(x, y, 24, 32);
+                        this.ctx.fillRect(x, y, 30, 40);
                         this.ctx.strokeStyle = '#333';
-                        this.ctx.strokeRect(x, y, 24, 32);
+                        this.ctx.strokeRect(x, y, 30, 40);
                         
                         this.ctx.fillStyle = this.getTileColor(tile);
                         this.ctx.font = '12px Arial';
-                        this.ctx.fillText(this.getTileDisplay(tile), x + 3, y + 20);
+                        this.ctx.fillText(this.getTileDisplay(tile), x + 4, y + 30);
                     });
                 }
             }
