@@ -1211,7 +1211,7 @@ getMeldsWidth(melds, myPosition) {
                 const tileWidth = 36;
                 const tileHeight = 48;
                 const tileSpacing = 42;     // 水平間距
-                const lineSpacing = 56;      // 垂直行距
+                const lineSpacing = 70;      // 垂直行距
                 
                 for (let i = 0; i < 4; i++) {
                     const playerDiscards = discards[i] || [];
@@ -1227,7 +1227,7 @@ getMeldsWidth(melds, myPosition) {
                         this.ctx.strokeRect(x, y, tileWidth, tileHeight);
                         
                         this.ctx.fillStyle = this.getTileColor(tile);
-                        this.ctx.font = '16px Arial';
+                        this.ctx.font = '18px Arial';
                         this.ctx.fillText(this.getTileDisplay(tile), x + 5, y + 32);
                     });
                 }
