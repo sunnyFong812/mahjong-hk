@@ -1271,10 +1271,9 @@ const startX = 50 + meldsWidth;  // 喺副露後面開始畫手牌
                 
                 this.ctx.fillStyle = 'white';
                 this.ctx.font = '18px Arial';
-                this.ctx.fillText('其他玩家', 500, 200);
                 
                 this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
-                this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 250);
+                this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, discardTop - 10);
                 
                 if (!this.gameState) this.gameState = {};
                 if (!this.gameState.hands) this.gameState.hands = {};
