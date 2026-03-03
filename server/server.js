@@ -50,7 +50,8 @@ function aiHandleReaction(room, aiPlayer) {
           type: 'DRAW',
           player: next.position,
           hand: game.hands[next.position],
-          drawnTile: drawnTile
+          drawnTile: drawnTile,
+          wallSize: room.game.wall.length
         });
 
         if (next.isAI) {
@@ -99,7 +100,8 @@ function aiMove(room, aiPlayer) {
           type: 'DRAW',
           player: reactionPlayer.position,
           hand: game.hands[reactionPlayer.position],
-          drawnTile: drawnTile
+          drawnTile: drawnTile,
+          wallSize: room.game.wall.length
         });
         
         // 然後 AI 打牌
@@ -121,7 +123,8 @@ function aiMove(room, aiPlayer) {
         type: 'DRAW',
         player: nextPlayer.position,
         hand: game.hands[nextPlayer.position],
-        drawnTile: drawnTile
+        drawnTile: drawnTile,
+        wallSize: room.game.wall.length
       });
 
       if (nextPlayer.isAI) {
@@ -256,7 +259,8 @@ io.on('connection', (socket) => {
                 type: 'DRAW',
                 player: nextPlayer.position,
                 hand: room.game.hands[nextPlayer.position],
-                drawnTile: drawnTile
+                drawnTile: drawnTile,
+              wallSize: room.game.wall.length
             });
         }
 
@@ -287,7 +291,8 @@ io.on('connection', (socket) => {
                     type: 'DRAW',
                     player: nextPlayer.position,
                     hand: room.game.hands[nextPlayer.position],
-                    drawnTile: drawnTile
+                    drawnTile: drawnTile,
+                  wallSize: room.game.wall.length
                 });
             }
         }
