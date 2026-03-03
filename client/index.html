@@ -1202,28 +1202,33 @@ getMeldsWidth(melds, myPosition) {
                 this.ctx.strokeRect(centerX - width/2, centerY - height/2, width, height);
                 
                 this.ctx.fillStyle = 'white';
-                this.ctx.font = '16px Arial';
-                this.ctx.fillText('棄牌區', centerX - 35, centerY - height/2 + 25);
+                this.ctx.font = '20px Arial';
+                this.ctx.fillText('棄牌區', centerX - 45, centerY - height/2 + 35);
                 
                 let startX = centerX - width/2 + 15;
                 let startY = centerY - height/2 + 45;
+
+                const tileWidth = 36;
+                const tileHeight = 48;
+                const tileSpacing = 42;     // 水平間距
+                const lineSpacing = 56;      // 垂直行距
                 
                 for (let i = 0; i < 4; i++) {
                     const playerDiscards = discards[i] || [];
                     const lastTiles = playerDiscards.slice(-6);
                     
                     lastTiles.forEach((tile, index) => {
-                        const x = startX + index * 34;
-                        const y = startY + i * 46;
+                        const x = startX + index * tileSpacing;
+                        const y = startY + i * lineSpacing;
                         
                         this.ctx.fillStyle = '#f8f9fa';
-                        this.ctx.fillRect(x, y, 30, 40);
+                        this.ctx.fillRect(x, y, tileWidth, tileHeight);
                         this.ctx.strokeStyle = '#333';
-                        this.ctx.strokeRect(x, y, 30, 40);
+                        this.ctx.strokeRect(x, y, tileWidth, tileHeight);
                         
                         this.ctx.fillStyle = this.getTileColor(tile);
-                        this.ctx.font = '12px Arial';
-                        this.ctx.fillText(this.getTileDisplay(tile), x + 4, y + 30);
+                        this.ctx.font = '16px Arial';
+                        this.ctx.fillText(this.getTileDisplay(tile), x + 5, y + 32);
                     });
                 }
             }
