@@ -5,597 +5,517 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>港式麻雀 - 16張牌</title>
     <style>
-   /* ===== 基礎設定 ===== */
-/* ===== 基礎設定 ===== */
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent;
-    user-select: none;
-}
+        /* ===== 基礎設定 ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+            user-select: none;
+        }
 
-body {
-    font-family: 'PingFang HK', Arial, sans-serif;
-    background: #1a4d2a;
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    touch-action: manipulation;
-}
+        body {
+            font-family: 'PingFang HK', Arial, sans-serif;
+            background: #1a4d2a;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            touch-action: manipulation;
+        }
 
-.container {
-    width: 100%;
-    max-width: 1200px;
-    height: 100vh;
-    background-color: #2a6f2a;
-    position: relative;
-    overflow: hidden;
-    border: 4px solid #8b5a2b;
-}
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            height: 100vh;
+            background-color: #2a6f2a;
+            position: relative;
+            overflow: hidden;
+            border: 4px solid #8b5a2b;
+        }
 
-.screen {
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    top: 0;
-    left: 0;
-    background: rgba(42, 111, 42, 0.95);
-}
+        .screen {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            background: rgba(42, 111, 42, 0.95);
+        }
 
-/* ===== 登入畫面 ===== */
-.login-box {
-    width: min(90%, 400px);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.98);
-    padding: 30px;
-    border-radius: 20px;
-    text-align: center;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    max-height: 90vh;
-    overflow-y: auto;
-}
+        /* ===== 登入畫面 ===== */
+        .login-box {
+            width: min(90%, 400px);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-.login-box h1 {
-    color: #d4a373;
-    margin-bottom: 30px;
-    font-size: 36px;
-}
+        .login-box h1 {
+            color: #d4a373;
+            margin-bottom: 30px;
+            font-size: 36px;
+        }
 
-.input-group {
-    margin-bottom: 20px;
-    text-align: left;
-}
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
 
-.input-group label {
-    display: block;
-    margin-bottom: 5px;
-    color: #555;
-    font-size: 16px;
-    font-weight: bold;
-}
+        .input-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-size: 16px;
+            font-weight: bold;
+        }
 
-.input-group input {
-    width: 100%;
-    padding: 12px;
-    border: 2px solid #ddd;
-    border-radius: 10px;
-    font-size: 16px;
-    background: white;
-}
+        .input-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 16px;
+            background: white;
+        }
 
-/* ===== 大廳畫面 ===== */
-.lobby-box {
-    width: min(90%, 500px);
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgba(255, 255, 255, 0.98);
-    padding: 20px;
-    border-radius: 20px;
-    text-align: center;
-    max-height: 90vh;
-    overflow-y: auto;
-}
+        /* ===== 大廳畫面 ===== */
+        .lobby-box {
+            width: min(90%, 500px);
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            border-radius: 20px;
+            text-align: center;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
 
-.lobby-box h2 {
-    color: #d4a373;
-    font-size: 24px;
-    margin-bottom: 15px;
-}
+        .lobby-box h2 {
+            color: #d4a373;
+            font-size: 24px;
+            margin-bottom: 15px;
+        }
 
-.players-container {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 8px;
-    margin: 10px 0;
-}
+        .players-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 8px;
+            margin: 10px 0;
+        }
 
-.player-slot {
-    background: #f8f9fa;
-    border: 2px solid #dee2e6;
-    border-radius: 12px;
-    padding: 8px;
-    position: relative;
-    aspect-ratio: 4/3;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-}
+        .player-slot {
+            background: #f8f9fa;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            padding: 8px;
+            position: relative;
+            aspect-ratio: 4/3;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
 
-.player-slot.ready {
-    border-color: #28a745;
-    background: #d4edda;
-}
+        .player-slot.ready {
+            border-color: #28a745;
+            background: #d4edda;
+        }
 
-.player-slot .position {
-    position: absolute;
-    top: -8px;
-    left: 8px;
-    background: #d4a373;
-    color: white;
-    padding: 2px 10px;
-    border-radius: 20px;
-    font-size: 14px;
-    font-weight: bold;
-}
+        .player-slot .position {
+            position: absolute;
+            top: -8px;
+            left: 8px;
+            background: #d4a373;
+            color: white;
+            padding: 2px 10px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+        }
 
-.player-slot .player-info {
-    font-size: 16px;
-    font-weight: bold;
-    text-align: center;
-    word-break: break-word;
-}
+        .player-slot .player-info {
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            word-break: break-word;
+        }
 
-.ai-badge {
-    background: #6c5ce7;
-    color: white;
-    padding: 2px 6px;
-    border-radius: 10px;
-    font-size: 12px;
-    margin-left: 5px;
-    display: inline-block;
-}
+        .ai-badge {
+            background: #6c5ce7;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 10px;
+            font-size: 12px;
+            margin-left: 5px;
+            display: inline-block;
+        }
 
-.lobby-controls {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 15px;
-    flex-wrap: wrap;
-}
+        .lobby-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
 
-.countdown {
-    margin-top: 15px;
-    font-size: 24px;
-    color: #d4a373;
-    font-weight: bold;
-}
+        .countdown {
+            margin-top: 15px;
+            font-size: 24px;
+            color: #d4a373;
+            font-weight: bold;
+        }
 
-/* ===== 按鈕 ===== */
-.btn {
-    padding: 10px 20px;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: bold;
-    border: none;
-    cursor: pointer;
-    transition: transform 0.2s, opacity 0.2s;
-    white-space: nowrap;
-}
+        /* ===== 按鈕 ===== */
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+            white-space: nowrap;
+        }
 
-.btn:active {
-    transform: scale(0.97);
-    opacity: 0.9;
-}
+        .btn:active {
+            transform: scale(0.97);
+            opacity: 0.9;
+        }
 
-.btn-primary {
-    background: #d4a373;
-    color: white;
-}
+        .btn-primary {
+            background: #d4a373;
+            color: white;
+        }
 
-.btn-secondary {
-    background: #6c757d;
-    color: white;
-}
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
 
-.btn-danger {
-    background: #dc3545;
-    color: white;
-}
+        .btn-danger {
+            background: #dc3545;
+            color: white;
+        }
 
-/* ===== 遊戲畫面 - 修正壓縮問題 ===== */
-#game-screen {
-    position: relative;
-    width: 100%;
-    height: 100%;
-    background: rgba(42, 111, 42, 0.95);
-}
+        /* ===== 遊戲畫面 ===== */
+        #game-screen {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: rgba(42, 111, 42, 0.95);
+        }
 
-/* 手牌區域 */
-.hand-area {
-    position: absolute;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 90%;
-    text-align: center;
-    z-index: 10;
-}
+        /* 手牌區域 */
+        .hand-area {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 90%;
+            text-align: center;
+            z-index: 10;
+        }
 
-#game-canvas {
-    width: 100%;
-    height: auto;
-    max-height: 180px;
-    min-height: 120px;
-    display: block;
-    margin: 0 auto;
-    touch-action: none;
-}
+        #game-canvas {
+            width: 100%;
+            height: auto;
+            max-height: 180px;
+            min-height: 120px;
+            display: block;
+            margin: 0 auto;
+            touch-action: none;
+        }
 
-/* 棄牌區 */
-.discard-area {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 280px;
-    height: 180px;
-    background: rgba(0,0,0,0.3);
-    border: 2px solid #d4a373;
-    border-radius: 10px;
-    z-index: 5;
-}
+        /* 過按鈕 */
+        .btn-pass-new {
+            position: absolute;
+            bottom: 220px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            padding: 12px 0;
+            background: #6c757d;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            font-size: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            z-index: 30;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            text-align: center;
+        }
 
-/* 過按鈕 */
-.btn-pass-new {
-    position: absolute;
-    bottom: 220px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 100px;
-    padding: 12px 0;
-    background: #6c757d;
-    color: white;
-    border: none;
-    border-radius: 30px;
-    font-size: 20px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none;
-    z-index: 30;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    text-align: center;
-}
+        .btn-pass-new.active {
+            display: block;
+        }
 
-.btn-pass-new.active {
-    display: block;
-}
+        /* 糊按鈕 */
+        .btn-mahjong-new {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 70px;
+            height: 70px;
+            background: #ff6b6b;
+            color: white;
+            border: 3px solid #c92a2a;
+            border-radius: 50%;
+            font-size: 24px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            z-index: 40;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+            align-items: center;
+            justify-content: center;
+        }
 
-/* 糊按鈕 */
-.btn-mahjong-new {
-    position: absolute;
-    top: 40%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 70px;
-    height: 70px;
-    background: #ff6b6b;
-    color: white;
-    border: 3px solid #c92a2a;
-    border-radius: 50%;
-    font-size: 24px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none;
-    z-index: 40;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-    align-items: center;
-    justify-content: center;
-}
+        .btn-mahjong-new.active {
+            display: flex;
+        }
 
-.btn-mahjong-new.active {
-    display: flex;
-}
+        /* 左邊按鈕 */
+        .left-buttons {
+            position: absolute;
+            bottom: 260px;
+            left: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 30;
+            width: 120px;
+        }
 
-/* 左邊按鈕 */
-.left-buttons {
-    position: absolute;
-    bottom: 260px;
-    left: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 30;
-    width: 120px;
-}
+        /* 右邊按鈕 */
+        .right-buttons {
+            position: absolute;
+            bottom: 260px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 30;
+            width: 120px;
+        }
 
-/* 右邊按鈕 */
-.right-buttons {
-    position: absolute;
-    bottom: 260px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 30;
-    width: 120px;
-}
+        /* 牌型按鈕 */
+        .btn-tile-group {
+            width: 100%;
+            padding: 8px 5px;
+            background: #ffd966;
+            border: 2px solid #b5835a;
+            border-radius: 20px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            white-space: nowrap;
+        }
 
-/* 牌型按鈕 */
-.btn-tile-group {
-    width: 100%;
-    padding: 8px 5px;
-    background: #ffd966;
-    border: 2px solid #b5835a;
-    border-radius: 20px;
-    font-size: 15px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    white-space: nowrap;
-}
+        .btn-tile-group.active {
+            display: block;
+        }
 
-.btn-tile-group.active {
-    display: block;
-}
+        /* 遊戲資訊 */
+        .game-info {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            z-index: 100;
+            min-width: 150px;
+            line-height: 1.6;
+        }
 
-/* 副露區 */
-.meld-area {
-    position: absolute;
-    bottom: 100px;
-    left: 20px;
-    width: 140px;
-    min-height: 100px;
-    background: rgba(0,0,0,0.3);
-    border: 2px solid #d4a373;
-    border-radius: 10px;
-    padding: 8px;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
+        /* 手牌數顯示 */
+        .players-hand-count {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background: rgba(0, 0, 0, 0.6);
+            color: white;
+            padding: 12px 18px;
+            border-radius: 10px;
+            font-size: 15px;
+            z-index: 100;
+            border: 1px solid #d4a373;
+            min-width: 120px;
+            line-height: 1.6;
+        }
 
-.meld-item {
-    display: flex;
-    gap: 2px;
-    background: rgba(255,255,255,0.1);
-    padding: 4px;
-    border-radius: 5px;
-    justify-content: center;
-}
+        .player-hand {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+        }
 
-.meld-tile {
-    width: 28px;
-    height: 38px;
-    background: #f8f9fa;
-    border: 1px solid #333;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 15px;
-    font-weight: bold;
-}
+        .player-hand.ai-hand {
+            color: #ffd966;
+        }
 
-/* 遊戲資訊 */
-.game-info {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    padding: 12px 18px;
-    border-radius: 10px;
-    font-size: 15px;
-    z-index: 100;
-    min-width: 150px;
-    line-height: 1.6;
-}
+        /* 連接狀態 */
+        .connection-status {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
+            z-index: 9999;
+            color: white;
+        }
 
-/* 手牌數顯示 */
-.players-hand-count {
-    position: absolute;
-    top: 20px;
-    left: 20px;
-    background: rgba(0, 0, 0, 0.6);
-    color: white;
-    padding: 12px 18px;
-    border-radius: 10px;
-    font-size: 15px;
-    z-index: 100;
-    border: 1px solid #d4a373;
-    min-width: 120px;
-    line-height: 1.6;
-}
+        .status-connected { background: #28a745; }
+        .status-disconnected { background: #dc3545; }
 
-.player-hand {
-    display: flex;
-    justify-content: space-between;
-    gap: 15px;
-}
+        /* 提示文字 */
+        #selected-tile-hint {
+            position: absolute;
+            bottom: 190px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.7);
+            color: gold;
+            padding: 8px 16px;
+            border-radius: 20px;
+            display: none;
+            z-index: 200;
+            font-size: 15px;
+            white-space: nowrap;
+        }
 
-.player-hand.ai-hand {
-    color: #ffd966;
-}
+        /* 彈窗 */
+        .modal {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
 
-/* 連接狀態 */
-.connection-status {
-    position: fixed;
-    top: 10px;
-    right: 10px;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 12px;
-    z-index: 9999;
-    color: white;
-}
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+        }
 
-.status-connected { background: #28a745; }
-.status-disconnected { background: #dc3545; }
+        .win-total {
+            font-size: 36px;
+            color: #d4a373;
+            margin: 20px 0;
+            font-weight: bold;
+        }
 
-/* 提示文字 */
-#selected-tile-hint {
-    position: absolute;
-    bottom: 190px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
-    color: gold;
-    padding: 8px 16px;
-    border-radius: 20px;
-    display: none;
-    z-index: 200;
-    font-size: 15px;
-    white-space: nowrap;
-}
+        #win-details {
+            margin: 20px 0;
+            max-height: 200px;
+            overflow-y: auto;
+        }
 
-/* 彈窗 */
-.modal {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-}
+        .win-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px;
+            border-bottom: 1px solid #eee;
+            font-size: 18px;
+        }
 
-.modal-content {
-    background: white;
-    padding: 30px;
-    border-radius: 20px;
-    max-width: 400px;
-    width: 90%;
-    text-align: center;
-}
+        /* ===== 橫屏優化 ===== */
+        @media (orientation: landscape) {
+            .hand-area {
+                bottom: 15px;
+            }
+            
+            #game-canvas {
+                max-height: 160px;
+            }
+            
+            .btn-pass-new {
+                bottom: 180px;
+            }
+            
+            .left-buttons, .right-buttons {
+                bottom: 220px;
+            }
+            
+            #selected-tile-hint {
+                bottom: 150px;
+            }
+        }
 
-.win-total {
-    font-size: 36px;
-    color: #d4a373;
-    margin: 20px 0;
-    font-weight: bold;
-}
+        /* ===== 手機直屏優化 ===== */
+        @media (max-width: 600px) {
+            .hand-area {
+                bottom: 10px;
+            }
+            
+            #game-canvas {
+                max-height: 140px;
+                min-height: 100px;
+            }
+            
+            .btn-pass-new {
+                bottom: 170px;
+                width: 80px;
+                font-size: 16px;
+                padding: 8px 0;
+            }
+            
+            .left-buttons, .right-buttons {
+                bottom: 200px;
+                width: 90px;
+            }
+            
+            .btn-tile-group {
+                font-size: 13px;
+                padding: 6px 3px;
+            }
+            
+            .game-info, .players-hand-count {
+                padding: 8px 12px;
+                font-size: 13px;
+            }
+        }
 
-#win-details {
-    margin: 20px 0;
-    max-height: 200px;
-    overflow-y: auto;
-}
-
-.win-detail-item {
-    display: flex;
-    justify-content: space-between;
-    padding: 8px;
-    border-bottom: 1px solid #eee;
-    font-size: 18px;
-}
-
-/* ===== 橫屏優化 ===== */
-@media (orientation: landscape) {
-    .hand-area {
-        bottom: 15px;
-    }
-    
-    #game-canvas {
-        max-height: 160px;
-    }
-    
-    .btn-pass-new {
-        bottom: 180px;
-    }
-    
-    .left-buttons, .right-buttons {
-        bottom: 220px;
-    }
-    
-    .meld-area {
-        bottom: 80px;
-    }
-    
-    #selected-tile-hint {
-        bottom: 150px;
-    }
-}
-
-/* ===== 手機直屏優化 ===== */
-@media (max-width: 600px) {
-    .hand-area {
-        bottom: 10px;
-    }
-    
-    #game-canvas {
-        max-height: 140px;
-        min-height: 100px;
-    }
-    
-    .btn-pass-new {
-        bottom: 170px;
-        width: 80px;
-        font-size: 16px;
-        padding: 8px 0;
-    }
-    
-    .left-buttons, .right-buttons {
-        bottom: 200px;
-        width: 90px;
-    }
-    
-    .btn-tile-group {
-        font-size: 13px;
-        padding: 6px 3px;
-    }
-    
-    .meld-area {
-        bottom: 70px;
-        width: 110px;
-    }
-    
-    .meld-tile {
-        width: 22px;
-        height: 30px;
-        font-size: 12px;
-    }
-    
-    .discard-area {
-        width: 200px;
-        height: 130px;
-    }
-    
-    .game-info, .players-hand-count {
-        padding: 8px 12px;
-        font-size: 13px;
-    }
-}
-
-/* 超小屏幕 */
-@media (max-width: 400px) {
-    .left-buttons, .right-buttons {
-        width: 80px;
-    }
-    
-    .btn-tile-group {
-        font-size: 11px;
-        padding: 4px 2px;
-    }
-    
-    .meld-tile {
-        width: 20px;
-        height: 26px;
-        font-size: 10px;
-    }
-}
+        /* 超小屏幕 */
+        @media (max-width: 400px) {
+            .left-buttons, .right-buttons {
+                width: 80px;
+            }
+            
+            .btn-tile-group {
+                font-size: 11px;
+                padding: 4px 2px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -672,9 +592,6 @@ body {
             <!-- 過按鈕 -->
             <button id="btn-pass-new" class="btn-pass-new">過</button>
             
-            <!-- 副露區 -->
-            <!--<div class="meld-area" id="meld-area"></div>-->
-            
             <!-- 糊按鈕 -->
             <button id="btn-mahjong-new" class="btn-mahjong-new">糊</button>
             
@@ -683,9 +600,6 @@ body {
             
             <!-- 右邊按鈕（吃） -->
             <div class="right-buttons" id="right-buttons"></div>
-            
-            <!-- 棄牌區 (由 renderer 畫) -->
-            <!-- <div class="discard-area" id="discard-area"></div> -->
             
             <!-- 隱藏舊按鈕 -->
             <div class="action-buttons" style="display: none;">
@@ -843,89 +757,82 @@ body {
             document.getElementById('display-room-id').textContent = data.roomId;
         });
 
-        // ===== 更新手牌數顯示 =====// ===== 更新手牌數顯示 =====
-function updateAllHandsCount() {
-    console.log('🔄 更新手牌數');
-    
-    for (let i = 0; i < 4; i++) {
-        const element = document.getElementById(`player${i}-hand`);
-        if (!element) {
-            console.log(`❌ 搵唔到 player${i}-hand 元素`);
-            continue;
+        // ===== 更新手牌數顯示 =====
+        function updateAllHandsCount() {
+            console.log('🔄 更新手牌數');
+            
+            for (let i = 0; i < 4; i++) {
+                const element = document.getElementById(`player${i}-hand`);
+                if (!element) {
+                    console.log(`❌ 搵唔到 player${i}-hand 元素`);
+                    continue;
+                }
+                
+                let handCount = 0;
+                if (window.gameRenderer && window.gameRenderer.gameState && window.gameRenderer.gameState.hands) {
+                    handCount = window.gameRenderer.gameState.hands[i]?.length || 0;
+                } else if (i === window.myPosition && window.myHand) {
+                    handCount = window.myHand.length;
+                }
+                
+                const wind = ['東', '南', '西', '北'][i];
+                element.textContent = `${wind}: ${handCount}`;
+                
+                if (window.players && window.players[i]?.isAI) {
+                    element.classList.add('ai-hand');
+                } else {
+                    element.classList.remove('ai-hand');
+                }
+                
+                console.log(`📊 玩家 ${i} (${wind}) 手牌: ${handCount}`);
+            }
         }
-        
-        // 從 gameState 攞手牌數
-        let handCount = 0;
-        if (window.gameRenderer && window.gameRenderer.gameState && window.gameRenderer.gameState.hands) {
-            handCount = window.gameRenderer.gameState.hands[i]?.length || 0;
-        } else if (i === window.myPosition && window.myHand) {
-            // 如果係自己，直接用 window.myHand
-            handCount = window.myHand.length;
-        }
-        
-        const wind = ['東', '南', '西', '北'][i];
-        element.textContent = `${wind}: ${handCount}`;
-        
-        // 標記 AI 玩家
-        if (window.players && window.players[i]?.isAI) {
-            element.classList.add('ai-hand');
-        } else {
-            element.classList.remove('ai-hand');
-        }
-        
-        console.log(`📊 玩家 ${i} (${wind}) 手牌: ${handCount}`);
-    }
-}
 
-// 定時更新，確保顯示正確
-setInterval(updateAllHandsCount, 1000);
+        setInterval(updateAllHandsCount, 1000);
 
         // ===== 遊戲開始 =====
         socket.on('gameStart', (data) => {
-    console.log('🎮 遊戲開始', data);
-    
-    document.getElementById('lobby-screen').style.display = 'none';
-    document.getElementById('game-screen').style.display = 'block';
-    
-    window.myPosition = data.position;
-    window.myHand = sortTiles(data.hand || []);
-    window.currentPlayer = data.currentPlayer;
-    window.discards = data.discards || { 0: [], 1: [], 2: [], 3: [] };
-    
-    // 儲存玩家資料
-    window.players = data.players || [
-        { name: '玩家', isAI: false },
-        { name: '🤖 阿倫', isAI: true },
-        { name: '🤖 阿東', isAI: true },
-        { name: '🤖 阿北', isAI: true }
-    ];
-    
-    document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
-    document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
-    
-    if (!window.gameRenderer) {
-        window.gameRenderer = new MahjongRenderer('game-canvas');
-    }
-    
-    // 初始化 gameState
-    window.gameRenderer.gameState = {
-        hands: data.hands || {}
-    };
-    
-    window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-    
-    // 立即更新手牌數
-    setTimeout(updateAllHandsCount, 100);
-    // 再 set 一個 interval 確保更新
-    setInterval(updateAllHandsCount, 2000);
-    
-    if (data.currentPlayer === window.myPosition) {
-        document.getElementById('selected-tile-hint').style.display = 'block';
-        setTimeout(() => {
-            document.getElementById('selected-tile-hint').style.display = 'none';
-        }, 5000);
-    }
-});
+            console.log('🎮 遊戲開始', data);
+            
+            document.getElementById('lobby-screen').style.display = 'none';
+            document.getElementById('game-screen').style.display = 'block';
+            
+            window.myPosition = data.position;
+            window.myHand = sortTiles(data.hand || []);
+            window.currentPlayer = data.currentPlayer;
+            window.discards = data.discards || { 0: [], 1: [], 2: [], 3: [] };
+            
+            window.players = data.players || [
+                { name: '玩家', isAI: false },
+                { name: '🤖 阿倫', isAI: true },
+                { name: '🤖 阿東', isAI: true },
+                { name: '🤖 阿北', isAI: true }
+            ];
+            
+            document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
+            document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
+            
+            if (!window.gameRenderer) {
+                window.gameRenderer = new MahjongRenderer('game-canvas');
+            }
+            
+            window.gameRenderer.gameState = {
+                hands: data.hands || {}
+            };
+            
+            window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+            
+            setTimeout(updateAllHandsCount, 100);
+            setInterval(updateAllHandsCount, 2000);
+            
+            if (data.currentPlayer === window.myPosition) {
+                document.getElementById('selected-tile-hint').style.display = 'block';
+                setTimeout(() => {
+                    document.getElementById('selected-tile-hint').style.display = 'none';
+                }, 5000);
+            }
+        });
+
         // ===== 輔助函數 =====
         function getTileDisplay(tile) {
             if (!tile) return '';
@@ -935,133 +842,88 @@ setInterval(updateAllHandsCount, 1000);
             return tile;
         }
 
-        function renderMelds(melds) {
-            const meldArea = document.getElementById('meld-area');
-            if (!meldArea) return;
+        function updateReactionButtons(reactions, dataTile, dataPlayer) {
+            const leftButtons = document.getElementById('left-buttons');
+            const rightButtons = document.getElementById('right-buttons');
+            const passBtn = document.getElementById('btn-pass-new');
+            const mahjongBtn = document.getElementById('btn-mahjong-new');
             
-            meldArea.innerHTML = '';
+            leftButtons.innerHTML = '';
+            rightButtons.innerHTML = '';
             
-            if (!melds || !melds[window.myPosition]) return;
+            if (!reactions) {
+                passBtn.classList.remove('active');
+                mahjongBtn.classList.remove('active');
+                return;
+            }
             
-            const myMelds = melds[window.myPosition];
+            const myReaction = reactions.find(r => r.player === window.myPosition);
             
-            myMelds.forEach(meld => {
-                const meldItem = document.createElement('div');
-                meldItem.className = 'meld-item';
-                
-                let tiles = [];
-                if (meld.type === 'PONG') {
-                    tiles = [meld.tile, meld.tile, meld.tile];
-                } else if (meld.type === 'CHOW') {
-                    tiles = meld.tiles;
-                } else if (meld.type === 'KONG') {
-                    tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
+            if (myReaction) {
+                if (myReaction.actions.includes('MAHJONG')) {
+                    mahjongBtn.classList.add('active');
+                } else {
+                    mahjongBtn.classList.remove('active');
                 }
                 
-                tiles.forEach(tile => {
-                    const tileEl = document.createElement('div');
-                    tileEl.className = 'meld-tile';
-                    tileEl.textContent = getTileDisplay(tile);
-                    tileEl.style.color = window.gameRenderer?.getTileColor(tile) || '#333';
-                    meldItem.appendChild(tileEl);
-                });
+                if (myReaction.actions.includes('PONG')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-tile-group active';
+                    btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
+                    btn.onclick = () => {
+                        socket.emit('playerAction', {
+                            roomId: window.currentRoom,
+                            action: 'PONG',
+                            tile: dataTile,
+                            targetPosition: dataPlayer
+                        });
+                        hideAllReactionButtons();
+                    };
+                    leftButtons.appendChild(btn);
+                }
                 
-                meldArea.appendChild(meldItem);
-            });
+                if (myReaction.actions.includes('KONG')) {
+                    const btn = document.createElement('button');
+                    btn.className = 'btn-tile-group active';
+                    btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
+                    btn.onclick = () => {
+                        socket.emit('playerAction', {
+                            roomId: window.currentRoom,
+                            action: 'KONG',
+                            tile: dataTile,
+                            targetPosition: dataPlayer
+                        });
+                        hideAllReactionButtons();
+                    };
+                    leftButtons.appendChild(btn);
+                }
+                
+                if (myReaction.chowCombos && myReaction.chowCombos.length > 0) {
+                    myReaction.chowCombos.forEach((combo, idx) => {
+                        const btn = document.createElement('button');
+                        btn.className = 'btn-tile-group active';
+                        btn.innerHTML = `<span>[${combo.map(t => getTileDisplay(t)).join('')}]</span>`;
+                        btn.onclick = () => {
+                            socket.emit('playerAction', {
+                                roomId: window.currentRoom,
+                                action: 'CHOW',
+                                tile: dataTile,
+                                targetPosition: myReaction.discardPlayer,
+                                combination: combo
+                            });
+                            hideAllReactionButtons();
+                        };
+                        rightButtons.appendChild(btn);
+                    });
+                }
+                
+                passBtn.classList.add('active');
+                
+            } else {
+                passBtn.classList.remove('active');
+                mahjongBtn.classList.remove('active');
+            }
         }
-
-        function updateReactionButtons(reactions, dataTile, dataPlayer) {
-    const leftButtons = document.getElementById('left-buttons');
-    const rightButtons = document.getElementById('right-buttons');
-    const passBtn = document.getElementById('btn-pass-new');
-    const mahjongBtn = document.getElementById('btn-mahjong-new');
-    
-    leftButtons.innerHTML = '';
-    rightButtons.innerHTML = '';
-    console.log('🎨 updateReactionButtons 被 call');
-    console.log('🎨 reactions =', reactions);
-    console.log('🎨 myPosition =', window.myPosition);
-    
-    if (!reactions) {
-        passBtn.classList.remove('active');
-        mahjongBtn.classList.remove('active');
-        return;
-    }
-    
-    const myReaction = reactions.find(r => r.player === window.myPosition);
-    
-    if (myReaction) {
-        // 糊
-        if (myReaction.actions.includes('MAHJONG')) {
-            mahjongBtn.classList.add('active');
-        } else {
-            mahjongBtn.classList.remove('active');
-        }
-        
-        // 碰
-        if (myReaction.actions.includes('PONG')) {
-            const btn = document.createElement('button');
-            btn.className = 'btn-tile-group active';
-            btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
-            btn.onclick = () => {
-                socket.emit('playerAction', {
-                    roomId: window.currentRoom,
-                    action: 'PONG',
-                    tile: dataTile,
-                    targetPosition: dataPlayer
-                });
-                hideAllReactionButtons();
-            };
-            leftButtons.appendChild(btn);
-        }
-        
-        // 槓
-        if (myReaction.actions.includes('KONG')) {
-            const btn = document.createElement('button');
-            btn.className = 'btn-tile-group active';
-            btn.innerHTML = `<span>[${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)} ${getTileDisplay(dataTile)}]</span>`;
-            btn.onclick = () => {
-                socket.emit('playerAction', {
-                    roomId: window.currentRoom,
-                    action: 'KONG',
-                    tile: dataTile,
-                    targetPosition: dataPlayer
-                });
-                hideAllReactionButtons();
-            };
-            leftButtons.appendChild(btn);
-        }
-        
-        // 吃 - 直接用 chowCombos，唔靠 actions
-        if (myReaction.chowCombos && myReaction.chowCombos.length > 0) {
-            myReaction.chowCombos.forEach((combo, idx) => {
-                const btn = document.createElement('button');
-                btn.className = 'btn-tile-group active';
-                btn.innerHTML = `<span>[${combo.map(t => getTileDisplay(t)).join('')}]</span>`;
-                btn.onclick = () => {
-    // 確保 tile 係 combo 入面嘅中間牌（即係上家打出嘅牌）
-    const tileToEat = combo[1]; // combo 係 [num-1, num, num+1] 咁樣
-    
-    socket.emit('playerAction', {
-        roomId: window.currentRoom,
-        action: 'CHOW',
-        tile: dataTile,
-        targetPosition: myReaction.discardPlayer,
-        combination: combo
-    });
-    hideAllReactionButtons();
-};                rightButtons.appendChild(btn);
-            });
-        }
-        
-        // 過按鈕
-        passBtn.classList.add('active');
-        
-    } else {
-        passBtn.classList.remove('active');
-        mahjongBtn.classList.remove('active');
-    }
-}
         
         function hideAllReactionButtons() {
             document.getElementById('left-buttons').innerHTML = '';
@@ -1071,112 +933,93 @@ setInterval(updateAllHandsCount, 1000);
         }
 
         // ===== 遊戲更新 =====
-socket.on('gameUpdate', (data) => {
-    console.log('🔄 gameUpdate', data);
-    
-    if (data.currentPlayer !== undefined) {
-        window.currentPlayer = data.currentPlayer;
-    }
+        socket.on('gameUpdate', (data) => {
+            console.log('🔄 gameUpdate', data);
+            
+            if (data.currentPlayer !== undefined) {
+                window.currentPlayer = data.currentPlayer;
+            }
 
-    if (data.hand && data.player === window.myPosition) {
-        window.myHand = sortTiles(data.hand);
-    }
+            if (data.hand && data.player === window.myPosition) {
+                window.myHand = sortTiles(data.hand);
+            }
 
-    // 喺 gameUpdate 入面，收到其他玩家手牌時要儲存
-if (data.hand && data.player !== window.myPosition) {
-    if (!window.gameState) window.gameState = {};
-    if (!window.gameState.hands) window.gameState.hands = {};
-    window.gameState.hands[data.player] = data.hand;
-}
+            if (data.hand && data.player !== window.myPosition) {
+                if (!window.gameState) window.gameState = {};
+                if (!window.gameState.hands) window.gameState.hands = {};
+                window.gameState.hands[data.player] = data.hand;
+            }
 
-     // 如果有 nextPlayerHand，都係用嚟更新手牌數
-    if (data.nextPlayerHand && data.currentPlayer !== undefined) {
-        if (!window.gameState) window.gameState = {};
-        if (!window.gameState.hands) window.gameState.hands = {};
-        window.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
-        console.log(`📊 更新下家 ${data.currentPlayer} 手牌: ${data.nextPlayerHand.length} 張`);
-    }
-    
-    if (data.discards) {
-        window.discards = data.discards;
-    }
+            if (data.nextPlayerHand && data.currentPlayer !== undefined) {
+                if (!window.gameState) window.gameState = {};
+                if (!window.gameState.hands) window.gameState.hands = {};
+                window.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
+            }
+            
+            if (data.discards) {
+                window.discards = data.discards;
+            }
 
-    if (data.wallSize !== undefined) {
-        document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
-    }
-    
-    if (data.melds) {
-        window.melds = data.melds;
-        renderMelds(data.melds);
-    }
+            if (data.wallSize !== undefined) {
+                document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
+            }
+            
+            if (data.melds) {
+                window.melds = data.melds;
+            }
 
-    if (data.drawnTile && data.player === window.myPosition) {
-        console.log('🀄️ 你摸到:', data.drawnTile);
-        if (data.nextPlayerHand) {
-            window.myHand = sortTiles(data.nextPlayerHand);
-        }
-    }
+            if (data.drawnTile && data.player === window.myPosition) {
+                console.log('🀄️ 你摸到:', data.drawnTile);
+                if (data.nextPlayerHand) {
+                    window.myHand = sortTiles(data.nextPlayerHand);
+                }
+            }
 
+            if (window.gameRenderer) {
+                if (!window.gameRenderer.gameState) {
+                    window.gameRenderer.gameState = {};
+                }
+                window.gameRenderer.gameState.hands = window.gameRenderer.gameState.hands || {};
+                window.gameRenderer.gameState.hands[data.player] = data.hand;
+                
+                if (data.nextPlayerHand && data.player !== undefined) {
+                    window.gameRenderer.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
+                }
+            }
 
-    // 更新 gameRenderer 嘅 gameState
-    if (window.gameRenderer) {
-        if (!window.gameRenderer.gameState) {
-            window.gameRenderer.gameState = {};
-        }
-        window.gameRenderer.gameState.hands = window.gameRenderer.gameState.hands || {};
-        window.gameRenderer.gameState.hands[data.player] = data.hand;
-        
-        // 如果有 nextPlayerHand，更新埋
-        if (data.nextPlayerHand && data.player !== undefined) {
-            window.gameRenderer.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
-        }
-    }
+            if (data.reactions) {
+                updateReactionButtons(data.reactions, data.tile, data.player);
 
-    // 喺 index.html 嘅 socket.on('gameUpdate', ...) 入面
-if (data.reactions) {
-    console.log('🔍 有 reaction，準備顯示按鈕');
-    console.log('🔍 myPosition =', window.myPosition);
-    console.log('🔍 reactions =', data.reactions);
+                const myReaction = data.reactions.find(r => r.player === window.myPosition);
 
-    // 1. 永遠根據 data.reactions 去更新 UI 按鈕 (為所有有 reaction 嘅玩家顯示)
-    updateReactionButtons(data.reactions, data.tile, data.player);
+                if (myReaction) {
+                    window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+                    window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
+                    window.chowFrom = data.player;
+                    window.canDiscard = false;
+                } else {
+                    window.canPongTile = null;
+                    window.canChowTile = null;
+                    window.canDiscard = false;
+                }
+            } else {
+                updateReactionButtons(null);
+                window.canPongTile = null;
+                window.canChowTile = null;
+                window.canDiscard = true;
+            }
+            
+            if (window.gameRenderer) {
+                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+                setTimeout(updateAllHandsCount, 10);
+            }
 
-    // 2. 搵下自己有冇 reaction，用嚟更新自己嘅狀態變數 (e.g., canPongTile, canDiscard)
-    const myReaction = data.reactions.find(r => r.player === window.myPosition);
-    console.log('🔍 myReaction =', myReaction);
-
-    if (myReaction) {
-        // 有自己嘅 reaction
-        window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
-        window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
-        window.chowFrom = data.player;
-        window.canDiscard = false; // 有 reaction，唔可以打牌
-    } else {
-        // 冇自己嘅 reaction，但 game 仲係 pending 狀態，所以都唔可以打牌
-        window.canPongTile = null;
-        window.canChowTile = null;
-        window.canDiscard = false; // 都係唔可以打牌
-    }
-} else {
-    // 沒有 reaction，可以打牌，並隱藏所有按鈕
-    updateReactionButtons(null);
-    window.canPongTile = null;
-    window.canChowTile = null;
-    window.canDiscard = true;
-}
-    
-    if (window.gameRenderer) {
-        window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-        // 立即更新手牌數
-        setTimeout(updateAllHandsCount, 10);
-    }
-
-    if (window.currentPlayer === window.myPosition) {
-        document.getElementById('selected-tile-hint').style.display = 'block';
-    } else {
-        document.getElementById('selected-tile-hint').style.display = 'none';
-    }
-});
+            if (window.currentPlayer === window.myPosition) {
+                document.getElementById('selected-tile-hint').style.display = 'block';
+            } else {
+                document.getElementById('selected-tile-hint').style.display = 'none';
+            }
+        });
 
         // ===== 遊戲結束 =====
         socket.on('gameOver', (data) => {
@@ -1198,201 +1041,234 @@ if (data.reactions) {
         });
 
         // ===== 渲染器 =====
-        // ===== 渲染器 =====
-class MahjongRenderer {
-    constructor(canvasId) {
-        this.canvas = document.getElementById(canvasId);
-        this.ctx = this.canvas.getContext('2d');
-        this.tileWidth = 45;
-        this.tileHeight = 60;
-        this.selectedIndex = -1;
-        this.gameState = {
-            hands: {}
-        };
-        
-        this.canvas.addEventListener('click', (e) => this.handleClick(e));
-    }
-    
-    getTileColor(tile) {
-        if (tile.includes('m')) return '#d32f2f';
-        if (tile.includes('p')) return '#2e7d32';
-        if (tile.includes('s')) return '#1976d2';
-        return '#7b1fa2';
-    }
-    
-    getTileDisplay(tile) {
-        if (tile.includes('m')) return tile.replace('m', '萬');
-        if (tile.includes('p')) return tile.replace('p', '筒');
-        if (tile.includes('s')) return tile.replace('s', '條');
-        return tile;
-    }
-    
-    handleClick(e) {
-        const rect = this.canvas.getBoundingClientRect();
-        const scaleX = this.canvas.width / rect.width;
-        const scaleY = this.canvas.height / rect.height;
-        
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
-        
-        const startX = 50;
-        const startY = 550;
-        
-        for (let i = 0; i < window.myHand.length; i++) {
-            const tileX = startX + i * (this.tileWidth + 3);
-            
-            if (x >= tileX && x <= tileX + this.tileWidth &&
-                y >= startY && y <= startY + this.tileHeight) {
+        class MahjongRenderer {
+            constructor(canvasId) {
+                this.canvas = document.getElementById(canvasId);
+                this.ctx = this.canvas.getContext('2d');
+                this.tileWidth = 45;
+                this.tileHeight = 60;
+                this.selectedIndex = -1;
+                this.gameState = {
+                    hands: {}
+                };
                 
-                if (this.selectedIndex === i) {
-                    if (window.currentPlayer === window.myPosition) {
-                        if (!window.canDiscard) {
-                            alert('⚠️ 而家唔可以打牌（請先處理碰/槓/糊）');
-                            this.selectedIndex = -1;
-                            return;
+                this.canvas.addEventListener('click', (e) => this.handleClick(e));
+            }
+            
+            getTileColor(tile) {
+                if (tile.includes('m')) return '#d32f2f';
+                if (tile.includes('p')) return '#2e7d32';
+                if (tile.includes('s')) return '#1976d2';
+                return '#7b1fa2';
+            }
+            
+            getTileDisplay(tile) {
+                if (tile.includes('m')) return tile.replace('m', '萬');
+                if (tile.includes('p')) return tile.replace('p', '筒');
+                if (tile.includes('s')) return tile.replace('s', '條');
+                return tile;
+            }
+            
+            handleClick(e) {
+                const rect = this.canvas.getBoundingClientRect();
+                const scaleX = this.canvas.width / rect.width;
+                const scaleY = this.canvas.height / rect.height;
+                
+                const x = (e.clientX - rect.left) * scaleX;
+                const y = (e.clientY - rect.top) * scaleY;
+                
+                const startX = 50;
+                const startY = 550;
+                
+                for (let i = 0; i < window.myHand.length; i++) {
+                    const tileX = startX + i * (this.tileWidth + 3);
+                    
+                    if (x >= tileX && x <= tileX + this.tileWidth &&
+                        y >= startY && y <= startY + this.tileHeight) {
+                        
+                        if (this.selectedIndex === i) {
+                            if (window.currentPlayer === window.myPosition) {
+                                if (!window.canDiscard) {
+                                    alert('⚠️ 而家唔可以打牌（請先處理碰/槓/糊）');
+                                    this.selectedIndex = -1;
+                                    return;
+                                }
+                                
+                                socket.emit('playerAction', {
+                                    roomId: window.currentRoom,
+                                    action: 'DISCARD',
+                                    tile: window.myHand[i]
+                                });
+                                
+                                this.selectedIndex = -1;
+                                document.getElementById('selected-tile-hint').style.display = 'none';
+                            } else {
+                                alert('⚠️ 唔係你嘅回合');
+                                this.selectedIndex = -1;
+                            }
+                        } else {
+                            this.selectedIndex = i;
+                            document.getElementById('selected-tile-hint').style.display = 'block';
+                            document.getElementById('selected-tile-hint').textContent = `✅ 已選中 ${this.getTileDisplay(window.myHand[i])}，再點擊打出`;
                         }
                         
-                        socket.emit('playerAction', {
-                            roomId: window.currentRoom,
-                            action: 'DISCARD',
-                            tile: window.myHand[i]
-                        });
-                        
-                        this.selectedIndex = -1;
-                        document.getElementById('selected-tile-hint').style.display = 'none';
-                    } else {
-                        alert('⚠️ 唔係你嘅回合');
-                        this.selectedIndex = -1;
+                        this.render(window.myHand, window.myPosition, window.discards);
+                        break;
                     }
-                } else {
-                    this.selectedIndex = i;
-                    document.getElementById('selected-tile-hint').style.display = 'block';
-                    document.getElementById('selected-tile-hint').textContent = `✅ 已選中 ${this.getTileDisplay(window.myHand[i])}，再點擊打出`;
+                }
+            }
+            
+            // 畫副露牌（橫向排列，喺手牌左方）
+            renderMelds(melds, myPosition) {
+                if (!melds || !melds[myPosition]) return;
+                
+                const myMelds = melds[myPosition];
+                
+                // 位置：手牌左方 (同手牌同一水平線)
+                const startX = 20;
+                const startY = 550;  // 同手牌 startY 一樣
+                
+                let currentX = startX;
+                
+                myMelds.forEach((meld) => {
+                    // 決定要畫幾多張牌
+                    let tiles = [];
+                    if (meld.type === 'PONG') {
+                        tiles = [meld.tile, meld.tile, meld.tile];
+                    } else if (meld.type === 'CHOW') {
+                        tiles = meld.tiles;
+                    } else if (meld.type === 'KONG') {
+                        tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
+                    }
+                    
+                    // 畫每張牌 (size 80%)
+                    tiles.forEach((tile) => {
+                        // 牌面 (28x38 = 80% of 35x45)
+                        this.ctx.fillStyle = '#f8f9fa';
+                        this.ctx.fillRect(currentX, startY, 28, 38);
+                        
+                        // 邊框
+                        this.ctx.strokeStyle = '#333';
+                        this.ctx.lineWidth = 1;
+                        this.ctx.strokeRect(currentX, startY, 28, 38);
+                        
+                        // 牌面文字 (80% of 16px)
+                        this.ctx.fillStyle = this.getTileColor(tile);
+                        this.ctx.font = '14px "PingFang HK"';
+                        this.ctx.fillText(this.getTileDisplay(tile), currentX + 4, startY + 25);
+                        
+                        // 移動到下一個位置
+                        currentX += 30;  // 28px 寬 + 2px 間距
+                    });
+                    
+                    // 每組之間留多少少空間
+                    currentX += 5;
+                });
+            }
+            
+            renderDiscardArea(discards) {
+                if (!discards) return;
+                
+                const centerX = this.canvas.width / 2;
+                const centerY = this.canvas.height / 2;
+                const width = 280;
+                const height = 180;
+                
+                this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                this.ctx.fillRect(centerX - width/2, centerY - height/2, width, height);
+                
+                this.ctx.strokeStyle = '#d4a373';
+                this.ctx.lineWidth = 2;
+                this.ctx.strokeRect(centerX - width/2, centerY - height/2, width, height);
+                
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '16px Arial';
+                this.ctx.fillText('棄牌區', centerX - 35, centerY - height/2 + 25);
+                
+                let startX = centerX - width/2 + 15;
+                let startY = centerY - height/2 + 45;
+                
+                for (let i = 0; i < 4; i++) {
+                    const playerDiscards = discards[i] || [];
+                    const lastTiles = playerDiscards.slice(-6);
+                    
+                    lastTiles.forEach((tile, index) => {
+                        const x = startX + index * 28;
+                        const y = startY + i * 38;
+                        
+                        this.ctx.fillStyle = '#f8f9fa';
+                        this.ctx.fillRect(x, y, 24, 32);
+                        this.ctx.strokeStyle = '#333';
+                        this.ctx.strokeRect(x, y, 24, 32);
+                        
+                        this.ctx.fillStyle = this.getTileColor(tile);
+                        this.ctx.font = '12px Arial';
+                        this.ctx.fillText(this.getTileDisplay(tile), x + 3, y + 20);
+                    });
+                }
+            }
+            
+            render(hand, myPosition, discards) {
+                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.ctx.fillStyle = '#2a6f2a';
+                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+                
+                this.renderDiscardArea(discards);
+                
+                // 畫副露牌 (喺手牌左方)
+                if (window.melds) {
+                    this.renderMelds(window.melds, myPosition);
                 }
                 
-                this.render(window.myHand, window.myPosition, window.discards);
-                break;
-            }
-        }
-    }
-    
-    renderDiscardArea(discards) {
-    if (!discards) return;
-    
-    // 設定棄牌區嘅位置同大小（獨立定位，唔受其他元素影響）
-    const centerX = this.canvas.width / 2;
-    const centerY = this.canvas.height / 2;
-    const width = 280;
-    const height = 180;
-    
-    // 畫背景
-    this.ctx.fillStyle = 'rgba(0,0,0,0.3)';
-    this.ctx.fillRect(centerX - width/2, centerY - height/2, width, height);
-    
-    // 畫邊框
-    this.ctx.strokeStyle = '#d4a373';
-    this.ctx.lineWidth = 2;
-    this.ctx.strokeRect(centerX - width/2, centerY - height/2, width, height);
-    
-    // 畫標題
-    this.ctx.fillStyle = 'white';
-    this.ctx.font = '16px Arial';
-    this.ctx.fillText('棄牌區', centerX - 35, centerY - height/2 + 25);
-    
-    // 顯示最近打出的牌
-    let startX = centerX - width/2 + 15;
-    let startY = centerY - height/2 + 45;
-    
-    for (let i = 0; i < 4; i++) {
-        const playerDiscards = discards[i] || [];
-        const lastTiles = playerDiscards.slice(-6);
-        
-        lastTiles.forEach((tile, index) => {
-            const x = startX + index * 28;
-            const y = startY + i * 38;
-            
-            // 牌面
-            this.ctx.fillStyle = '#f8f9fa';
-            this.ctx.fillRect(x, y, 24, 32);
-            this.ctx.strokeStyle = '#333';
-            this.ctx.strokeRect(x, y, 24, 32);
-            
-            // 牌面文字
-            this.ctx.fillStyle = this.getTileColor(tile);
-            this.ctx.font = '12px Arial';
-            this.ctx.fillText(this.getTileDisplay(tile), x + 3, y + 20);
-        });
-    }
-}
-    
-    render(hand, myPosition, discards) {
-        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // 背景
-        this.ctx.fillStyle = '#2a6f2a';
-        this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-        
-        // 棄牌區
-        this.renderDiscardArea(discards);
-        
-        // 手牌數量文字
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '20px Arial';
-        this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
-        
-        // 手牌
-        const startX = 50;
-        const startY = 550;
-        
-        hand.forEach((tile, i) => {
-            const x = startX + i * (this.tileWidth + 3);
-            
-            // 牌面
-            this.ctx.fillStyle = '#f8f9fa';
-            this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
-            
-            // 邊框 - 選中時金色
-            this.ctx.strokeStyle = (i === this.selectedIndex) ? 'gold' : '#333';
-            this.ctx.lineWidth = (i === this.selectedIndex) ? 4 : 1;
-            this.ctx.strokeRect(x, startY, this.tileWidth, this.tileHeight);
-            
-            // 牌面文字
-            this.ctx.fillStyle = this.getTileColor(tile);
-            this.ctx.font = 'bold 24px "PingFang HK"';
-            this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
-        });
-        
-        // 其他玩家文字
-        this.ctx.fillStyle = 'white';
-        this.ctx.font = '18px Arial';
-        this.ctx.fillText('其他玩家', 500, 200);
-        
-        // 當前玩家
-        this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
-        this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 250);
-        
-        // ===== 更新 gameState 手牌資料 =====
-        if (!this.gameState) this.gameState = {};
-        if (!this.gameState.hands) this.gameState.hands = {};
-        
-        // 更新自己手牌
-        this.gameState.hands[myPosition] = hand;
-        
-        // 如果有傳入其他玩家手牌資料，都更新埋
-        if (window.gameState && window.gameState.hands) {
-            for (let i = 0; i < 4; i++) {
-                if (i !== myPosition && window.gameState.hands[i]) {
-                    this.gameState.hands[i] = window.gameState.hands[i];
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '20px Arial';
+                this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
+                
+                const startX = 50;
+                const startY = 550;
+                
+                hand.forEach((tile, i) => {
+                    const x = startX + i * (this.tileWidth + 3);
+                    
+                    this.ctx.fillStyle = '#f8f9fa';
+                    this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
+                    
+                    this.ctx.strokeStyle = (i === this.selectedIndex) ? 'gold' : '#333';
+                    this.ctx.lineWidth = (i === this.selectedIndex) ? 4 : 1;
+                    this.ctx.strokeRect(x, startY, this.tileWidth, this.tileHeight);
+                    
+                    this.ctx.fillStyle = this.getTileColor(tile);
+                    this.ctx.font = 'bold 24px "PingFang HK"';
+                    this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
+                });
+                
+                this.ctx.fillStyle = 'white';
+                this.ctx.font = '18px Arial';
+                this.ctx.fillText('其他玩家', 500, 200);
+                
+                this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
+                this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 250);
+                
+                if (!this.gameState) this.gameState = {};
+                if (!this.gameState.hands) this.gameState.hands = {};
+                
+                this.gameState.hands[myPosition] = hand;
+                
+                if (window.gameState && window.gameState.hands) {
+                    for (let i = 0; i < 4; i++) {
+                        if (i !== myPosition && window.gameState.hands[i]) {
+                            this.gameState.hands[i] = window.gameState.hands[i];
+                        }
+                    }
+                }
+                
+                if (typeof updateAllHandsCount === 'function') {
+                    setTimeout(updateAllHandsCount, 5);
                 }
             }
         }
-        
-        // 立即更新手牌數顯示
-        if (typeof updateAllHandsCount === 'function') {
-            setTimeout(updateAllHandsCount, 5);
-        }
-    }
-}
+
         // ===== 按鈕函數 =====
         window.joinRoom = function() {
             const name = document.getElementById('player-name').value.trim();
@@ -1441,7 +1317,6 @@ class MahjongRenderer {
             document.getElementById('win-modal').style.display = 'none';
         };
 
-        // ===== 橫屏處理 =====
         function handleOrientation() {
             const canvas = document.getElementById('game-canvas');
             if (window.innerWidth > window.innerHeight) {
@@ -1459,7 +1334,6 @@ class MahjongRenderer {
         window.addEventListener('resize', handleOrientation);
         handleOrientation();
 
-        // ===== 新按鈕事件 =====
         document.getElementById('btn-pass-new').addEventListener('click', () => {
             socket.emit('playerAction', {
                 roomId: window.currentRoom,
