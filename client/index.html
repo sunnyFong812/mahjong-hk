@@ -6,6 +6,7 @@
     <title>港式麻雀 - 16張牌</title>
     <style>
    /* ===== 基礎設定 ===== */
+/* ===== 基礎設定 ===== */
 * {
     margin: 0;
     padding: 0;
@@ -55,6 +56,8 @@ body {
     border-radius: 20px;
     text-align: center;
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    max-height: 90vh;
+    overflow-y: auto;
 }
 
 .login-box h1 {
@@ -85,7 +88,7 @@ body {
     background: white;
 }
 
-/* ===== 大廳畫面 - 字體正常 + 格仔縮細 ===== */
+/* ===== 大廳畫面 ===== */
 .lobby-box {
     width: min(90%, 500px);
     position: absolute;
@@ -123,7 +126,6 @@ body {
     display: flex;
     flex-direction: column;
     justify-content: center;
-    transition: border-color 0.3s, background 0.3s;
 }
 
 .player-slot.ready {
@@ -141,7 +143,6 @@ body {
     border-radius: 20px;
     font-size: 14px;
     font-weight: bold;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .player-slot .player-info {
@@ -208,11 +209,12 @@ body {
     color: white;
 }
 
-/* ===== 遊戲畫面 - 穩定版 ===== */
+/* ===== 遊戲畫面 - 修正壓縮問題 ===== */
 #game-screen {
     position: relative;
     width: 100%;
     height: 100%;
+    background: rgba(42, 111, 42, 0.95);
 }
 
 /* 手牌區域 */
@@ -229,19 +231,35 @@ body {
 #game-canvas {
     width: 100%;
     height: auto;
-    max-height: 200px;
+    max-height: 180px;
+    min-height: 120px;
     display: block;
+    margin: 0 auto;
     touch-action: none;
+}
+
+/* 棄牌區 */
+.discard-area {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 280px;
+    height: 180px;
+    background: rgba(0,0,0,0.3);
+    border: 2px solid #d4a373;
+    border-radius: 10px;
+    z-index: 5;
 }
 
 /* 過按鈕 */
 .btn-pass-new {
     position: absolute;
-    bottom: 240px;
+    bottom: 220px;
     left: 50%;
     transform: translateX(-50%);
     width: 100px;
-    padding: 12px 20px;
+    padding: 12px 0;
     background: #6c757d;
     color: white;
     border: none;
@@ -252,109 +270,26 @@ body {
     display: none;
     z-index: 30;
     box-shadow: 0 4px 8px rgba(0,0,0,0.3);
+    text-align: center;
 }
 
 .btn-pass-new.active {
     display: block;
 }
 
-/* 副露區 */
-.meld-area {
-    position: absolute;
-    bottom: 20px;
-    right: 50%;
-    margin-right: 30px;
-    width: 150px;
-    min-height: 120px;
-    background: rgba(0,0,0,0.3);
-    border: 2px solid #d4a373;
-    border-radius: 10px;
-    padding: 10px;
-    z-index: 20;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.meld-item {
-    display: flex;
-    gap: 2px;
-    background: rgba(255,255,255,0.1);
-    padding: 5px;
-    border-radius: 5px;
-    justify-content: center;
-}
-
-.meld-tile {
-    width: 30px;
-    height: 40px;
-    background: #f8f9fa;
-    border: 1px solid #333;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 16px;
-    font-weight: bold;
-}
-
-/* 左邊按鈕 */
-.left-buttons {
-    position: absolute;
-    bottom: 280px;
-    left: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 30;
-    width: 120px;
-}
-
-/* 右邊按鈕 */
-.right-buttons {
-    position: absolute;
-    bottom: 280px;
-    right: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    z-index: 30;
-    width: 120px;
-}
-
-/* 牌型按鈕 */
-.btn-tile-group {
-    width: 100%;
-    padding: 10px 5px;
-    background: #ffd966;
-    border: 2px solid #b5835a;
-    border-radius: 20px;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
-    display: none;
-    text-align: center;
-    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
-    white-space: nowrap;
-}
-
-.btn-tile-group.active {
-    display: block;
-}
-
 /* 糊按鈕 */
 .btn-mahjong-new {
     position: absolute;
-    top: 45%;
+    top: 40%;
     left: 50%;
     transform: translate(-50%, -50%);
-    width: 80px;
-    height: 80px;
+    width: 70px;
+    height: 70px;
     background: #ff6b6b;
     color: white;
     border: 3px solid #c92a2a;
     border-radius: 50%;
-    font-size: 28px;
+    font-size: 24px;
     font-weight: bold;
     cursor: pointer;
     display: none;
@@ -368,49 +303,118 @@ body {
     display: flex;
 }
 
-/* 棄牌區 */
-.discard-area {
+/* 左邊按鈕 */
+.left-buttons {
     position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    width: 300px;
-    height: 200px;
+    bottom: 260px;
+    left: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 30;
+    width: 120px;
+}
+
+/* 右邊按鈕 */
+.right-buttons {
+    position: absolute;
+    bottom: 260px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 30;
+    width: 120px;
+}
+
+/* 牌型按鈕 */
+.btn-tile-group {
+    width: 100%;
+    padding: 8px 5px;
+    background: #ffd966;
+    border: 2px solid #b5835a;
+    border-radius: 20px;
+    font-size: 15px;
+    font-weight: bold;
+    cursor: pointer;
+    display: none;
+    text-align: center;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+    white-space: nowrap;
+}
+
+.btn-tile-group.active {
+    display: block;
+}
+
+/* 副露區 */
+.meld-area {
+    position: absolute;
+    bottom: 100px;
+    left: 20px;
+    width: 140px;
+    min-height: 100px;
     background: rgba(0,0,0,0.3);
     border: 2px solid #d4a373;
     border-radius: 10px;
-    z-index: 5;
+    padding: 8px;
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.meld-item {
+    display: flex;
+    gap: 2px;
+    background: rgba(255,255,255,0.1);
+    padding: 4px;
+    border-radius: 5px;
+    justify-content: center;
+}
+
+.meld-tile {
+    width: 28px;
+    height: 38px;
+    background: #f8f9fa;
+    border: 1px solid #333;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 15px;
+    font-weight: bold;
 }
 
 /* 遊戲資訊 */
 .game-info {
     position: absolute;
-    top: 10px;
-    right: 10px;
+    top: 20px;
+    right: 20px;
     background: rgba(0, 0, 0, 0.7);
     color: white;
-    padding: 10px 15px;
+    padding: 12px 18px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 15px;
     z-index: 100;
-    line-height: 1.8;
     min-width: 150px;
+    line-height: 1.6;
 }
 
 /* 手牌數顯示 */
 .players-hand-count {
     position: absolute;
-    top: 10px;
-    left: 10px;
+    top: 20px;
+    left: 20px;
     background: rgba(0, 0, 0, 0.6);
     color: white;
-    padding: 10px 15px;
+    padding: 12px 18px;
     border-radius: 10px;
-    font-size: 14px;
+    font-size: 15px;
     z-index: 100;
     border: 1px solid #d4a373;
-    line-height: 1.8;
     min-width: 120px;
+    line-height: 1.6;
 }
 
 .player-hand {
@@ -441,17 +445,17 @@ body {
 /* 提示文字 */
 #selected-tile-hint {
     position: absolute;
-    bottom: 200px;
+    bottom: 190px;
     left: 50%;
     transform: translateX(-50%);
     background: rgba(0,0,0,0.7);
     color: gold;
-    padding: 8px 15px;
+    padding: 8px 16px;
     border-radius: 20px;
     display: none;
     z-index: 200;
+    font-size: 15px;
     white-space: nowrap;
-    font-size: 16px;
 }
 
 /* 彈窗 */
@@ -501,38 +505,60 @@ body {
 /* ===== 橫屏優化 ===== */
 @media (orientation: landscape) {
     .hand-area {
-        bottom: 10px;
+        bottom: 15px;
+    }
+    
+    #game-canvas {
+        max-height: 160px;
     }
     
     .btn-pass-new {
-        bottom: 200px;
+        bottom: 180px;
     }
     
     .left-buttons, .right-buttons {
-        bottom: 240px;
+        bottom: 220px;
     }
     
     .meld-area {
-        bottom: 10px;
+        bottom: 80px;
     }
     
     #selected-tile-hint {
-        bottom: 160px;
+        bottom: 150px;
     }
 }
 
 /* ===== 手機直屏優化 ===== */
 @media (max-width: 600px) {
+    .hand-area {
+        bottom: 10px;
+    }
+    
+    #game-canvas {
+        max-height: 140px;
+        min-height: 100px;
+    }
+    
+    .btn-pass-new {
+        bottom: 170px;
+        width: 80px;
+        font-size: 16px;
+        padding: 8px 0;
+    }
+    
     .left-buttons, .right-buttons {
+        bottom: 200px;
         width: 90px;
     }
     
     .btn-tile-group {
-        font-size: 12px;
-        padding: 6px 2px;
+        font-size: 13px;
+        padding: 6px 3px;
     }
     
     .meld-area {
+        bottom: 70px;
         width: 110px;
     }
     
@@ -542,21 +568,32 @@ body {
         font-size: 12px;
     }
     
-    .btn-pass-new {
-        width: 80px;
-        font-size: 16px;
-        padding: 8px 15px;
-    }
-    
-    .btn-mahjong-new {
-        width: 60px;
-        height: 60px;
-        font-size: 22px;
-    }
-    
     .discard-area {
-        width: 220px;
-        height: 150px;
+        width: 200px;
+        height: 130px;
+    }
+    
+    .game-info, .players-hand-count {
+        padding: 8px 12px;
+        font-size: 13px;
+    }
+}
+
+/* 超小屏幕 */
+@media (max-width: 400px) {
+    .left-buttons, .right-buttons {
+        width: 80px;
+    }
+    
+    .btn-tile-group {
+        font-size: 11px;
+        padding: 4px 2px;
+    }
+    
+    .meld-tile {
+        width: 20px;
+        height: 26px;
+        font-size: 10px;
     }
 }
     </style>
