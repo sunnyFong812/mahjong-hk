@@ -844,6 +844,38 @@
             return tile;
         }
 
+        // 暗槓 - 自己摸到第四張時檢查
+function checkDarkKong() {
+    const hand = window.myHand;
+    const counts = {};
+    hand.forEach(t => counts[t] = (counts[t] || 0) + 1);
+    
+    // 清除舊嘅暗槓按鈕
+    const oldDarkKong = document.getElementById('dark-kong-btn');
+    if (oldDarkKong) oldDarkKong.remove();
+    
+    for (let tile in counts) {
+        if (counts[tile] === 4 && window.currentPlayer === window.myPosition) {
+            const btn = document.createElement('button');
+            btn.id = 'dark-kong-btn';
+            btn.className = 'btn-tile-group active';
+            btn.innerHTML = `<span>暗槓 [${getTileDisplay(tile)}]</span>`;
+            btn.onclick = () => {
+                socket.emit('playerAction', {
+                    roomId: window.currentRoom,
+                    action: 'DARK_KONG',
+                    tile: tile,
+                    isDark: true
+                });
+                hideAllReactionButtons();
+                btn.remove();
+            };
+            document.getElementById('left-buttons').appendChild(btn);
+            break;
+        }
+    }
+}
+        
         function updateReactionButtons(reactions, dataTile, dataPlayer) {
             const leftButtons = document.getElementById('left-buttons');
             const rightButtons = document.getElementById('right-buttons');
@@ -899,6 +931,7 @@
                     };
                     leftButtons.appendChild(btn);
                 }
+
                 
                 if (myReaction.chowCombos && myReaction.chowCombos.length > 0) {
                     myReaction.chowCombos.forEach((combo, idx) => {
