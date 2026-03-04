@@ -346,7 +346,7 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
     };
   }
 
-  // 處理槓
+// 處理槓
 handleKong(playerPosition, tile, targetPosition, isDark = false) {
     const hand = this.hands[playerPosition];
     
@@ -400,14 +400,9 @@ handleKong(playerPosition, tile, targetPosition, isDark = false) {
         });
     }
     
-    // 槓完之後，要摸一張牌
-    const drawnTile = this.drawTile(playerPosition);
-    
-    // 記錄最後打出的牌設為 null（因為槓完可以直接打牌）
-    this.lastDiscard = null;
-    
     // 槓完之後輪到自己出牌
     this.currentPlayer = playerPosition;
+    this.lastDiscard = null;
     this.pendingReaction = false;
     
     return {
@@ -418,11 +413,9 @@ handleKong(playerPosition, tile, targetPosition, isDark = false) {
         isDark: isDark,
         hand: this.hands[playerPosition],
         melds: this.melds,
-        drawnTile: drawnTile,
         currentPlayer: this.currentPlayer
     };
-}
-  
+}  
   // ========== 新增：吃牌處理 ==========
   handleChow(playerPosition, tile, targetPosition, combination) {
     // 檢查是否可以吃（只能吃上家）
