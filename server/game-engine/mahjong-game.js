@@ -88,8 +88,7 @@ class MahjongGame {
                     
                     // 如果補到嘅牌又係花牌，就再放入花牌區 (但唔再補，因為會由 loop 再處理)
                     if (flowers.includes(newTile)) {
-                        // 標記等下次 loop 處理
-                        j++;  // 因為 splice 後 index 會變，但由 loop 控制
+                        
                     }
                 }
             }
