@@ -103,6 +103,10 @@ class MahjongGame {
     return false;
   }
 
+  isFlower(tile) {
+    const flowers = ['春', '夏', '秋', '冬', '梅', '蘭', '菊', '竹'];
+    return flowers.includes(tile);
+}
   // ========== 食糊判定核心 ==========
   encodeTile(tile) {
     if (tile.includes('m')) return parseInt(tile); // 1m -> 1
