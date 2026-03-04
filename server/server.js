@@ -299,6 +299,7 @@ if (action === 'KONG') {
     const result = room.game.processAction(player.position, 'KONG', tile, targetPosition);
     
     if (result) {
+      result.flowers = room.game.flowers;
         io.to(roomId).emit('gameUpdate', result);
         
         // 槓完之後摸牌
@@ -330,6 +331,7 @@ if (action === 'DARK_KONG') {
     const result = room.game.processAction(player.position, 'DARK_KONG', tile, null, true);
     
     if (result) {
+      result.flowers = room.game.flowers;
         io.to(roomId).emit('gameUpdate', result);
         
         // 暗槓完之後摸牌
@@ -359,6 +361,7 @@ if (action === 'DARK_KONG') {
     const result = room.game.processAction(player.position, action, tile, targetPosition, combination);
     
     if (result) {
+      result.flowers = room.game.flowers;
         console.log(`🔍 result.reactions =`, result.reactions);
         io.to(roomId).emit('gameUpdate', result);
 
