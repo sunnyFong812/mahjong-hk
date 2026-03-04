@@ -67,6 +67,22 @@ function aiMove(room, aiPlayer) {
   if (!game || game.gameOver) return;
   if (game.currentPlayer !== aiPlayer.position) return;
 
+  // ===== 1. 先摸牌 =====
+  // 用你嘅 handleDraw 函數處理摸牌（包括花牌）
+  const drawnTile = handleDraw(room, aiPlayer.position);
+  
+  // 如果有摸到牌，通知前端
+  if (drawnTile) {
+    io.to(room.id).emit('gameUpdate', {
+      type: 'DRAW',
+      player: aiPlayer.position,
+      hand: game.hands[aiPlayer.position],
+      drawnTile: drawnTile,
+      wallSize: game.wall.length
+    });
+  }
+
+  // ===== 2. 然後先打牌 =====
   const hand = game.hands[aiPlayer.position];
   if (!hand || hand.length === 0) return;
 
@@ -79,59 +95,59 @@ function aiMove(room, aiPlayer) {
 
     // 如果有 reaction，處理 reaction
     if (result.reactions) {
-  console.log('🎯 AI reactions players:', result.reactions.map(r => r.player));
-  
-  result.reactions.forEach(r => {
-    const reactionPlayer = room.players.find(p => p.position === r.player);
-    if (reactionPlayer?.isAI) {
-      console.log(`🤖 AI ${reactionPlayer.name} 自動按過`);
+      console.log('🎯 AI reactions players:', result.reactions.map(r => r.player));
       
-      // 先 PASS
-      const passResult = game.processAction(reactionPlayer.position, 'PASS');
-      io.to(room.id).emit('gameUpdate', passResult);
-      
-      // 然後摸牌
-      if (game.wall.length > 0) {
-        const drawnTile = game.wall.pop();
-        game.hands[reactionPlayer.position].push(drawnTile);
-        game.hands[reactionPlayer.position].sort((a, b) => a.localeCompare(b));
-        
-        io.to(room.id).emit('gameUpdate', {
-          type: 'DRAW',
-          player: reactionPlayer.position,
-          hand: game.hands[reactionPlayer.position],
-          drawnTile: drawnTile,
-          wallSize: room.game.wall.length
-        });
-        
-        // 然後 AI 打牌
-        setTimeout(() => aiMove(room, reactionPlayer), 600);
-      }
+      result.reactions.forEach(r => {
+        const reactionPlayer = room.players.find(p => p.position === r.player);
+        if (reactionPlayer?.isAI) {
+          console.log(`🤖 AI ${reactionPlayer.name} 自動按過`);
+          
+          // 先 PASS
+          const passResult = game.processAction(reactionPlayer.position, 'PASS');
+          io.to(room.id).emit('gameUpdate', passResult);
+          
+          // 然後再 call aiMove (呢個 reactionPlayer 會喺自己嘅回合先摸牌)
+          setTimeout(() => aiMove(room, reactionPlayer), 600);
+        }
+      });
+      return;
     }
-  });
-  return;
+
+    // 冇 reaction，下家係邊個？
+    const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
+    if (nextPlayer && nextPlayer.isAI) {
+      // 直接 call aiMove，下一個 AI 會先摸牌再打牌
+      setTimeout(() => aiMove(room, nextPlayer), 600);
+    }
+    // 如果下家係真人，唔使做嘢，等佢自己摸牌
+  }
 }
 
-    // 冇 reaction，下家摸牌
-    const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
-    if (nextPlayer && game.wall.length > 0) {
-      const drawnTile = game.wall.pop();
-      game.hands[nextPlayer.position].push(drawnTile);
-      game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
-
-      io.to(room.id).emit('gameUpdate', {
-        type: 'DRAW',
-        player: nextPlayer.position,
-        hand: game.hands[nextPlayer.position],
-        drawnTile: drawnTile,
-        wallSize: room.game.wall.length
-      });
-
-      if (nextPlayer.isAI) {
-        setTimeout(() => aiMove(room, nextPlayer), 600);
-      }
+function handleDraw(room, playerPosition) {
+    if (room.game.wall.length === 0) return null;
+    
+    const drawnTile = room.game.wall.pop();
+    room.game.hands[playerPosition].push(drawnTile);
+    room.game.hands[playerPosition].sort((a, b) => a.localeCompare(b));
+    
+    // 檢查係咪花牌
+    const flowers = ['春', '夏', '秋', '冬', '梅', '蘭', '菊', '竹'];
+    if (flowers.includes(drawnTile)) {
+        console.log(`🌸 玩家 ${playerPosition} 摸到花牌 ${drawnTile}，補花`);
+        
+        // 記錄花牌
+        if (!room.game.flowers) room.game.flowers = { 0: [], 1: [], 2: [], 3: [] };
+        room.game.flowers[playerPosition].push(drawnTile);
+        
+        // 從手牌移除花牌
+        const index = room.game.hands[playerPosition].indexOf(drawnTile);
+        if (index !== -1) room.game.hands[playerPosition].splice(index, 1);
+        
+        // 補花 - 遞迴 call 自己
+        return handleDraw(room, playerPosition);
     }
-  }
+    
+    return drawnTile;
 }
 
 function startGame(room) {
@@ -341,9 +357,7 @@ if (action === 'DARK_KONG') {
         if (action === 'DISCARD' && !result.reactions) {
             const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
             if (nextPlayer && room.game.wall.length > 0) {
-                const drawnTile = room.game.wall.pop();
-                room.game.hands[nextPlayer.position].push(drawnTile);
-                room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+                const drawnTile = handleDraw(room, nextPlayer.position);
 
                 io.to(room.id).emit('gameUpdate', {
                     type: 'DRAW',
