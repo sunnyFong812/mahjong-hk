@@ -1138,7 +1138,7 @@ getMeldsWidth(melds, myPosition) {
                 const x = (e.clientX - rect.left) * scaleX;
                 const y = (e.clientY - rect.top) * scaleY;
                 
-                const startX = 50;
+                const startX = this.handStartX;
                 const startY = 550;
                 
                 for (let i = 0; i < window.myHand.length; i++) {
@@ -1311,7 +1311,7 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
     
     // ===== 畫花牌 + 副露牌，並取得手牌起始 X 座標 =====
     const handStartX = this.renderMeldsAndFlowers(window.melds, window.flowers, myPosition);
-    
+    this.handStartX = handStartX + 10;
     this.ctx.fillStyle = 'white';
     this.ctx.font = '20px Arial';
     this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
