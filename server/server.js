@@ -270,10 +270,8 @@ if (action === 'KONG') {
         
         // 槓完之後摸牌
         if (room.game.wall.length > 0) {
-            const drawnTile = room.game.wall.pop();
-            room.game.hands[player.position].push(drawnTile);
-            room.game.hands[player.position].sort((a, b) => a.localeCompare(b));
-            
+            const drawnTile = handleDraw(room, player.position);
+          
             io.to(player.id).emit('gameUpdate', {
                 type: 'DRAW',
                 player: player.position,
@@ -300,17 +298,18 @@ if (action === 'DARK_KONG') {
         
         // 暗槓完之後摸牌
         if (room.game.wall.length > 0) {
-            const drawnTile = room.game.wall.pop();
-            room.game.hands[player.position].push(drawnTile);
-            room.game.hands[player.position].sort((a, b) => a.localeCompare(b));
-            
-            io.to(player.id).emit('gameUpdate', {
-                type: 'DRAW',
-                player: player.position,
-                hand: room.game.hands[player.position],
-                drawnTile: drawnTile
-            });
-        }
+    const drawnTile = handleDraw(room, player.position);
+    
+    if (drawnTile) {
+        io.to(player.id).emit('gameUpdate', {
+            type: 'DRAW',
+            player: player.position,
+            hand: room.game.hands[player.position],
+            drawnTile: drawnTile,
+            wallSize: room.game.wall.length  // 可以加埋剩牌數
+        });
+    }
+}
         
         if (!room.game.gameOver && result.currentPlayer !== undefined) {
             const next = room.players.find(p => p.position === result.currentPlayer);
