@@ -74,13 +74,29 @@ class MahjongGame {
     // 檢查每位玩家手牌有冇花牌
     for (let i = 0; i < 4; i++) {
         const hand = this.hands[i];
+        // 由後向前檢查，避免 index 問題
         for (let j = hand.length - 1; j >= 0; j--) {
             if (flowers.includes(hand[j])) {
                 // 將花牌移到花牌區
                 this.flowers[i].push(hand[j]);
                 hand.splice(j, 1);
+                
+                // 👇 立即補一張牌
+                if (this.wall.length > 0) {
+                    const newTile = this.wall.pop();
+                    hand.push(newTile);
+                    
+                    // 如果補到嘅牌又係花牌，就再放入花牌區 (但唔再補，因為會由 loop 再處理)
+                    if (flowers.includes(newTile)) {
+                        // 標記等下次 loop 處理
+                        j++;  // 因為 splice 後 index 會變，但由 loop 控制
+                    }
+                }
             }
         }
+        
+        // 排序手牌
+        hand.sort((a, b) => a.localeCompare(b));
     }
     
     this.currentPlayer = 0;
