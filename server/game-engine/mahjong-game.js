@@ -346,6 +346,83 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
     };
   }
 
+  // 處理槓
+handleKong(playerPosition, tile, targetPosition, isDark = false) {
+    const hand = this.hands[playerPosition];
+    
+    // 明槓：用其他人打出嘅牌
+    if (!isDark) {
+        const matching = hand.filter(t => t === tile);
+        if (matching.length < 3) return { error: 'cannot kong' };
+        
+        // 移除三張牌
+        let removed = 0;
+        const newHand = [];
+        for (const t of hand) {
+            if (t === tile && removed < 3) {
+                removed++;
+            } else {
+                newHand.push(t);
+            }
+        }
+        this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+        
+        // 記錄明槓
+        this.melds[playerPosition].push({
+            type: 'KONG',
+            tile: tile,
+            from: targetPosition,
+            isDark: false
+        });
+    } 
+    // 暗槓：自己摸到第四張
+    else {
+        const matching = hand.filter(t => t === tile);
+        if (matching.length < 4) return { error: 'cannot kong (dark)' };
+        
+        // 移除四張牌
+        let removed = 0;
+        const newHand = [];
+        for (const t of hand) {
+            if (t === tile && removed < 4) {
+                removed++;
+            } else {
+                newHand.push(t);
+            }
+        }
+        this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
+        
+        // 記錄暗槓
+        this.melds[playerPosition].push({
+            type: 'KONG',
+            tile: tile,
+            isDark: true
+        });
+    }
+    
+    // 槓完之後，要摸一張牌
+    const drawnTile = this.drawTile(playerPosition);
+    
+    // 記錄最後打出的牌設為 null（因為槓完可以直接打牌）
+    this.lastDiscard = null;
+    
+    // 槓完之後輪到自己出牌
+    this.currentPlayer = playerPosition;
+    this.pendingReaction = false;
+    
+    return {
+        type: 'KONG',
+        player: playerPosition,
+        tile: tile,
+        from: targetPosition,
+        isDark: isDark,
+        hand: this.hands[playerPosition],
+        melds: this.melds,
+        drawnTile: drawnTile,
+        currentPlayer: this.currentPlayer
+    };
+}
+  
   // ========== 新增：吃牌處理 ==========
   handleChow(playerPosition, tile, targetPosition, combination) {
     // 檢查是否可以吃（只能吃上家）
