@@ -19,6 +19,7 @@ class MahjongGame {
     const wall = [];
     const suits = ['m', 'p', 's'];
     const honors = ['東', '南', '西', '北', '中', '發', '白'];
+    const flowers = ['春', '夏', '秋', '冬', '梅', '蘭', '菊', '竹'];
     
     // 萬、筒、條 1-9
     for (const suit of suits) {
@@ -34,6 +35,11 @@ class MahjongGame {
       for (let i = 0; i < 4; i++) {
         wall.push(honor);
       }
+    }
+
+     // 花牌 (每張只有 1 隻)
+    for (const flower of flowers) {
+        wall.push(flower);
     }
     
     return this.shuffle(wall);
