@@ -239,6 +239,100 @@
     pointer-events: auto;
 }
 
+        /* ===== 其他玩家手牌區域 ===== */
+.other-player-hand {
+    position: absolute;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 10px;
+    padding: 10px;
+    z-index: 20;
+}
+
+.other-player-hand .player-name-tag {
+    position: absolute;
+    top: -25px;
+    left: 10px;
+    background: #d4a373;
+    color: white;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 14px;
+    font-weight: bold;
+    white-space: nowrap;
+}
+
+.other-player-hand .hand-container {
+    display: flex;
+    gap: 4px;
+}
+
+.other-player-hand .hand-tile {
+    width: 30px;
+    height: 40px;
+    background: #1a4f7a;  /* 綠色牌背 */
+    border: 2px solid #0a2f4a;
+    border-radius: 5px;
+    position: relative;
+}
+
+.other-player-hand .hand-tile::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 20px;
+    height: 25px;
+    background: linear-gradient(135deg, #2a6f2a 0%, #1a4f2a 100%);
+    border-radius: 3px;
+    opacity: 0.8;
+}
+
+/* 左邊玩家手牌 */
+#left-player-hand {
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    width: 140px;
+}
+
+#left-player-hand .hand-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 280px;
+}
+
+/* 右邊玩家手牌 */
+#right-player-hand {
+    top: 50%;
+    right: 20px;
+    transform: translateY(-50%);
+    width: 140px;
+}
+
+#right-player-hand .hand-container {
+    flex-direction: column;
+    flex-wrap: wrap;
+    height: 280px;
+}
+
+/* 上方玩家手牌 */
+#top-player-hand {
+    top: 80px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 70px;
+}
+
+#top-player-hand .hand-container {
+    flex-direction: row;
+}
+
+/* 當前玩家高亮 */
+.other-player-hand.current-turn {
+    border: 2px solid gold;
+    box-shadow: 0 0 15px gold;
+}
         
         /* 過按鈕 */
         .btn-pass-new {
@@ -591,7 +685,24 @@
             <div class="hand-area">
                 <canvas id="game-canvas" width="1200" height="700"></canvas>
             </div>
-            
+
+            <!-- 左邊玩家 (下家) -->
+<div id="left-player-hand" class="other-player-hand">
+    <div class="player-name-tag" id="left-player-name">南: 玩家2</div>
+    <div class="hand-container" id="left-player-tiles"></div>
+</div>
+
+<!-- 右邊玩家 (上家) -->
+<div id="right-player-hand" class="other-player-hand">
+    <div class="player-name-tag" id="right-player-name">北: 玩家4</div>
+    <div class="hand-container" id="right-player-tiles"></div>
+</div>
+
+<!-- 上方玩家 (對家) -->
+<div id="top-player-hand" class="other-player-hand">
+    <div class="player-name-tag" id="top-player-name">西: 玩家3</div>
+    <div class="hand-container" id="top-player-tiles"></div>
+</div>
             <!-- 過按鈕 -->
             <button id="btn-pass-new" class="btn-pass-new">過</button>
             
