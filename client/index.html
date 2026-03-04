@@ -1176,58 +1176,80 @@ getMeldsWidth(melds, myPosition) {
                 }
             }
             
-            // 畫副露牌（橫向排列，喺手牌左方）
-            renderMelds(melds, myPosition) {
-                if (!melds || !melds[myPosition]) return;
-                
-                const myMelds = melds[myPosition];
-                
-                // 位置：手牌左方 (同手牌同一水平線)
-                const startX = 20;
-                const startY = 550;  // 同手牌 startY 一樣
-                
-                let currentX = startX;
-                
-                myMelds.forEach((meld) => {
-                    // 決定要畫幾多張牌
-                    let tiles = [];
-                    if (meld.type === 'PONG') {
-                        tiles = [meld.tile, meld.tile, meld.tile];
-                    } else if (meld.type === 'CHOW') {
-                        tiles = meld.tiles;
-                    } else if (meld.type === 'KONG') {
-                        tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
-                    }
-                    
-                    // 畫每張牌 (size 80%)
-                    tiles.forEach((tile) => {
-                        // 牌面 - 暗槓用淺灰色
-            if (meld.type === 'KONG' && meld.isDark) {
-                this.ctx.fillStyle = '#9c9c9c';  // 灰色
-            } else {
-                this.ctx.fillStyle = '#f8f9fa';  // 正常白色
+            // 畫副露牌同花牌
+renderMeldsAndFlowers(melds, flowers, myPosition) {
+    let currentX = 20;  // 最左邊起始
+    
+    // ===== 1. 先畫花牌 (size 50%) =====
+    if (flowers && flowers[myPosition] && flowers[myPosition].length > 0) {
+        const myFlowers = flowers[myPosition];
+        const flowerY = 565;  // 比手牌稍為提高
+        
+        myFlowers.forEach((tile) => {
+            // 花牌 size 一半 (14x19)
+            this.ctx.fillStyle = '#e0b3ff';
+            this.ctx.fillRect(currentX, flowerY, 14, 19);
+            
+            this.ctx.strokeStyle = '#9c27b0';
+            this.ctx.lineWidth = 1;
+            this.ctx.strokeRect(currentX, flowerY, 14, 19);
+            
+            this.ctx.fillStyle = '#9c27b0';
+            this.ctx.font = '10px "PingFang HK"';
+            this.ctx.fillText(this.getTileDisplay(tile), currentX + 2, flowerY + 12);
+            
+            currentX += 16;  // 14 + 2 間距
+        });
+        
+        currentX += 10;  // 花牌同副露之間留空位
+    }
+    
+    // ===== 2. 畫副露牌 (正常 size) =====
+    if (melds && melds[myPosition]) {
+        const myMelds = melds[myPosition];
+        const meldY = 550;
+        
+        myMelds.forEach((meld) => {
+            let tiles = [];
+            if (meld.type === 'PONG') {
+                tiles = [meld.tile, meld.tile, meld.tile];
+            } else if (meld.type === 'CHOW') {
+                tiles = meld.tiles;
+            } else if (meld.type === 'KONG') {
+                tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
             }
-                        // 牌面 (28x38 = 80% of 35x45)
-                        this.ctx.fillRect(currentX, startY, 28, 38);
-                        
-                        // 邊框
-                        this.ctx.strokeStyle = '#333';
-                        this.ctx.lineWidth = 1;
-                        this.ctx.strokeRect(currentX, startY, 28, 38);
-                        
-                        // 牌面文字 (80% of 16px)
-                        this.ctx.fillStyle = this.getTileColor(tile);
-                        this.ctx.font = '14px "PingFang HK"';
-                        this.ctx.fillText(this.getTileDisplay(tile), currentX + 4, startY + 25);
-                        
-                        // 移動到下一個位置
-                        currentX += 30;  // 28px 寬 + 2px 間距
-                    });
-                    
-                    // 每組之間留多少少空間
-                    currentX += 5;
-                });
-            }
+            
+            tiles.forEach((tile) => {
+                // 暗槓用灰色
+                if (meld.type === 'KONG' && meld.isDark) {
+                    this.ctx.fillStyle = '#e0e0e0';
+                } else {
+                    this.ctx.fillStyle = '#f8f9fa';
+                }
+                this.ctx.fillRect(currentX, meldY, 28, 38);
+                
+                this.ctx.strokeStyle = '#333';
+                this.ctx.lineWidth = 1;
+                this.ctx.strokeRect(currentX, meldY, 28, 38);
+                
+                if (meld.type === 'KONG' && meld.isDark) {
+                    this.ctx.fillStyle = '#888';
+                } else {
+                    this.ctx.fillStyle = this.getTileColor(tile);
+                }
+                this.ctx.font = '14px "PingFang HK"';
+                this.ctx.fillText(this.getTileDisplay(tile), currentX + 4, meldY + 25);
+                
+                currentX += 30;
+            });
+            
+            currentX += 5;
+        });
+    }
+    
+    // 返回手牌應該開始嘅 X 座標
+    return currentX;
+}
             
             renderDiscardArea(discards) {
                 if (!discards) return;
