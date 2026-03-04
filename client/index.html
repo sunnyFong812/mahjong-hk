@@ -1031,6 +1031,8 @@ function updatePlayerName(position, playerPos, wind) {
                     document.getElementById('selected-tile-hint').style.display = 'none';
                 }, 5000);
             }
+            updateOtherPlayersNames();
+            updateOtherPlayersHands();
         });
 
         // ===== 輔助函數 =====
@@ -1259,6 +1261,7 @@ function checkDarkKong() {
             } else {
                 document.getElementById('selected-tile-hint').style.display = 'none';
             }
+            updateOtherPlayersHands();
         });
 
         // ===== 遊戲結束 =====
