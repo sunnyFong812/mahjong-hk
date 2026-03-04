@@ -522,7 +522,7 @@ this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
         this.lastDiscard.player,
         this.lastDiscard.tile,
         nextLevel
-    );
+    ).filter(r => r.player !== playerPosition);
     
     if (nextReactions.length > 0) {
         // 仲有 reaction，更新 level 同繼續等
