@@ -1008,6 +1008,7 @@ function checkDarkKong() {
                 if (data.nextPlayerHand) {
                     window.myHand = sortTiles(data.nextPlayerHand);
                 }
+                checkDarkKong();
             }
 
             if (window.gameRenderer) {
@@ -1051,6 +1052,7 @@ function checkDarkKong() {
 
             if (window.currentPlayer === window.myPosition) {
                 document.getElementById('selected-tile-hint').style.display = 'block';
+                checkDarkKong();
             } else {
                 document.getElementById('selected-tile-hint').style.display = 'none';
             }
