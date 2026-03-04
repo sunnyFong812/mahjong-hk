@@ -804,6 +804,7 @@
             window.currentPlayer = data.currentPlayer;
             window.discards = data.discards || { 0: [], 1: [], 2: [], 3: [] };
             window.flowers = data.flowers || { 0: [], 1: [], 2: [], 3: [] };
+            console.log('🎮 gameStart flowers:', data.flowers);
             
             window.players = data.players || [
                 { name: '玩家', isAI: false },
@@ -1005,7 +1006,8 @@ function checkDarkKong() {
             }
 
             if (data.flowers) {
-    window.flowers = data.flowers;
+                window.flowers = data.flowers;
+                console.log('🌸 gameUpdate flowers:', data.flowers);
 }
         
             if (data.drawnTile && data.player === window.myPosition) {
