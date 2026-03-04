@@ -165,7 +165,8 @@ function startGame(room) {
         wind: ['東', '南', '西', '北'][p.position],
         currentPlayer: init.currentPlayer,
         discards: init.discards,
-        wallSize: init.wallSize
+        wallSize: init.wallSize,
+        flowers: room.game.flowers || { 0: [], 1: [], 2: [], 3: [] }
       });
     }
   });
