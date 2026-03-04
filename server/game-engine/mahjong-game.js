@@ -325,13 +325,12 @@ getChowCombinations(playerPosition, tile) {
         this.flowers[playerPosition].push(tile);
         
         // 補花
-        const drawnTile = this.drawTile(playerPosition);  // 用你嘅 drawTile 函數
+        const drawnTile = null;
         
         return {
             type: 'FLOWER_DISCARD',  // 新 type
             player: playerPosition,
             flower: tile,
-            drawnTile: drawnTile,
             hand: this.hands[playerPosition],
             flowers: this.flowers,
             currentPlayer: this.currentPlayer  // 唔轉人，仲係自己
