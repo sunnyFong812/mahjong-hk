@@ -51,7 +51,8 @@ function aiHandleReaction(room, aiPlayer) {
           player: next.position,
           hand: game.hands[next.position],
           drawnTile: drawnTile,
-          wallSize: room.game.wall.length
+          wallSize: room.game.wall.length,
+          flowers: room.game.flowers
         });
 
         if (next.isAI) {
@@ -78,7 +79,8 @@ function aiMove(room, aiPlayer) {
       player: aiPlayer.position,
       hand: game.hands[aiPlayer.position],
       drawnTile: drawnTile,
-      wallSize: game.wall.length
+      wallSize: game.wall.length,
+      flowers: room.game.flowers
     });
   }
 
@@ -276,7 +278,8 @@ if (action === 'KONG') {
                 type: 'DRAW',
                 player: player.position,
                 hand: room.game.hands[player.position],
-                drawnTile: drawnTile
+                drawnTile: drawnTile,
+              flowers: room.game.flowers
             });
         }
         
@@ -306,7 +309,8 @@ if (action === 'DARK_KONG') {
             player: player.position,
             hand: room.game.hands[player.position],
             drawnTile: drawnTile,
-            wallSize: room.game.wall.length  // 可以加埋剩牌數
+            wallSize: room.game.wall.length,  // 可以加埋剩牌數
+          flowers: room.game.flowers
         });
     }
 }
@@ -333,7 +337,8 @@ if (action === 'DARK_KONG') {
                 player: nextPlayer.position,
                 hand: room.game.hands[nextPlayer.position],
                 drawnTile: drawnTile,
-              wallSize: room.game.wall.length
+              wallSize: room.game.wall.length,
+              flowers: room.game.flowers
             });
         }
 
@@ -363,7 +368,8 @@ if (action === 'DARK_KONG') {
                     player: nextPlayer.position,
                     hand: room.game.hands[nextPlayer.position],
                     drawnTile: drawnTile,
-                  wallSize: room.game.wall.length
+                  wallSize: room.game.wall.length,
+                  flowers: room.game.flowers
                 });
             }
         }
