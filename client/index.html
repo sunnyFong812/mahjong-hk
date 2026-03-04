@@ -1197,8 +1197,13 @@ getMeldsWidth(melds, myPosition) {
                     
                     // 畫每張牌 (size 80%)
                     tiles.forEach((tile) => {
+                        // 牌面 - 暗槓用淺灰色
+            if (meld.type === 'KONG' && meld.isDark) {
+                this.ctx.fillStyle = '#9c9c9c';  // 灰色
+            } else {
+                this.ctx.fillStyle = '#f8f9fa';  // 正常白色
+            }
                         // 牌面 (28x38 = 80% of 35x45)
-                        this.ctx.fillStyle = '#f8f9fa';
                         this.ctx.fillRect(currentX, startY, 28, 38);
                         
                         // 邊框
