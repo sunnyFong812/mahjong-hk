@@ -278,13 +278,15 @@ if (action === 'KONG') {
         if (room.game.wall.length > 0) {
             const drawnTile = handleDraw(room, player.position);
           
-            io.to(player.id).emit('gameUpdate', {
-                type: 'DRAW',
-                player: player.position,
-                hand: room.game.hands[player.position],
-                drawnTile: drawnTile,
-              flowers: room.game.flowers
-            });
+            if (drawnTile) {
+                io.to(player.id).emit('gameUpdate', {
+                    type: 'DRAW',
+                    player: player.position,
+                    hand: room.game.hands[player.position],
+                    drawnTile: drawnTile,
+                    flowers: room.game.flowers
+                });
+            }
         }
         
         // 如果下家係 AI，觸發 AI 行動
