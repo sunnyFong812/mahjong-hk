@@ -274,9 +274,7 @@ io.on('connection', (socket) => {
         // 下家摸牌
         const nextPlayer = room.players.find(p => p.position === passResult.currentPlayer);
         if (nextPlayer && room.game.wall.length > 0) {
-            const drawnTile = room.game.wall.pop();
-            room.game.hands[nextPlayer.position].push(drawnTile);
-            room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+            const drawnTile = handleDraw(room, nextPlayer.position);
 
             io.to(room.id).emit('gameUpdate', {
                 type: 'DRAW',
