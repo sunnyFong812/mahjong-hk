@@ -267,7 +267,36 @@ io.on('connection', (socket) => {
             return;
         }
 
-      // 處理 KONG
+
+        // 冇新 reaction，正常處理摸牌同轉回合
+        io.to(roomId).emit('gameUpdate', passResult);
+        
+        // 下家摸牌
+        const nextPlayer = room.players.find(p => p.position === passResult.currentPlayer);
+        if (nextPlayer && room.game.wall.length > 0) {
+            const drawnTile = room.game.wall.pop();
+            room.game.hands[nextPlayer.position].push(drawnTile);
+            room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
+
+            io.to(room.id).emit('gameUpdate', {
+                type: 'DRAW',
+                player: nextPlayer.position,
+                hand: room.game.hands[nextPlayer.position],
+                drawnTile: drawnTile,
+              wallSize: room.game.wall.length,
+              flowers: room.game.flowers
+            });
+        }
+
+        // 如果下家係 AI，觸發 AI 行動
+        if (!room.game.gameOver && passResult.currentPlayer !== undefined) {
+            const next = room.players.find(p => p.position === passResult.currentPlayer);
+            if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
+        }
+        return;
+    }
+
+          // 處理 KONG
 if (action === 'KONG') {
     const result = room.game.processAction(player.position, 'KONG', tile, targetPosition);
     
@@ -328,34 +357,6 @@ if (action === 'DARK_KONG') {
     }
     return;
 }
-        // 冇新 reaction，正常處理摸牌同轉回合
-        io.to(roomId).emit('gameUpdate', passResult);
-        
-        // 下家摸牌
-        const nextPlayer = room.players.find(p => p.position === passResult.currentPlayer);
-        if (nextPlayer && room.game.wall.length > 0) {
-            const drawnTile = room.game.wall.pop();
-            room.game.hands[nextPlayer.position].push(drawnTile);
-            room.game.hands[nextPlayer.position].sort((a, b) => a.localeCompare(b));
-
-            io.to(room.id).emit('gameUpdate', {
-                type: 'DRAW',
-                player: nextPlayer.position,
-                hand: room.game.hands[nextPlayer.position],
-                drawnTile: drawnTile,
-              wallSize: room.game.wall.length,
-              flowers: room.game.flowers
-            });
-        }
-
-        // 如果下家係 AI，觸發 AI 行動
-        if (!room.game.gameOver && passResult.currentPlayer !== undefined) {
-            const next = room.players.find(p => p.position === passResult.currentPlayer);
-            if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
-        }
-        return;
-    }
-
     // 處理其他動作 (DISCARD, PONG, CHOW, MAHJONG...)
     const result = room.game.processAction(player.position, action, tile, targetPosition, combination);
     
@@ -427,7 +428,7 @@ if (action === 'DARK_KONG') {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, '0.0.0.0', () => {
-  console.log('\n=== 🀄️ 港式麻雀（5c89b31 改良版）===');
+  console.log('\n=== 🀄️ 港式麻雀 ===');
   console.log(`🌐 http://localhost:${PORT}`);
   console.log('🎮 碰、槓、糊已加入，人機正常');
 });
