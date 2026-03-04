@@ -318,6 +318,26 @@ getChowCombinations(playerPosition, tile) {
     if (idx === -1) return { error: 'no tile' };
 
     hand.splice(idx, 1);
+    // ===== 檢查係咪花牌 =====
+    const flowers = ['春', '夏', '秋', '冬', '梅', '蘭', '菊', '竹'];
+    if (flowers.includes(tile)) {
+        // 花牌：放入花牌區，唔入棄牌區
+        this.flowers[playerPosition].push(tile);
+        
+        // 補花
+        const drawnTile = this.drawTile(playerPosition);  // 用你嘅 drawTile 函數
+        
+        return {
+            type: 'FLOWER_DISCARD',  // 新 type
+            player: playerPosition,
+            flower: tile,
+            drawnTile: drawnTile,
+            hand: this.hands[playerPosition],
+            flowers: this.flowers,
+            currentPlayer: this.currentPlayer  // 唔轉人，仲係自己
+        };
+    }
+
     this.discards[playerPosition].push(tile);
     this.lastDiscard = { tile, player: playerPosition };
 
