@@ -5,6 +5,7 @@ class MahjongGame {
     this.hands = { 0: [], 1: [], 2: [], 3: [] };
     this.discards = { 0: [], 1: [], 2: [], 3: [] };
     this.melds = { 0: [], 1: [], 2: [], 3: [] };
+    this.flowers = { 0: [], 1: [], 2: [], 3: [] };
     this.currentPlayer = 0;
     this.lastDiscard = null;
     this.winner = null;
