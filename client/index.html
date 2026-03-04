@@ -900,6 +900,91 @@
                 console.log(`📊 玩家 ${i} (${wind}) 手牌: ${handCount}`);
             }
         }
+        // ===== 更新其他玩家手牌 =====
+function updateOtherPlayersHands() {
+    if (!window.gameRenderer || !window.gameRenderer.gameState || !window.gameRenderer.gameState.hands) return;
+    
+    const myPos = window.myPosition;
+    const hands = window.gameRenderer.gameState.hands;
+    
+    // 左邊玩家 (下家: myPos + 1)
+    const leftPos = (myPos + 1) % 4;
+    updatePlayerHand('left', leftPos, hands[leftPos]);
+    
+    // 上方玩家 (對家: myPos + 2)
+    const topPos = (myPos + 2) % 4;
+    updatePlayerHand('top', topPos, hands[topPos]);
+    
+    // 右邊玩家 (上家: myPos + 3)
+    const rightPos = (myPos + 3) % 4;
+    updatePlayerHand('right', rightPos, hands[rightPos]);
+}
+
+function updatePlayerHand(position, playerPos, handTiles) {
+    const container = document.getElementById(`${position}-player-tiles`);
+    if (!container) return;
+    
+    container.innerHTML = '';
+    
+    if (!handTiles || handTiles.length === 0) {
+        // 顯示背面牌
+        for (let i = 0; i < 13; i++) {
+            const tileDiv = document.createElement('div');
+            tileDiv.className = 'hand-tile';
+            container.appendChild(tileDiv);
+        }
+        return;
+    }
+    
+    // 顯示手牌 (全部用背面)
+    const tileCount = handTiles.length;
+    for (let i = 0; i < tileCount; i++) {
+        const tileDiv = document.createElement('div');
+        tileDiv.className = 'hand-tile';
+        container.appendChild(tileDiv);
+    }
+    
+    // 更新當前玩家高亮
+    const handDiv = document.getElementById(`${position}-player-hand`);
+    if (window.currentPlayer === playerPos) {
+        handDiv.classList.add('current-turn');
+    } else {
+        handDiv.classList.remove('current-turn');
+    }
+}
+
+// ===== 更新其他玩家名稱 =====
+function updateOtherPlayersNames() {
+    if (!window.players) return;
+    
+    const myPos = window.myPosition;
+    const windMap = ['東', '南', '西', '北'];
+    
+    // 左邊玩家 (下家)
+    const leftPos = (myPos + 1) % 4;
+    updatePlayerName('left', leftPos, windMap[1]);
+    
+    // 上方玩家 (對家)
+    const topPos = (myPos + 2) % 4;
+    updatePlayerName('top', topPos, windMap[2]);
+    
+    // 右邊玩家 (上家)
+    const rightPos = (myPos + 3) % 4;
+    updatePlayerName('right', rightPos, windMap[3]);
+}
+
+function updatePlayerName(position, playerPos, wind) {
+    const nameEl = document.getElementById(`${position}-player-name`);
+    if (!nameEl) return;
+    
+    if (window.players[playerPos]) {
+        const player = window.players[playerPos];
+        const name = player.isAI ? player.name : '玩家';
+        nameEl.textContent = `${wind}: ${name}`;
+    } else {
+        nameEl.textContent = `${wind}: 等待中`;
+    }
+}
 
         setInterval(updateAllHandsCount, 1000);
 
