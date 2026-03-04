@@ -274,6 +274,35 @@ if (action === 'KONG') {
     }
     return;
 }
+
+      // 處理暗槓
+if (action === 'DARK_KONG') {
+    const result = room.game.processAction(player.position, 'DARK_KONG', tile, null, true);
+    
+    if (result) {
+        io.to(roomId).emit('gameUpdate', result);
+        
+        // 暗槓完之後摸牌
+        if (room.game.wall.length > 0) {
+            const drawnTile = room.game.wall.pop();
+            room.game.hands[player.position].push(drawnTile);
+            room.game.hands[player.position].sort((a, b) => a.localeCompare(b));
+            
+            io.to(player.id).emit('gameUpdate', {
+                type: 'DRAW',
+                player: player.position,
+                hand: room.game.hands[player.position],
+                drawnTile: drawnTile
+            });
+        }
+        
+        if (!room.game.gameOver && result.currentPlayer !== undefined) {
+            const next = room.players.find(p => p.position === result.currentPlayer);
+            if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
+        }
+    }
+    return;
+}
         // 冇新 reaction，正常處理摸牌同轉回合
         io.to(roomId).emit('gameUpdate', passResult);
         
