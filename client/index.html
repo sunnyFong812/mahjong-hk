@@ -1299,67 +1299,62 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
             }
             
             render(hand, myPosition, discards) {
-                this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                this.ctx.fillStyle = '#2a6f2a';
-                this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-                
-                this.renderDiscardArea(discards);
-                
-                // 畫副露牌 (喺手牌左方)
-                if (window.melds) {
-                    this.renderMelds(window.melds, myPosition);
-                }
-                
-                this.ctx.fillStyle = 'white';
-                this.ctx.font = '20px Arial';
-                this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
-                
-                // 計算手牌起始位置 (根據副露寬度)
-const meldsWidth = this.getMeldsWidth(window.melds, myPosition);
-const startX = 50 + meldsWidth;  // 喺副露後面開始畫手牌
-                const startY = 550;
-                
-                hand.forEach((tile, i) => {
-                    const x = startX + i * (this.tileWidth + 3);
-                    
-                    this.ctx.fillStyle = '#f8f9fa';
-                    this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
-                    
-                    this.ctx.strokeStyle = (i === this.selectedIndex) ? 'gold' : '#333';
-                    this.ctx.lineWidth = (i === this.selectedIndex) ? 4 : 1;
-                    this.ctx.strokeRect(x, startY, this.tileWidth, this.tileHeight);
-                    
-                    this.ctx.fillStyle = this.getTileColor(tile);
-                    this.ctx.font = 'bold 24px "PingFang HK"';
-                    this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
-                });
-                
-                this.ctx.fillStyle = 'white';
-                this.ctx.font = '18px Arial';
-                
-                this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
-                this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 160);
-                
-                if (!this.gameState) this.gameState = {};
-                if (!this.gameState.hands) this.gameState.hands = {};
-                
-                this.gameState.hands[myPosition] = hand;
-                
-                if (window.gameState && window.gameState.hands) {
-                    for (let i = 0; i < 4; i++) {
-                        if (i !== myPosition && window.gameState.hands[i]) {
-                            this.gameState.hands[i] = window.gameState.hands[i];
-                        }
-                    }
-                }
-                
-                if (typeof updateAllHandsCount === 'function') {
-                    setTimeout(updateAllHandsCount, 5);
-                }
+    this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    this.ctx.fillStyle = '#2a6f2a';
+    this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+    
+    this.renderDiscardArea(discards);
+    
+    // ===== 畫花牌 + 副露牌，並取得手牌起始 X 座標 =====
+    const handStartX = this.renderMeldsAndFlowers(window.melds, window.flowers, myPosition);
+    
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '20px Arial';
+    this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
+    
+    // 手牌起始位置 (用 renderMeldsAndFlowers 回傳嘅 X 座標)
+    const startX = handStartX + 10;  // 留多少少空間
+    const startY = 550;
+    
+    hand.forEach((tile, i) => {
+        const x = startX + i * (this.tileWidth + 3);
+        
+        this.ctx.fillStyle = '#f8f9fa';
+        this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
+        
+        this.ctx.strokeStyle = (i === this.selectedIndex) ? 'gold' : '#333';
+        this.ctx.lineWidth = (i === this.selectedIndex) ? 4 : 1;
+        this.ctx.strokeRect(x, startY, this.tileWidth, this.tileHeight);
+        
+        this.ctx.fillStyle = this.getTileColor(tile);
+        this.ctx.font = 'bold 24px "PingFang HK"';
+        this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
+    });
+    
+    this.ctx.fillStyle = 'white';
+    this.ctx.font = '18px Arial';
+    
+    this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
+    this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 160);
+    
+    if (!this.gameState) this.gameState = {};
+    if (!this.gameState.hands) this.gameState.hands = {};
+    
+    this.gameState.hands[myPosition] = hand;
+    
+    if (window.gameState && window.gameState.hands) {
+        for (let i = 0; i < 4; i++) {
+            if (i !== myPosition && window.gameState.hands[i]) {
+                this.gameState.hands[i] = window.gameState.hands[i];
             }
         }
-
+    }
+    
+    if (typeof updateAllHandsCount === 'function') {
+        setTimeout(updateAllHandsCount, 5);
+    }
+}
         // ===== 按鈕函數 =====
         window.joinRoom = function() {
             const name = document.getElementById('player-name').value.trim();
