@@ -366,8 +366,19 @@ if (action === 'DARK_KONG') {
         io.to(roomId).emit('gameUpdate', result);
         // 如果係花牌打出，唔使轉人，亦唔使摸牌（已經喺 engine 補咗）
         if (result.type === 'FLOWER_DISCARD') {
-            // 已經補咗牌，直接 continue
-            return;
+            // 打出花牌後補牌
+    const drawnTile = handleDraw(room, player.position);
+    
+    // 再 send 一個 DRAW 事件
+    io.to(player.id).emit('gameUpdate', {
+        type: 'DRAW',
+        player: player.position,
+        hand: room.game.hands[player.position],
+        drawnTile: drawnTile,
+        flowers: room.game.flowers
+    });
+    
+    return;
         }
         // 如果係 DISCARD 而且冇 reaction，下家要摸牌
         if (action === 'DISCARD' && !result.reactions) {
