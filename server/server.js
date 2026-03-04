@@ -364,7 +364,11 @@ if (action === 'DARK_KONG') {
       result.flowers = room.game.flowers;
         console.log(`🔍 result.reactions =`, result.reactions);
         io.to(roomId).emit('gameUpdate', result);
-
+        // 如果係花牌打出，唔使轉人，亦唔使摸牌（已經喺 engine 補咗）
+        if (result.type === 'FLOWER_DISCARD') {
+            // 已經補咗牌，直接 continue
+            return;
+        }
         // 如果係 DISCARD 而且冇 reaction，下家要摸牌
         if (action === 'DISCARD' && !result.reactions) {
             const nextPlayer = room.players.find(p => p.position === result.currentPlayer);
