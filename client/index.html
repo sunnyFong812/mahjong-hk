@@ -1173,15 +1173,25 @@ function checkDarkKong() {
                 window.currentPlayer = data.currentPlayer;
             }
 
-            if (data.hand && data.player === window.myPosition) {
-                window.myHand = sortTiles(data.hand);
-            }
-
-            if (data.hand && data.player !== window.myPosition) {
-                if (!window.gameState) window.gameState = {};
-                if (!window.gameState.hands) window.gameState.hands = {};
-                window.gameState.hands[data.player] = data.hand;
-            }
+            // 統一處理所有玩家手牌
+if (data.hand && data.player !== undefined) {
+    // 更新自己手牌變數
+    if (data.player === window.myPosition) {
+        window.myHand = sortTiles(data.hand);
+    }
+    
+    // 更新 gameState（俾其他玩家顯示用）
+    if (!window.gameState) window.gameState = {};
+    if (!window.gameState.hands) window.gameState.hands = {};
+    window.gameState.hands[data.player] = data.hand;
+    
+    // 更新 gameRenderer
+    if (window.gameRenderer) {
+        if (!window.gameRenderer.gameState) window.gameRenderer.gameState = {};
+        if (!window.gameRenderer.gameState.hands) window.gameRenderer.gameState.hands = {};
+        window.gameRenderer.gameState.hands[data.player] = data.hand;
+    }
+}
 
             if (data.nextPlayerHand && data.currentPlayer !== undefined) {
                 if (!window.gameState) window.gameState = {};
