@@ -66,6 +66,22 @@ class MahjongGame {
       }
       this.hands[i].sort((a, b) => a.localeCompare(b));
     }
+
+// 初始化花牌
+    this.flowers = { 0: [], 1: [], 2: [], 3: [] };
+    const flowers = ['春', '夏', '秋', '冬', '梅', '蘭', '菊', '竹'];
+    
+    // 檢查每位玩家手牌有冇花牌
+    for (let i = 0; i < 4; i++) {
+        const hand = this.hands[i];
+        for (let j = hand.length - 1; j >= 0; j--) {
+            if (flowers.includes(hand[j])) {
+                // 將花牌移到花牌區
+                this.flowers[i].push(hand[j]);
+                hand.splice(j, 1);
+            }
+        }
+    }
     
     this.currentPlayer = 0;
     this.pendingReaction = false;
