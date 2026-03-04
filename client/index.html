@@ -1003,6 +1003,10 @@ function checkDarkKong() {
                 window.melds = data.melds;
             }
 
+            if (data.flowers) {
+    window.flowers = data.flowers;
+}
+        
             if (data.drawnTile && data.player === window.myPosition) {
                 console.log('🀄️ 你摸到:', data.drawnTile);
                 if (data.nextPlayerHand) {
