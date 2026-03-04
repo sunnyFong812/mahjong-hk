@@ -388,6 +388,7 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
       from: targetPosition,
       hand: this.hands[playerPosition],
       melds: this.melds,
+      discards: this.discards,
       currentPlayer: this.currentPlayer
     };
   }
