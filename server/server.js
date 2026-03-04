@@ -244,7 +244,36 @@ io.on('connection', (socket) => {
             });
             return;
         }
+
+      // 處理 KONG
+if (action === 'KONG') {
+    const result = room.game.processAction(player.position, 'KONG', tile, targetPosition);
+    
+    if (result) {
+        io.to(roomId).emit('gameUpdate', result);
         
+        // 槓完之後摸牌
+        if (room.game.wall.length > 0) {
+            const drawnTile = room.game.wall.pop();
+            room.game.hands[player.position].push(drawnTile);
+            room.game.hands[player.position].sort((a, b) => a.localeCompare(b));
+            
+            io.to(player.id).emit('gameUpdate', {
+                type: 'DRAW',
+                player: player.position,
+                hand: room.game.hands[player.position],
+                drawnTile: drawnTile
+            });
+        }
+        
+        // 如果下家係 AI，觸發 AI 行動
+        if (!room.game.gameOver && result.currentPlayer !== undefined) {
+            const next = room.players.find(p => p.position === result.currentPlayer);
+            if (next?.isAI) setTimeout(() => aiMove(room, next), 600);
+        }
+    }
+    return;
+}
         // 冇新 reaction，正常處理摸牌同轉回合
         io.to(roomId).emit('gameUpdate', passResult);
         
