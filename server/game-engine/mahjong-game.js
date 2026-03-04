@@ -557,6 +557,10 @@ getNextLevel(currentLevel) {
         return this.handleDiscard(playerPosition, tile);
       case 'PONG':
         return this.handlePong(playerPosition, tile, targetPosition);
+      case 'KONG':
+        return this.handleKong(playerPosition, tile, targetPosition, false);  // 明槓
+      case 'DARK_KONG':
+        return this.handleKong(playerPosition, tile, null, true);
       case 'CHOW':
         return this.handleChow(playerPosition, tile, targetPosition, combination);
       case 'MAHJONG':
