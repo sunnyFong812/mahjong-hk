@@ -372,6 +372,10 @@ console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
       tile,
       from: targetPosition
     });
+
+    if (this.discards[targetPosition] && this.discards[targetPosition].length > 0) {
+        this.discards[targetPosition].pop();  // 移除最後打出嘅牌
+    }
     
     this.currentPlayer = playerPosition;
     this.lastDiscard = null;
@@ -443,7 +447,10 @@ handleKong(playerPosition, tile, targetPosition, isDark = false) {
     }
     
     // 槓完之後要摸牌 (由 server.js 負責)
-    
+
+  if (this.discards[targetPosition] && this.discards[targetPosition].length > 0) {
+        this.discards[targetPosition].pop();  // 移除最後打出嘅牌
+    }
     // 槓完之後輪到自己出牌
     this.currentPlayer = playerPosition;
     this.lastDiscard = null;
@@ -492,6 +499,10 @@ this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
         from: targetPosition
     });
 
+    if (this.discards[targetPosition] && this.discards[targetPosition].length > 0) {
+        this.discards[targetPosition].pop();  // 移除最後打出嘅牌
+    }
+    
     // 吃完之後輪到自己出牌
     this.currentPlayer = playerPosition;
     this.lastDiscard = null;
