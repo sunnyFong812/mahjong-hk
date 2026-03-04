@@ -1224,6 +1224,7 @@ function checkDarkKong() {
                 if (data.nextPlayerHand && data.player !== undefined) {
                     window.gameRenderer.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
                 }
+                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
             }
 
             if (data.reactions) {
