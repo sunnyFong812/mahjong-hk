@@ -155,6 +155,9 @@ function handleDraw(room, playerPosition) {
 function startGame(room) {
   console.log(`🎮 房間 ${room.id} 遊戲開始`);
   room.game = new MahjongGame(room.players);
+  if (!room.game.flowers) {
+    room.game.flowers = { 0: [], 1: [], 2: [], 3: [] };
+  }
   const init = room.game.start();
 
   room.players.forEach(p => {
@@ -166,7 +169,7 @@ function startGame(room) {
         currentPlayer: init.currentPlayer,
         discards: init.discards,
         wallSize: init.wallSize,
-        flowers: room.game.flowers || { 0: [], 1: [], 2: [], 3: [] }
+        flowers: room.game.flowers
       });
     }
   });
