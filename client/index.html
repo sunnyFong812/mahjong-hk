@@ -1167,112 +1167,99 @@ function checkDarkKong() {
 
         // ===== 遊戲更新 =====
         socket.on('gameUpdate', (data) => {
-            console.log('🔄 gameUpdate', data);
-            
-            if (data.currentPlayer !== undefined) {
-                window.currentPlayer = data.currentPlayer;
-            }
-
-            // 統一處理所有玩家手牌
-if (data.hand && data.player !== undefined) {
-    // 更新自己手牌變數
-    if (data.player === window.myPosition) {
-        window.myHand = sortTiles(data.hand);
-    }
+    console.log('🔄 gameUpdate', data);
     
-    // 更新 gameState（俾其他玩家顯示用）
-    if (!window.gameState) window.gameState = {};
-    if (!window.gameState.hands) window.gameState.hands = {};
-    window.gameState.hands[data.player] = data.hand;
-    
-    // 更新 gameRenderer
-    if (window.gameRenderer) {
-        if (!window.gameRenderer.gameState) window.gameRenderer.gameState = {};
-        if (!window.gameRenderer.gameState.hands) window.gameRenderer.gameState.hands = {};
-        window.gameRenderer.gameState.hands[data.player] = data.hand;
+    // ===== 1. 更新基本狀態 =====
+    if (data.currentPlayer !== undefined) {
+        window.currentPlayer = data.currentPlayer;
     }
-}
 
-            if (data.nextPlayerHand && data.currentPlayer !== undefined) {
-                if (!window.gameState) window.gameState = {};
-                if (!window.gameState.hands) window.gameState.hands = {};
-                window.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
-            }
-            
-            if (data.discards) {
-                window.discards = data.discards;
-            }
-
-            if (data.wallSize !== undefined) {
-                document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
-            }
-            
-            if (data.melds) {
-                window.melds = data.melds;
-            }
-
-            if (data.flowers) {
-                window.flowers = data.flowers;
-                console.log('🌸 gameUpdate flowers:', data.flowers);
-}
+    // ===== 2. 更新手牌（統一處理） =====
+    if (data.hand && data.player !== undefined) {
+        // 自己手牌
+        if (data.player === window.myPosition) {
+            window.myHand = sortTiles(data.hand);
+        }
         
-            if (data.drawnTile && data.player === window.myPosition) {
-                console.log('🀄️ 你摸到:', data.drawnTile);
-                if (data.nextPlayerHand) {
-                    window.myHand = sortTiles(data.nextPlayerHand);
-                }
-                checkDarkKong();
-            }
+        // 更新 gameState（俾其他玩家顯示用）
+        if (!window.gameState) window.gameState = {};
+        if (!window.gameState.hands) window.gameState.hands = {};
+        window.gameState.hands[data.player] = data.hand;
+    }
 
-            if (window.gameRenderer) {
-                if (!window.gameRenderer.gameState) {
-                    window.gameRenderer.gameState = {};
-                }
-                window.gameRenderer.gameState.hands = window.gameRenderer.gameState.hands || {};
-                window.gameRenderer.gameState.hands[data.player] = data.hand;
-                
-                if (data.nextPlayerHand && data.player !== undefined) {
-                    window.gameRenderer.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
-                }
-                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-            }
+    // ===== 3. 更新下家手牌 =====
+    if (data.nextPlayerHand && data.currentPlayer !== undefined) {
+        if (!window.gameState) window.gameState = {};
+        if (!window.gameState.hands) window.gameState.hands = {};
+        window.gameState.hands[data.currentPlayer] = data.nextPlayerHand;
+        
+        // 如果下家係自己，更新 myHand
+        if (data.currentPlayer === window.myPosition) {
+            window.myHand = sortTiles(data.nextPlayerHand);
+        }
+    }
+    
+    // ===== 4. 更新其他遊戲資料 =====
+    if (data.discards) window.discards = data.discards;
+    if (data.melds) window.melds = data.melds;
+    if (data.flowers) window.flowers = data.flowers;
+    if (data.wallSize !== undefined) {
+        document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize}`;
+    }
 
-            if (data.reactions) {
-                updateReactionButtons(data.reactions, data.tile, data.player);
+    // ===== 5. 摸牌處理 =====
+    if (data.drawnTile && data.player === window.myPosition) {
+        console.log('🀄️ 你摸到:', data.drawnTile);
+        if (data.nextPlayerHand) {
+            window.myHand = sortTiles(data.nextPlayerHand);
+        }
+        checkDarkKong();
+    }
 
-                const myReaction = data.reactions.find(r => r.player === window.myPosition);
+    // ===== 6. reactions 處理 =====
+    if (data.reactions) {
+        updateReactionButtons(data.reactions, data.tile, data.player);
 
-                if (myReaction) {
-                    window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
-                    window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
-                    window.chowFrom = data.player;
-                    window.canDiscard = false;
-                } else {
-                    window.canPongTile = null;
-                    window.canChowTile = null;
-                    window.canDiscard = false;
-                }
-            } else {
-                updateReactionButtons(null);
-                window.canPongTile = null;
-                window.canChowTile = null;
-                window.canDiscard = true;
-            }
-            
-            if (window.gameRenderer) {
-                window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
-                setTimeout(updateAllHandsCount, 10);
-            }
+        const myReaction = data.reactions.find(r => r.player === window.myPosition);
+        if (myReaction) {
+            window.canPongTile = myReaction.actions.includes('PONG') ? data.tile : null;
+            window.canChowTile = myReaction.actions.includes('CHOW') ? data.tile : null;
+            window.chowFrom = data.player;
+            window.canDiscard = false;
+        } else {
+            window.canPongTile = null;
+            window.canChowTile = null;
+            window.canDiscard = false;
+        }
+    } else {
+        updateReactionButtons(null);
+        window.canPongTile = null;
+        window.canChowTile = null;
+        window.canDiscard = true;
+    }
+    
+    // ===== 7. 最後 render =====
+    if (window.gameRenderer) {
+        // 更新 gameRenderer 嘅 gameState
+        if (!window.gameRenderer.gameState) window.gameRenderer.gameState = {};
+        window.gameRenderer.gameState.hands = window.gameState?.hands || {};
+        
+        // render
+        window.gameRenderer.render(window.myHand, window.myPosition, window.discards);
+        setTimeout(updateAllHandsCount, 10);
+    }
 
-            if (window.currentPlayer === window.myPosition) {
-                document.getElementById('selected-tile-hint').style.display = 'block';
-                checkDarkKong();
-            } else {
-                document.getElementById('selected-tile-hint').style.display = 'none';
-            }
-            updateOtherPlayersHands();
-        });
-
+    // ===== 8. 更新 UI =====
+    if (window.currentPlayer === window.myPosition) {
+        document.getElementById('selected-tile-hint').style.display = 'block';
+        checkDarkKong();
+    } else {
+        document.getElementById('selected-tile-hint').style.display = 'none';
+    }
+    
+    // ===== 9. 更新其他玩家手牌顯示 =====
+    updateOtherPlayersHands();
+});
         // ===== 遊戲結束 =====
         socket.on('gameOver', (data) => {
             const modal = document.getElementById('win-modal');
