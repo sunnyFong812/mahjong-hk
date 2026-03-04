@@ -400,6 +400,8 @@ handleKong(playerPosition, tile, targetPosition, isDark = false) {
         });
     }
     
+    // 槓完之後要摸牌 (由 server.js 負責)
+    
     // 槓完之後輪到自己出牌
     this.currentPlayer = playerPosition;
     this.lastDiscard = null;
@@ -415,7 +417,8 @@ handleKong(playerPosition, tile, targetPosition, isDark = false) {
         melds: this.melds,
         currentPlayer: this.currentPlayer
     };
-}  
+}
+  
   // ========== 新增：吃牌處理 ==========
   handleChow(playerPosition, tile, targetPosition, combination) {
     // 檢查是否可以吃（只能吃上家）
