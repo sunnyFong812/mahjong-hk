@@ -924,22 +924,71 @@ function updatePlayerHand(position, playerPos, handTiles) {
     
     container.innerHTML = '';
     
-    if (!handTiles || handTiles.length === 0) {
-        // 顯示背面牌
+    // ===== 1. 先顯示副露牌 (如果有) =====
+    if (window.melds && window.melds[playerPos] && window.melds[playerPos].length > 0) {
+        const playerMelds = window.melds[playerPos];
+        
+        playerMelds.forEach(meld => {
+            // 每組副露牌
+            let tiles = [];
+            if (meld.type === 'PONG') {
+                tiles = [meld.tile, meld.tile, meld.tile];
+            } else if (meld.type === 'CHOW') {
+                tiles = meld.tiles;
+            } else if (meld.type === 'KONG') {
+                tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
+            }
+            
+            // 每組副露牌之間留多啲空間
+            tiles.forEach((tile, idx) => {
+                const tileDiv = document.createElement('div');
+                tileDiv.className = 'meld-tile';
+                tileDiv.textContent = getTileDisplay(tile);
+                tileDiv.style.color = window.gameRenderer?.getTileColor(tile) || '#333';
+                tileDiv.style.marginRight = (idx === tiles.length - 1) ? '10px' : '2px';
+                container.appendChild(tileDiv);
+            });
+        });
+    }
+    
+    // ===== 2. 顯示花牌 (如果有) =====
+    if (window.flowers && window.flowers[playerPos] && window.flowers[playerPos].length > 0) {
+        const playerFlowers = window.flowers[playerPos];
+        
+        // 花牌用細啲嘅樣式
+        playerFlowers.forEach((tile, idx) => {
+            const tileDiv = document.createElement('div');
+            tileDiv.className = 'flower-tile';
+            tileDiv.textContent = getTileDisplay(tile);
+            tileDiv.style.color = '#9c27b0';
+            tileDiv.style.fontSize = '12px';
+            tileDiv.style.width = '20px';
+            tileDiv.style.height = '28px';
+            tileDiv.style.background = '#e0b3ff';
+            tileDiv.style.border = '1px solid #9c27b0';
+            tileDiv.style.borderRadius = '4px';
+            tileDiv.style.display = 'flex';
+            tileDiv.style.alignItems = 'center';
+            tileDiv.style.justifyContent = 'center';
+            tileDiv.style.marginRight = '4px';
+            container.appendChild(tileDiv);
+        });
+    }
+    
+    // ===== 3. 顯示手牌 (牌背) =====
+    if (handTiles && handTiles.length > 0) {
+        for (let i = 0; i < handTiles.length; i++) {
+            const tileDiv = document.createElement('div');
+            tileDiv.className = 'hand-tile';
+            container.appendChild(tileDiv);
+        }
+    } else {
+        // 如果冇手牌資料，顯示 13 張牌背
         for (let i = 0; i < 13; i++) {
             const tileDiv = document.createElement('div');
             tileDiv.className = 'hand-tile';
             container.appendChild(tileDiv);
         }
-        return;
-    }
-    
-    // 顯示手牌 (全部用背面)
-    const tileCount = handTiles.length;
-    for (let i = 0; i < tileCount; i++) {
-        const tileDiv = document.createElement('div');
-        tileDiv.className = 'hand-tile';
-        container.appendChild(tileDiv);
     }
     
     // 更新當前玩家高亮
@@ -950,7 +999,6 @@ function updatePlayerHand(position, playerPos, handTiles) {
         handDiv.classList.remove('current-turn');
     }
 }
-
 // ===== 更新其他玩家名稱 =====
 function updateOtherPlayersNames() {
     if (!window.players) return;
