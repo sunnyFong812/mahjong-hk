@@ -293,7 +293,8 @@
     top: 50%;
     left: 20px;
     transform: translateY(-50%);
-    width: auto;
+    width: 70px;
+    align-items: center;
 }
 
 #left-player-hand .hand-container {
@@ -303,6 +304,7 @@
 
 #left-player-hand .hand-tile {
     transform: rotate(90deg);  /* 旋轉每張牌 */
+    transform-origin: center;
 }
 
 /* 右邊玩家手牌 */
@@ -310,7 +312,8 @@
     top: 50%;
     right: 20px;
     transform: translateY(-50%);
-    width: auto;
+    width: 70px;
+    align-items: center;
 }
 
 #right-player-hand .hand-container {
@@ -320,6 +323,7 @@
 
 #right-player-hand .hand-tile {
     transform: rotate(90deg);  /* 旋轉每張牌 */
+    transform-origin: center;
 }
 
 /* 上方玩家手牌 */
