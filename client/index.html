@@ -1434,7 +1434,7 @@ getMeldsWidth(melds, myPosition) {
                 const y = (e.clientY - rect.top) * scaleY;
                 
                 const startX = this.handStartX;
-                const startY = 650;
+                const startY = 600;
                 
                 for (let i = 0; i < window.myHand.length; i++) {
                     const tileX = startX + i * (this.tileWidth + 3);
@@ -1613,7 +1613,7 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
     
     // 手牌起始位置 (用 renderMeldsAndFlowers 回傳嘅 X 座標)
     const startX = handStartX + 10;  // 留多少少空間
-    const startY = 650;
+    const startY = 600;
     
     hand.forEach((tile, i) => {
         const x = startX + i * (this.tileWidth + 3);
