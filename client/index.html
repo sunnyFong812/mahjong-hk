@@ -1001,13 +1001,20 @@ function updatePlayerHand(position, playerPos, handTiles) {
             container.appendChild(tileDiv);
         }
     } else {
-        // 如果冇手牌資料，顯示 13 張牌背
-        for (let i = 0; i < 13; i++) {
-            const tileDiv = document.createElement('div');
-            tileDiv.className = 'hand-tile';
-            container.appendChild(tileDiv);
-        }
+    // 如果冇手牌資料，根據位置決定顯示張數
+    let defaultCount = 16;  // 預設閒家16張
+    
+    // 如果這個位置是莊家（位置0），顯示17張
+    if (playerPos === 0) {
+        defaultCount = 17;
     }
+    
+    for (let i = 0; i < defaultCount; i++) {
+        const tileDiv = document.createElement('div');
+        tileDiv.className = 'hand-tile';
+        container.appendChild(tileDiv);
+    }
+}
     
     // 更新當前玩家高亮
     const handDiv = document.getElementById(`${position}-player-hand`);
