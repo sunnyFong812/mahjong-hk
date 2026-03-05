@@ -968,8 +968,32 @@ function updatePlayerHand(position, playerPos, handTiles) {
     if (!container) return;
     
     container.innerHTML = '';
+        
+    // ===== 1. 顯示花牌 (如果有) =====
+    if (window.flowers && window.flowers[playerPos] && window.flowers[playerPos].length > 0) {
+        const playerFlowers = window.flowers[playerPos];
+        
+        // 花牌用細啲嘅樣式
+        playerFlowers.forEach((tile, idx) => {
+            const tileDiv = document.createElement('div');
+            tileDiv.className = 'flower-tile';
+            tileDiv.textContent = getTileDisplay(tile);
+            tileDiv.style.color = '#9c27b0';
+            tileDiv.style.fontSize = '12px';
+            tileDiv.style.width = '20px';
+            tileDiv.style.height = '28px';
+            tileDiv.style.background = '#e0b3ff';
+            tileDiv.style.border = '1px solid #9c27b0';
+            tileDiv.style.borderRadius = '4px';
+            tileDiv.style.display = 'flex';
+            tileDiv.style.alignItems = 'center';
+            tileDiv.style.justifyContent = 'center';
+            tileDiv.style.marginRight = '4px';
+            container.appendChild(tileDiv);
+        });
+    }
     
-    // ===== 1. 先顯示副露牌 (如果有) =====
+    // ===== 2. 顯示副露牌 (如果有) =====
     if (window.melds && window.melds[playerPos] && window.melds[playerPos].length > 0) {
         const playerMelds = window.melds[playerPos];
         
@@ -995,31 +1019,7 @@ function updatePlayerHand(position, playerPos, handTiles) {
             });
         });
     }
-    
-    // ===== 2. 顯示花牌 (如果有) =====
-    if (window.flowers && window.flowers[playerPos] && window.flowers[playerPos].length > 0) {
-        const playerFlowers = window.flowers[playerPos];
-        
-        // 花牌用細啲嘅樣式
-        playerFlowers.forEach((tile, idx) => {
-            const tileDiv = document.createElement('div');
-            tileDiv.className = 'flower-tile';
-            tileDiv.textContent = getTileDisplay(tile);
-            tileDiv.style.color = '#9c27b0';
-            tileDiv.style.fontSize = '12px';
-            tileDiv.style.width = '20px';
-            tileDiv.style.height = '28px';
-            tileDiv.style.background = '#e0b3ff';
-            tileDiv.style.border = '1px solid #9c27b0';
-            tileDiv.style.borderRadius = '4px';
-            tileDiv.style.display = 'flex';
-            tileDiv.style.alignItems = 'center';
-            tileDiv.style.justifyContent = 'center';
-            tileDiv.style.marginRight = '4px';
-            container.appendChild(tileDiv);
-        });
-    }
-    
+
     // ===== 3. 顯示手牌 (牌背) =====
     if (handTiles && handTiles.length > 0) {
         for (let i = 0; i < handTiles.length; i++) {
