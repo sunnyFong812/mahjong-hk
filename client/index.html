@@ -299,7 +299,7 @@
 
 #left-player-hand .hand-container {
     flex-direction: column;
-    gap:0.01px;
+    gap:4px;
     width: 40px;
     height: auto;
 }
@@ -334,6 +334,9 @@
 
 #right-player-hand .hand-container {
     flex-direction: column;
+    gap:4px;
+    width: 40px;
+    height: auto;
 }
 
 #right-player-hand .hand-tile {
@@ -342,7 +345,19 @@
     width: 30px;         /* 保持不變 */
     height: 40px;         /* 保持不變 */
     flex-shrink: 0;
+    margin: -5px 0;
 }
+
+/* 第一張牌不用負 margin */
+#right-player-hand .hand-tile:first-child {
+    margin-top: 0;
+}
+
+/* 最後一張牌也不用負 margin */
+#right-player-hand .hand-tile:last-child {
+    margin-bottom: 0;
+}
+
 
 /* 上方玩家手牌 */
 #top-player-hand {
@@ -702,7 +717,7 @@
         <!-- 遊戲畫面 -->
         <div id="game-screen" class="screen" style="display: none;">
             <!-- 玩家手牌數顯示 -->
-            <div class="players-hand-count">
+        <!--<div class="players-hand-count">
                 <div class="player-hand" id="player0-hand">東: 0</div>
                 <div class="player-hand" id="player1-hand">南: 0</div>
                 <div class="player-hand" id="player2-hand">西: 0</div>
