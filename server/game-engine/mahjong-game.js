@@ -493,8 +493,8 @@ handleKong(playerPosition, tile, targetPosition, isDark = false) {
     // 檢查是否可以吃（只能吃上家）
     console.log('🔥 handleChow 被 call!', {playerPosition, tile, targetPosition, combination});
     console.log(`🔍 targetPosition: ${targetPosition}, playerPosition: ${playerPosition}`);
-console.log(`🔍 計算上家: (${targetPosition} + 3) % 4 = ${(targetPosition + 3) % 4}`);
-    const isUpperSeat = (targetPosition + 3) % 4 === playerPosition;
+console.log(`🔍 計算上家: (${targetPosition} + 1) % 4 = ${(targetPosition + 1) % 4}`);
+    const isUpperSeat = (targetPosition + 1) % 4 === playerPosition;
     console.log('🔥 isUpperSeat:', isUpperSeat);
     if (!isUpperSeat) return { error: '只能吃上家' };
     
