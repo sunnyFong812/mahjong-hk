@@ -1481,7 +1481,7 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
     // ===== 1. 先畫花牌 (size 50%) =====
     if (flowers && flowers[myPosition] && flowers[myPosition].length > 0) {
         const myFlowers = flowers[myPosition];
-        const flowerY = 565;  // 比手牌稍為提高
+        const flowerY = 600;  // 比手牌稍為提高
         
         myFlowers.forEach((tile) => {
             // 花牌 size 一半 (14x19)
@@ -1505,7 +1505,7 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
     // ===== 2. 畫副露牌 (正常 size) =====
     if (melds && melds[myPosition]) {
         const myMelds = melds[myPosition];
-        const meldY = 550;
+        const meldY = 600;
         
         myMelds.forEach((meld) => {
             let tiles = [];
