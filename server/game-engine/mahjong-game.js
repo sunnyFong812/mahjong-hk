@@ -361,7 +361,7 @@ getChowCombinations(playerPosition, tile) {
 const reactionPlayers = reactions.map(r => `玩家 ${r.player}`).join(', ');
 console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
     } else {
-      this.currentPlayer = (playerPosition + 3) % 4;
+      this.currentPlayer = (playerPosition + 1) % 4;
       result.currentPlayer = this.currentPlayer;
       this.pendingReaction = false;
       console.log(`🔁 打完牌後 currentPlayer 由 ${playerPosition} 轉為 ${this.currentPlayer}`);
@@ -559,7 +559,7 @@ this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
   handlePass(playerPosition) {
     // 如果冇 lastDiscard，正常轉下家
     if (!this.lastDiscard) {
-        this.currentPlayer = (playerPosition + 3) % 4;
+        this.currentPlayer = (playerPosition + 1) % 4;
         this.pendingReaction = false;
         this.currentReactionLevel = null;
         return {
@@ -642,7 +642,7 @@ getNextLevel(currentLevel) {
   }
 
   nextTurn() {
-    this.currentPlayer = (this.currentPlayer + 3) % 4;
+    this.currentPlayer = (this.currentPlayer + 1) % 4;
   }
 
   getState() {
