@@ -1059,16 +1059,16 @@ function updateOtherPlayersNames() {
     const windMap = ['東', '南', '西', '北'];
     
     // 左邊玩家 (下家)
-    const leftPos = (myPos + 1) % 4;
-    updatePlayerName('left', leftPos, windMap[1]);
+    const leftPos = (myPos + 3) % 4;
+    updatePlayerName('left', leftPos, windMap[3]);
     
     // 上方玩家 (對家)
     const topPos = (myPos + 2) % 4;
     updatePlayerName('top', topPos, windMap[2]);
     
     // 右邊玩家 (上家)
-    const rightPos = (myPos + 3) % 4;
-    updatePlayerName('right', rightPos, windMap[3]);
+    const rightPos = (myPos + 1) % 4;
+    updatePlayerName('right', rightPos, windMap[1]);
 }
 
 function updatePlayerName(position, playerPos, wind) {
