@@ -310,7 +310,17 @@
     width: 30px;         /* 保持不變 */
     height: 40px;         /* 保持不變 */
     flex-shrink: 0;
-    padding: 0 10px;
+    margin: -5px 0;
+}
+
+/* 第一張牌不用負 margin */
+#left-player-hand .hand-tile:first-child {
+    margin-top: 0;
+}
+
+/* 最後一張牌也不用負 margin */
+#left-player-hand .hand-tile:last-child {
+    margin-bottom: 0;
 }
 
 /* 右邊玩家手牌 */
