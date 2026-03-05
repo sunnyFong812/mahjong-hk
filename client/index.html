@@ -950,16 +950,16 @@ function updateOtherPlayersHands() {
     const myPos = window.myPosition;
     const hands = window.gameRenderer.gameState.hands;
     
-    // 左邊玩家 (下家: myPos + 1)
-    const leftPos = (myPos + 1) % 4;
+    // 左邊玩家 (下家: myPos + 3)
+    const leftPos = (myPos + 3) % 4;
     updatePlayerHand('left', leftPos, hands[leftPos]);
     
     // 上方玩家 (對家: myPos + 2)
     const topPos = (myPos + 2) % 4;
     updatePlayerHand('top', topPos, hands[topPos]);
     
-    // 右邊玩家 (上家: myPos + 3)
-    const rightPos = (myPos + 3) % 4;
+    // 右邊玩家 (上家: myPos + 1)
+    const rightPos = (myPos + 1) % 4;
     updatePlayerHand('right', rightPos, hands[rightPos]);
 }
 
