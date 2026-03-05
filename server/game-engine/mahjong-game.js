@@ -288,7 +288,7 @@ getChowCombinations(playerPosition, tile) {
     // 吃
     if (level === 'chow') {
         const chowReactions = [];
-        const upperPlayer = (discardPlayer + 3) % 4;
+        const upperPlayer = (discardPlayer + 1) % 4;
         if (this.canChow(upperPlayer, tile)) {
             chowReactions.push({
                 player: upperPlayer,
