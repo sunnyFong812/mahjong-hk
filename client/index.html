@@ -609,6 +609,66 @@
             #selected-tile-hint {
                 bottom: 150px;
             }
+            /* 左右玩家手牌變細 */
+    #left-player-hand .hand-tile,
+    #right-player-hand .hand-tile {
+        width: 18px;      /* 由 30px 改為 18px */
+        height: 24px;      /* 由 40px 改為 24px */
+    }
+    
+    #left-player-hand .hand-tile::after,
+    #right-player-hand .hand-tile::after {
+        width: 12px;       /* 由 20px 改為 12px */
+        height: 16px;      /* 由 25px 改為 16px */
+    }
+    
+    /* 左右玩家嘅副露牌都跟住變細 */
+    #left-player-hand .meld-tile,
+    #right-player-hand .meld-tile {
+        width: 18px;
+        height: 24px;
+        font-size: 10px;
+    }
+    
+    /* 左右玩家嘅花牌都變細 */
+    #left-player-hand .flower-tile,
+    #right-player-hand .flower-tile {
+        width: 14px;
+        height: 20px;
+        font-size: 8px;
+    }
+    
+    /* 調整左右玩家容器寬度 */
+    #left-player-hand,
+    #right-player-hand {
+        width: 45px;       /* 由 70px 改為 45px */
+        left: 10px;        /* 調整位置 */
+        right: 10px;
+    }
+    
+    /* 右邊玩家靠右 */
+    #right-player-hand {
+        left: auto;
+        right: 10px;
+    }
+    
+    /* 調整手牌間距 */
+    #left-player-hand .hand-container,
+    #right-player-hand .hand-container {
+        gap: 1px;
+    }
+    
+    /* 上方玩家手牌都變細 (可選) */
+    #top-player-hand .hand-tile {
+        width: 18px;
+        height: 24px;
+    }
+    
+    #top-player-hand .hand-tile::after {
+        width: 12px;
+        height: 16px;
+    }
+    
         }
 
         /* ===== 手機直屏優化 ===== */
