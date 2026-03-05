@@ -288,7 +288,7 @@ getChowCombinations(playerPosition, tile) {
     // 吃
     if (level === 'chow') {
         const chowReactions = [];
-        const upperPlayer = (discardPlayer + 1) % 4;
+        const upperPlayer = (discardPlayer + 3) % 4;
         if (this.canChow(upperPlayer, tile)) {
             chowReactions.push({
                 player: upperPlayer,
@@ -361,7 +361,7 @@ getChowCombinations(playerPosition, tile) {
 const reactionPlayers = reactions.map(r => `玩家 ${r.player}`).join(', ');
 console.log(`⏸️ 有 reaction (${reactionPlayers})，暫停回合`);
     } else {
-      this.currentPlayer = (playerPosition + 1) % 4;
+      this.currentPlayer = (playerPosition + 3) % 4;
       result.currentPlayer = this.currentPlayer;
       this.pendingReaction = false;
       console.log(`🔁 打完牌後 currentPlayer 由 ${playerPosition} 轉為 ${this.currentPlayer}`);
@@ -493,8 +493,8 @@ handleKong(playerPosition, tile, targetPosition, isDark = false) {
     // 檢查是否可以吃（只能吃上家）
     console.log('🔥 handleChow 被 call!', {playerPosition, tile, targetPosition, combination});
     console.log(`🔍 targetPosition: ${targetPosition}, playerPosition: ${playerPosition}`);
-console.log(`🔍 計算上家: (${targetPosition} + 1) % 4 = ${(targetPosition + 1) % 4}`);
-    const isUpperSeat = (targetPosition + 1) % 4 === playerPosition;
+console.log(`🔍 計算上家: (${targetPosition} + 3) % 4 = ${(targetPosition + 3) % 4}`);
+    const isUpperSeat = (targetPosition + 3) % 4 === playerPosition;
     console.log('🔥 isUpperSeat:', isUpperSeat);
     if (!isUpperSeat) return { error: '只能吃上家' };
     
@@ -559,7 +559,7 @@ this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
   handlePass(playerPosition) {
     // 如果冇 lastDiscard，正常轉下家
     if (!this.lastDiscard) {
-        this.currentPlayer = (playerPosition + 1) % 4;
+        this.currentPlayer = (playerPosition + 3) % 4;
         this.pendingReaction = false;
         this.currentReactionLevel = null;
         return {
@@ -600,7 +600,7 @@ this.hands[playerPosition] = newHand.sort((a, b) => a.localeCompare(b));
     }
     
     // 冇晒 reaction，轉下家
-    this.currentPlayer = (this.lastDiscard.player + 1) % 4;
+    this.currentPlayer = (this.lastDiscard.player + 3) % 4;
     this.pendingReaction = false;
     this.currentReactionLevel = null;
     
@@ -642,7 +642,7 @@ getNextLevel(currentLevel) {
   }
 
   nextTurn() {
-    this.currentPlayer = (this.currentPlayer + 1) % 4;
+    this.currentPlayer = (this.currentPlayer + 3) % 4;
   }
 
   getState() {
