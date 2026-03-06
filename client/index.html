@@ -1152,7 +1152,7 @@ function updatePlayerName(position, playerPos, wind) {
         const player = window.players[playerPos];
         // 如果係真人，顯示佢嘅名稱；如果係 AI，顯示 AI 名稱
         const displayName = player.isAI ? player.name : player.name;  // player.name 已經有用戶名
-        nameEl.textContent = `${wind}: ${displayName}`;
+        nameEl.textContent = `${wind}: ${player.name}`;
     } else {
         nameEl.textContent = `${wind}: 等待中`;
     }
