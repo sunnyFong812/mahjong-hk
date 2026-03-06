@@ -1174,12 +1174,19 @@ function updatePlayerName(position, playerPos, wind) {
             window.flowers = data.flowers || { 0: [], 1: [], 2: [], 3: [] };
             console.log('🎮 gameStart flowers:', data.flowers);
             
-            window.players = data.players || [
-                { name: '玩家', isAI: false },
-                { name: '🤖 阿倫', isAI: true },
-                { name: '🤖 阿東', isAI: true },
-                { name: '🤖 阿北', isAI: true }
-            ];
+           if (data.players) {
+        window.players = data.players;
+        console.log('👥 收到 players:', window.players);
+    } else {
+        // 如果 server 冇傳 players，先用 default AI
+        window.players = [
+            { name: '玩家', isAI: false },
+            { name: '🤖 阿倫', isAI: true },
+            { name: '🤖 阿東', isAI: true },
+            { name: '🤖 阿北', isAI: true }
+        ];
+        console.log('👥 用 default players:', window.players);
+    }
             
             document.getElementById('wind-display').textContent = `門風: ${data.wind}`;
             document.getElementById('wall-size').textContent = `剩牌: ${data.wallSize || 68}`;
