@@ -1540,79 +1540,6 @@ getMeldsWidth(melds, myPosition) {
             }
             
             // 畫副露牌同花牌
-renderMeldsAndFlowers(melds, flowers, myPosition) {
-    let currentX = 20;  // 最左邊起始
-    
-    // ===== 1. 先畫花牌 (size 50%) =====
-    if (flowers && flowers[myPosition] && flowers[myPosition].length > 0) {
-        const myFlowers = flowers[myPosition];
-        const flowerY = 600;  // 比手牌稍為提高
-        
-        myFlowers.forEach((tile) => {
-            // 花牌 size 一半 (14x19)
-            this.ctx.fillStyle = '#e0b3ff';
-            this.ctx.fillRect(currentX, flowerY, 14, 19);
-            
-            this.ctx.strokeStyle = '#9c27b0';
-            this.ctx.lineWidth = 1;
-            this.ctx.strokeRect(currentX, flowerY, 14, 19);
-            
-            this.ctx.fillStyle = '#9c27b0';
-            this.ctx.font = '10px "PingFang HK"';
-            this.ctx.fillText(this.getTileDisplay(tile), currentX + 2, flowerY + 12);
-            
-            currentX += 16;  // 14 + 2 間距
-        });
-        
-        currentX += 10;  // 花牌同副露之間留空位
-    }
-    
-    // ===== 2. 畫副露牌 (正常 size) =====
-    if (melds && melds[myPosition]) {
-        const myMelds = melds[myPosition];
-        const meldY = 600;
-        
-        myMelds.forEach((meld) => {
-            let tiles = [];
-            if (meld.type === 'PONG') {
-                tiles = [meld.tile, meld.tile, meld.tile];
-            } else if (meld.type === 'CHOW') {
-                tiles = meld.tiles;
-            } else if (meld.type === 'KONG') {
-                tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
-            }
-            
-            tiles.forEach((tile) => {
-                // 暗槓用灰色
-                if (meld.type === 'KONG' && meld.isDark) {
-                    this.ctx.fillStyle = '#e0e0e0';
-                } else {
-                    this.ctx.fillStyle = '#f8f9fa';
-                }
-                this.ctx.fillRect(currentX, meldY, 28, 38);
-                
-                this.ctx.strokeStyle = '#333';
-                this.ctx.lineWidth = 1;
-                this.ctx.strokeRect(currentX, meldY, 28, 38);
-                
-                if (meld.type === 'KONG' && meld.isDark) {
-                    this.ctx.fillStyle = '#888';
-                } else {
-                    this.ctx.fillStyle = this.getTileColor(tile);
-                }
-                this.ctx.font = '14px "PingFang HK"';
-                this.ctx.fillText(this.getTileDisplay(tile), currentX + 4, meldY + 25);
-                
-                currentX += 30;
-            });
-            
-            currentX += 5;
-        });
-    }
-    
-    // 返回手牌應該開始嘅 X 座標
-    return currentX;
-}
             
             renderDiscardArea(discards) {
                 if (!discards) return;
@@ -1661,27 +1588,104 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
                 }
             }
             
-            render(hand, myPosition, discards) {
+   render(hand, myPosition, discards) {
     this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     
+    // 背景
     this.ctx.fillStyle = '#2a6f2a';
     this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
     
+    // 畫棄牌區
     this.renderDiscardArea(discards);
     
-    // ===== 畫花牌 + 副露牌，並取得手牌起始 X 座標 =====
-    const handStartX = this.renderMeldsAndFlowers(window.melds, window.flowers, myPosition);
-    this.handStartX = handStartX + 10;
-    this.ctx.fillStyle = 'white';
-    this.ctx.font = '20px Arial';
-    this.ctx.fillText(`手牌: ${hand.length} 張`, 20, 50);
+    // ===== 計算所有元素嘅總寬度 =====
+    let totalWidth = 0;
     
-    // 手牌起始位置 (用 renderMeldsAndFlowers 回傳嘅 X 座標)
-    const startX = handStartX + 10;  // 留多少少空間
+    // 1. 花牌寬度
+    if (window.flowers && window.flowers[myPosition] && window.flowers[myPosition].length > 0) {
+        totalWidth += window.flowers[myPosition].length * 16; // 每張花牌 16px
+        totalWidth += 10; // 同副露之間嘅間距
+    }
+    
+    // 2. 副露牌寬度
+    if (window.melds && window.melds[myPosition]) {
+        const myMelds = window.melds[myPosition];
+        myMelds.forEach((meld) => {
+            const tileCount = meld.type === 'KONG' ? 4 : 3;
+            totalWidth += tileCount * 30; // 每張副露牌 30px
+            totalWidth += 5; // 組之間間距
+        });
+    }
+    
+    // 3. 手牌寬度
+    totalWidth += hand.length * (this.tileWidth + 3);
+    
+    // ===== 計算起始 X 座標（令整體置中） =====
+    const centerX = this.canvas.width / 2;
+    let currentX = centerX - (totalWidth / 2);
+    
+    // ===== 1. 畫花牌 =====
+    if (window.flowers && window.flowers[myPosition] && window.flowers[myPosition].length > 0) {
+        const myFlowers = window.flowers[myPosition];
+        const flowerY = 600;
+        
+        myFlowers.forEach((tile) => {
+            // 花牌
+            this.ctx.fillStyle = '#e0b3ff';
+            this.ctx.fillRect(currentX, flowerY, 14, 19);
+            
+            this.ctx.strokeStyle = '#9c27b0';
+            this.ctx.strokeRect(currentX, flowerY, 14, 19);
+            
+            this.ctx.fillStyle = '#9c27b0';
+            this.ctx.font = '10px "PingFang HK"';
+            this.ctx.fillText(this.getTileDisplay(tile), currentX + 2, flowerY + 12);
+            
+            currentX += 16;
+        });
+        
+        currentX += 10; // 花牌同副露之間嘅間距
+    }
+    
+    // ===== 2. 畫副露牌 =====
+    if (window.melds && window.melds[myPosition]) {
+        const myMelds = window.melds[myPosition];
+        const meldY = 600;
+        
+        myMelds.forEach((meld) => {
+            let tiles = [];
+            if (meld.type === 'PONG') {
+                tiles = [meld.tile, meld.tile, meld.tile];
+            } else if (meld.type === 'CHOW') {
+                tiles = meld.tiles;
+            } else if (meld.type === 'KONG') {
+                tiles = [meld.tile, meld.tile, meld.tile, meld.tile];
+            }
+            
+            tiles.forEach((tile) => {
+                this.ctx.fillStyle = '#f8f9fa';
+                this.ctx.fillRect(currentX, meldY, 28, 38);
+                
+                this.ctx.strokeStyle = '#333';
+                this.ctx.strokeRect(currentX, meldY, 28, 38);
+                
+                this.ctx.fillStyle = this.getTileColor(tile);
+                this.ctx.font = '14px "PingFang HK"';
+                this.ctx.fillText(this.getTileDisplay(tile), currentX + 4, meldY + 25);
+                
+                currentX += 30;
+            });
+            
+            currentX += 5; // 組之間間距
+        });
+    }
+    
+    // ===== 3. 畫手牌 =====
     const startY = 600;
+    const handStartX = currentX; // 手牌起始位置
     
     hand.forEach((tile, i) => {
-        const x = startX + i * (this.tileWidth + 3);
+        const x = handStartX + i * (this.tileWidth + 3);
         
         this.ctx.fillStyle = '#f8f9fa';
         this.ctx.fillRect(x, startY, this.tileWidth, this.tileHeight);
@@ -1695,15 +1699,21 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
         this.ctx.fillText(this.getTileDisplay(tile), x + 5, startY + 40);
     });
     
+    // 記低手牌起始位置（俾 handleClick 用）
+    this.handStartX = handStartX;
+    
+    // 其他玩家文字
     this.ctx.fillStyle = 'white';
     this.ctx.font = '18px Arial';
+    this.ctx.fillText('其他玩家', 500, 200);
     
+    // 當前玩家
     this.ctx.fillStyle = window.currentPlayer === myPosition ? 'gold' : 'white';
     this.ctx.fillText(`當前玩家: ${window.currentPlayer === myPosition ? '👈 你' : '其他'}`, 500, 160);
     
+    // 更新 gameState
     if (!this.gameState) this.gameState = {};
     if (!this.gameState.hands) this.gameState.hands = {};
-    
     this.gameState.hands[myPosition] = hand;
     
     if (window.gameState && window.gameState.hands) {
@@ -1718,8 +1728,7 @@ renderMeldsAndFlowers(melds, flowers, myPosition) {
         setTimeout(updateAllHandsCount, 5);
     }
 }
-        }
-        // ===== 按鈕函數 =====
+            // ===== 按鈕函數 =====
         window.joinRoom = function() {
             const name = document.getElementById('player-name').value.trim();
             const room = document.getElementById('room-id').value.trim();
