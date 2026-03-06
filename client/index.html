@@ -945,6 +945,10 @@
             console.log('📦 房間更新', data);
 
             window.currentRoom = data.roomId;
+            // 更新 players 資料
+    if (data.players) {
+        window.players = data.players;
+    }
             console.log('✅ currentRoom 已設為:', window.currentRoom);
 
             for (let i = 0; i < 4; i++) {
@@ -976,6 +980,10 @@
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('lobby-screen').style.display = 'block';
             document.getElementById('display-room-id').textContent = data.roomId;
+
+            if (document.getElementById('game-screen').style.display === 'block') {
+        updateOtherPlayersNames();
+    }
         });
 
         // ===== 更新手牌數顯示 =====
@@ -1140,10 +1148,11 @@ function updatePlayerName(position, playerPos, wind) {
     const nameEl = document.getElementById(`${position}-player-name`);
     if (!nameEl) return;
     
-    if (window.players[playerPos]) {
+    if (window.players && window.players[playerPos]) {
         const player = window.players[playerPos];
-        const name = player.isAI ? player.name : '玩家';
-        nameEl.textContent = `${wind}: ${name}`;
+        // 如果係真人，顯示佢嘅名稱；如果係 AI，顯示 AI 名稱
+        const displayName = player.isAI ? player.name : player.name;  // player.name 已經有用戶名
+        nameEl.textContent = `${wind}: ${displayName}`;
     } else {
         nameEl.textContent = `${wind}: 等待中`;
     }
