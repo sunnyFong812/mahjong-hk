@@ -169,7 +169,8 @@ function startGame(room) {
         currentPlayer: init.currentPlayer,
         discards: init.discards,
         wallSize: init.wallSize,
-        flowers: room.game.flowers
+        flowers: room.game.flowers,
+        players: room.players 
       });
     }
   });
